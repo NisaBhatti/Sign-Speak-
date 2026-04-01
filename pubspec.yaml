@@ -1,0 +1,52 @@
+name: signspeak
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.0.0 # Changed to a more standard version; adjust if you specifically need 3.9
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  camera: ^0.10.0+4
+  
+  # Firebase dependencies
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.15.5
+  firebase_storage: ^11.6.0
+  
+  # State management and utilities
+  shared_preferences: ^2.2.2
+  provider: ^6.1.1
+  google_sign_in: ^6.1.5
+  
+  # UI and image handling
+  image_picker: ^1.0.5
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.9
+  
+  # Navigation
+  go_router: ^13.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/logo.png
+    - assets/images/image1.png
+    - assets/images/image2.png
+    - assets/images/image3.png
+    - assets/images/wel.png
+    - assets/images/real.png
+    - assets/images/communi.png
+    - assets/images/communi.png
