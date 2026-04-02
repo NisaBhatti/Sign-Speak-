@@ -1,23 +1,124 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  // Color scheme matching your sign-up screen
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // Color scheme matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color color4 = Color(0xFF6CC2C0);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+  
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
+  String? userName;
+  String? userEmail;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+  
+  Future<void> _loadUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    
+    if (user != null) {
+      try {
+        // Try to get user data from Firestore
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        
+        if (doc.exists) {
+          setState(() {
+            userData = doc.data();
+            userName = userData?['name'] ?? user.displayName;
+            userEmail = userData?['email'] ?? user.email;
+            isLoading = false;
+          });
+        } else {
+          // If no Firestore document, use Firebase Auth data
+          setState(() {
+            userName = user.displayName;
+            userEmail = user.email;
+            isLoading = false;
+          });
+        }
+      } catch (e) {
+        print('Error loading user data: $e');
+        setState(() {
+          userName = user.displayName;
+          userEmail = user.email;
+          isLoading = false;
+        });
+      }
+    } else {
+      // Guest user
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/welcome');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signed out successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing out: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+  
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null;
+    
     return Scaffold(
       backgroundColor: color1,
-      drawer: const DrawerPage(),
+      drawer: DrawerPage(
+        userName: userName ?? (isGuest ? null : 'User'),
+        userEmail: userEmail,
+        isGuest: isGuest,
+        onSignOut: () => _signOut(context),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -38,7 +139,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Hamburger menu on left - FIXED: Using Builder widget
+                    // Hamburger menu on left
                     Builder(
                       builder: (context) => Container(
                         decoration: BoxDecoration(
@@ -47,7 +148,6 @@ class HomeScreen extends StatelessWidget {
                         ),
                         child: IconButton(
                           onPressed: () {
-                            // FIXED: Open drawer using the context from Builder
                             Scaffold.of(context).openDrawer();
                           },
                           icon: Icon(Icons.menu, color: marineBlue, size: 22),
@@ -59,7 +159,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
+                    
                     // App title in center
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
@@ -72,35 +172,89 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // Empty container to maintain balance
-                    Container(
-                      width: 48, // Same width as left icon for symmetry
-                    ),
+                    
+                    // Profile icon or sign out button
+                    if (!isGuest)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: marineBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            _showProfileDialog();
+                          },
+                          icon: Icon(Icons.person_outline, color: marineBlue, size: 22),
+                          padding: const EdgeInsets.all(6),
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
+                        ),
+                      )
+                    else
+                      Container(width: 48), // Empty container for balance
                   ],
                 ),
               ),
-
-              // Welcome Text
+              
+              // Welcome Section with User Info
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'What would you like\nto do today?',
+                      _getGreeting(),
                       style: TextStyle(
-                        color: marineBlue,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
+                        color: lightBlue,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
+                    if (!isGuest && !isLoading)
+                      Text(
+                        userName ?? 'User',
+                        style: TextStyle(
+                          color: marineBlue,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      )
+                    else if (isGuest)
+                      Text(
+                        'Welcome!',
+                        style: TextStyle(
+                          color: marineBlue,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      )
+                    else
+                      const SizedBox(
+                        height: 28,
+                        width: 28,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'What would you like to do today?',
+                      style: TextStyle(
+                        color: marineBlue.withOpacity(0.7),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-
+              
               // Feature Cards
               Expanded(
                 child: Padding(
@@ -108,13 +262,16 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // 1st: Real-Time Signs - Navigates to CameraScreen
-                      _buildSmallFeatureCard(
+                      // 1st: Real-Time Signs
+                      _buildFeatureCard(
                         title: 'Real-Time Signs',
                         subtitle: 'Start camera detection',
+                        description: 'Translate sign language in real-time',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), color2],
+                          colors: [marineBlue, marineBlue.withOpacity(0.8)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         onTap: () {
                           Navigator.push(
@@ -125,14 +282,17 @@ class HomeScreen extends StatelessWidget {
                           );
                         },
                       ),
-
+                      
                       // 2nd: Signs Dictionary
-                      _buildSmallFeatureCard(
+                      _buildFeatureCard(
                         title: 'Signs Dictionary',
                         subtitle: 'Browse over 1,000 signs',
+                        description: 'Learn and practice sign language',
                         icon: Icons.menu_book_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue, lightBlue],
+                          colors: [lightBlue, marineBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         onTap: () {
                           Navigator.push(
@@ -143,24 +303,39 @@ class HomeScreen extends StatelessWidget {
                           );
                         },
                       ),
-
+                      
                       // 3rd: Favorites
-                      _buildSmallFeatureCard(
+                      _buildFeatureCard(
                         title: 'Favorites',
                         subtitle: 'Access your saved phrases',
+                        description: isGuest 
+                            ? 'Sign in to save favorites'
+                            : 'Quick access to your favorite signs',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          colors: [marineBlue, lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          print('Favorites tapped');
+                          if (isGuest) {
+                            _showGuestDialog();
+                          } else {
+                            // Navigate to favorites page
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Favorites feature coming soon!'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                          }
                         },
                       ),
                     ],
                   ),
                 ),
               ),
-
+              
               // Small bottom padding
               const SizedBox(height: 20),
             ],
@@ -169,10 +344,11 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildSmallFeatureCard({
+  
+  Widget _buildFeatureCard({
     required String title,
     required String subtitle,
+    required String description,
     required IconData icon,
     required Gradient gradient,
     VoidCallback? onTap,
@@ -180,15 +356,15 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 100,
+        height: 120,
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: marineBlue.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -197,16 +373,16 @@ class HomeScreen extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 24,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: 16),
@@ -219,7 +395,7 @@ class HomeScreen extends StatelessWidget {
                       title,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -231,18 +407,153 @@ class HomeScreen extends StatelessWidget {
                         fontSize: 12,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward,
-                color: Colors.white.withOpacity(0.8),
-                size: 20,
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 18,
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+  
+  void _showProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.person, color: marineBlue),
+              const SizedBox(width: 8),
+              Text(
+                'Profile',
+                style: TextStyle(color: marineBlue),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow(Icons.person_outline, 'Name', userName ?? 'Not set'),
+              const Divider(),
+              _buildInfoRow(Icons.email_outlined, 'Email', userEmail ?? 'Not set'),
+              const Divider(),
+              _buildInfoRow(Icons.calendar_today, 'Member Since', '2024'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close', style: TextStyle(color: marineBlue)),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await _signOut(context);
+              },
+              child: Text(
+                'Sign Out',
+                style: TextStyle(color: Colors.red.shade700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: lightBlue),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: marineBlue,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _showGuestDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              const SizedBox(width: 8),
+              const Text('Guest Mode'),
+            ],
+          ),
+          content: const Text(
+            'Sign in to save your favorite signs and access them across devices!',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: marineBlue,
+              ),
+              child: const Text('Sign In'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
