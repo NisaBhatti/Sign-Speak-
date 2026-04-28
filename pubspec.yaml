@@ -1,0 +1,67 @@
+name: signspeak
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"  # More specific version range
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI Icons
+  cupertino_icons: ^1.0.8
+  
+  # Camera
+  camera: ^0.10.5
+  
+  # Firebase - Using BoM (Bill of Materials) recommended versions
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  cloud_firestore: ^5.5.0
+  firebase_storage: ^12.3.3
+  
+  # State management and utilities
+  shared_preferences: ^2.3.2
+  provider: ^6.1.2
+  google_sign_in: ^6.2.2
+  
+  # UI and image handling
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+  flutter_svg: ^2.0.10+1
+  
+  # Navigation
+  go_router: ^14.2.8
+  
+  # Add these for better compatibility
+  flutter_plugin_android_lifecycle: ^2.0.21
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/logo.png
+    - assets/images/image1.png
+    - assets/images/image2.png
+    - assets/images/image3.png
+    - assets/images/wel.png
+    - assets/images/real.png
+    - assets/images/communi.png
+    
+  # Optional: Add fonts if needed
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
