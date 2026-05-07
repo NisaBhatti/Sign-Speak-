@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'signup.dart';
 import 'homepage.dart';
+import 'forgot.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -141,7 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return true;
   }
 
-  // Add a method to check if user is already logged in
   @override
   void initState() {
     super.initState();
@@ -152,17 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       print('User already logged in: ${user.email}');
-      // Optional: Auto-navigate to home
-      // Future.microtask(() {
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => const HomeScreen()),
-      //   );
-      // });
     }
   }
 
-  // [REST OF YOUR EXISTING BUILD METHOD AND HELPER WIDGETS REMAIN THE SAME]
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -263,13 +255,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
 
-                        // Forgot Password
+                        // Forgot Password Link - UPDATED to navigate to new screen
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
-                              _showForgotPasswordDialog();
+                              // Navigate to ForgotPasswordScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Forgot(),
+                                ),
+                              );
                             },
                             child: Text(
                               'Forgot Password?',
@@ -381,81 +379,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showForgotPasswordDialog() {
-    final TextEditingController resetEmailController = TextEditingController();
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Reset Password',
-            style: TextStyle(color: darkBlue),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter your email address to receive a password reset link.'),
-              const SizedBox(height: 16),
-              TextField(
-                controller: resetEmailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'example@gmail.com',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final email = resetEmailController.text.trim().toLowerCase();
-                if (email.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please enter your email')),
-                  );
-                  return;
-                }
-                
-                try {
-                  await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password reset email sent! Check your inbox.'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } catch (e) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to send reset email: ${e.toString()}'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: darkBlue,
-              ),
-              child: const Text('Send Reset Link'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Your existing helper widgets remain exactly the same
   Widget _buildFloatingLabelTextField({
     required TextEditingController controller,
     required String labelText,
