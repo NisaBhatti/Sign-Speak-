@@ -91,9 +91,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-       initialRoute: '/',
+      home: const SplashScreen(), // Start with SplashScreen directly
       routes: {
-        '/': (context) => const AuthWrapper(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
@@ -104,51 +103,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ====================== AUTH WRAPPER ======================
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashScreen();
-        }
-        
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-        
-        return FutureBuilder<bool>(
-          future: _checkFirstLaunch(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SplashScreen();
-            }
-            if (snapshot.data == true) {
-              return const OnboardingScreen();
-            }
-            return const WelcomeScreen();
-          },
-        );
-      },
-    );
-  }
-
-  Future<bool> _checkFirstLaunch() async {
-    final prefs = await SharedPreferences.getInstance();
-    final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-    if (isFirstLaunch) {
-      await prefs.setBool('isFirstLaunch', false);
-      return true;
-    }
-    return false;
-  }
-}
-
-// ====================== SPLASH SCREEN ======================
+// ====================== SPLASH SCREEN (Fixed) ======================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -160,32 +115,51 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-   _checkFirstLaunch();
+    _initializeApp();
   }
-Future<void> _checkFirstLaunch() async {
+
+  Future<void> _initializeApp() async {
     try {
+      // Check if it's first launch
       final prefs = await SharedPreferences.getInstance();
       final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-
-      Timer(const Duration(seconds: 3), () {
-        if (isFirstLaunch) {
+      
+      // Wait for 2 seconds to show splash screen
+      await Future.delayed(const Duration(seconds: 2));
+      
+      // Mark as not first launch if it was first launch
+      if (isFirstLaunch) {
+        await prefs.setBool('isFirstLaunch', false);
+        
+        if (mounted) {
+          // Navigate to onboarding for first time users
           Navigator.pushReplacementNamed(context, '/onboarding');
-          prefs.setBool('isFirstLaunch', false);
-        } else {
-          Navigator.pushReplacementNamed(context, '/welcome');
         }
-      });
+      } else {
+        // Check authentication status after showing splash
+        final user = FirebaseAuth.instance.currentUser;
+        
+        if (mounted) {
+          if (user != null) {
+            // User is logged in
+            Navigator.pushReplacementNamed(context, '/home');
+          } else {
+            // User is not logged in
+            Navigator.pushReplacementNamed(context, '/welcome');
+          }
+        }
+      }
     } catch (e) {
-      Timer(const Duration(seconds: 3), () {
+      // Error handling - default to welcome screen
+      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
         Navigator.pushReplacementNamed(context, '/welcome');
-      });
-    } 
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Theme.of(context);
-    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
