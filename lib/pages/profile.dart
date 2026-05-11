@@ -11,7 +11,11 @@ class MyApp extends StatelessWidget {
   static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
   static const Color color2 = Color(0xFFACD9D9);   // Light teal
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
+<<<<<<< HEAD
   static const Color lightBlue = Color.fromARGB(255, 46, 114, 157); // Light blue
+=======
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
 
   @override
   Widget build(BuildContext context) {

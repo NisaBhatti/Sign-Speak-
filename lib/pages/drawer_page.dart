@@ -12,9 +12,27 @@ const Color drawerColor2 = Color(0xFFACD9D9);
 const Color drawerColor3 = Color(0xFFB6C2C3);
 const Color drawerColor4 = Color(0xFF6CC2C0);
 const Color drawerDarkBlue = Color.fromARGB(255, 8, 4, 84);
+<<<<<<< HEAD
 
 class DrawerPage extends StatelessWidget {
   const DrawerPage({super.key});
+=======
+const Color drawerLightBlue = Color.fromARGB(255, 0, 109, 176);
+
+class DrawerPage extends StatelessWidget {
+  final String? userName;
+  final String? userEmail;
+  final bool isGuest;
+  final VoidCallback? onSignOut;
+
+  const DrawerPage({
+    super.key,
+    this.userName,
+    this.userEmail,
+    this.isGuest = false,
+    this.onSignOut,
+  });
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +50,16 @@ class DrawerPage extends StatelessWidget {
               onTap: () {}, // Prevent closing when tapping on drawer
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.5,
+<<<<<<< HEAD
                 child: const CustomDrawer(),
+=======
+                child: CustomDrawer(
+                  userName: userName,
+                  userEmail: userEmail,
+                  isGuest: isGuest,
+                  onSignOut: onSignOut,
+                ),
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
               ),
             ),
           ),
@@ -40,7 +67,10 @@ class DrawerPage extends StatelessWidget {
       ),
     );
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
 }
 
 class CustomDrawer extends StatelessWidget {
@@ -94,7 +124,11 @@ class CustomDrawer extends StatelessWidget {
     }
   }
 
+<<<<<<< HEAD
   void navigateAndCloseDrawer(BuildContext context, Widget page) {
+=======
+  void _navigateAndCloseDrawer(BuildContext context, Widget page) {
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
     Navigator.pop(context); // Close drawer first
     Navigator.push(
       context,
@@ -140,6 +174,26 @@ class CustomDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+<<<<<<< HEAD
+=======
+                // App Logo/Name
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.sign_language,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                     const Text(
                       'Signs Speak',
                       style: TextStyle(
@@ -150,7 +204,122 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
+<<<<<<< HEAD
           ),
+=======
+                const SizedBox(height: 16),
+                
+                // User Info Section
+                if (!isGuest) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.person_outline,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                userName ?? 'User',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.email_outlined,
+                              color: Colors.white70,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                userEmail ?? 'No email',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.person_outline,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Guest User',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.white70,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Sign in to save progress',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
           // Menu Items
           Expanded(
             child: ListView(
@@ -159,6 +328,7 @@ class CustomDrawer extends StatelessWidget {
                 const SizedBox(height: 16),
                 
                 // Home Menu Item
+<<<<<<< HEAD
                 ListTile(
                   leading: Icon(
                     Icons.home,
@@ -201,10 +371,34 @@ class CustomDrawer extends StatelessWidget {
                         builder: (context) => const ProfileSettingsPage(),
                       ),
                     );
+=======
+                _buildDrawerItem(
+                  icon: Icons.home,
+                  title: 'Home',
+                  onTap: () {
+                    Navigator.pop(context); // Close drawer
+                  },
+                ),
+                
+                // Profile Menu Item
+                _buildDrawerItem(
+                  icon: Icons.person,
+                  title: 'Profile',
+                  onTap: () {
+                    if (isGuest) {
+                      _showSignInDialog(context);
+                    } else {
+                      _navigateAndCloseDrawer(
+                        context,
+                        const ProfileSettingsPage(),
+                      );
+                    }
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                   },
                 ),
                 
                 // History Menu Item
+<<<<<<< HEAD
                 ListTile(
                   leading: Icon(
                     Icons.history,
@@ -259,6 +453,69 @@ class CustomDrawer extends StatelessWidget {
                   ),
                 ),
       // Logout/Sign In Menu Item
+=======
+                _buildDrawerItem(
+                  icon: Icons.history,
+                  title: 'History',
+                  onTap: () {
+                    if (isGuest) {
+                      _showSignInDialog(context);
+                    } else {
+                      _navigateAndCloseDrawer(
+                        context,
+                        TranslationHistoryScreen(),
+                      );
+                    }
+                  },
+                ),
+                
+                // Favorites Menu Item
+                _buildDrawerItem(
+                  icon: Icons.favorite_border,
+                  title: 'Favorites',
+                  onTap: () {
+                    if (isGuest) {
+                      _showSignInDialog(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Favorites feature coming soon!'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                
+                // Settings Menu Item
+                _buildDrawerItem(
+                  icon: Icons.settings,
+                  title: 'Settings',
+                  onTap: () {
+                    _navigateAndCloseDrawer(
+                      context,
+                      const SettingsPage(),
+                    );
+                  },
+                ),
+                
+                // App Introduction Menu Item
+                _buildDrawerItem(
+                  icon: Icons.info_outline,
+                  title: 'About App',
+                  onTap: () {
+                    _navigateAndCloseDrawer(
+                      context,
+                      const AppIntroDocument(),
+                    );
+                  },
+                ),
+                
+                const Divider(height: 32, thickness: 1, indent: 16, endIndent: 16),
+                
+                // Logout/Sign In Menu Item
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                 if (!isGuest)
                   _buildDrawerItem(
                     icon: Icons.logout,
@@ -403,7 +660,11 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
   void showSignInDialog(BuildContext context) {
+=======
+  void _showSignInDialog(BuildContext context) {
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -493,7 +754,11 @@ class WelcomeScreen extends StatelessWidget {
                 'Bridge the communication gap',
                 style: TextStyle(
                   fontSize: 16, 
+<<<<<<< HEAD
                   color: drawerDarkBlue, // Using global color constant
+=======
+                  color: drawerLightBlue, // Using global color constant
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                 ),
               ),
               const SizedBox(height: 32),
@@ -540,7 +805,11 @@ void showCustomDrawer(BuildContext context) {
           begin: const Offset(-1, 0),
           end: Offset.zero,
         ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+<<<<<<< HEAD
         child:const DrawerPage(),
+=======
+        child: const DrawerPage(),
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
       );
     },
   );

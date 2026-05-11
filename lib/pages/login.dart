@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'signup.dart';
 import 'homepage.dart';
+<<<<<<< HEAD
+=======
+import 'forgot.dart';
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,7 +38,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text.trim().toLowerCase();
       final password = _passwordController.text;
       
+<<<<<<< HEAD
       print('Attempting login with an email: $email');
+=======
+      print('Attempting login with email: $email');
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
       
       // Actual Firebase login
       UserCredential userCredential = await FirebaseAuth.instance
@@ -141,7 +149,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return true;
   }
 
+<<<<<<< HEAD
   // Add a method to check if user is already logged in
+=======
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
   @override
   void initState() {
     super.initState();
@@ -152,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       print('User already logged in: ${user.email}');
+<<<<<<< HEAD
       // Optional: Auto-navigate to home
       // Future.microtask(() {
       //   Navigator.pushReplacement(
@@ -163,6 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // [REST OF YOUR EXISTING BUILD METHOD AND HELPER WIDGETS REMAIN THE SAME]
+=======
+    }
+  }
+
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -263,13 +280,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
 
+<<<<<<< HEAD
                         // Forgot Password
+=======
+                        // Forgot Password Link - UPDATED to navigate to new screen
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
+<<<<<<< HEAD
                               _showForgotPasswordDialog();
+=======
+                              // Navigate to ForgotPasswordScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Forgot(),
+                                ),
+                              );
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                             },
                             child: Text(
                               'Forgot Password?',
@@ -381,6 +412,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+<<<<<<< HEAD
   void _showForgotPasswordDialog() {
     final TextEditingController resetEmailController = TextEditingController();
     
@@ -456,6 +488,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Your existing helper widgets remain exactly the same
+=======
+>>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
   Widget _buildFloatingLabelTextField({
     required TextEditingController controller,
     required String labelText,
