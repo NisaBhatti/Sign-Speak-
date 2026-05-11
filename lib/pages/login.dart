@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text.trim().toLowerCase();
       final password = _passwordController.text;
       
-      print('Attempting login with email: $email');
+      print('Attempting login with an email: $email');
       
       // Actual Firebase login
       UserCredential userCredential = await FirebaseAuth.instance
