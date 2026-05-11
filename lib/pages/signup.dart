@@ -365,6 +365,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                         ),
+                                            // Terms and Conditions
 
                         // Password Requirements
                         const SizedBox(height: 16),
@@ -426,7 +427,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 });
                               },
                               activeColor: darkBlue,
-                              checkColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
                             Expanded(
                               child: GestureDetector(
@@ -576,17 +579,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return SizedBox(
+      height: 56,
+
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -601,7 +596,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: darkBlue,
+            color: lightBlue,
+
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -618,12 +614,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide( color: lightBlue.withOpacity(0.3),
+              width: 1,)
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: darkBlue,
+              color: lightBlue,
               width: 2,
             ),
           ),
@@ -648,17 +645,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required bool isPassword,
     required VoidCallback onToggleVisibility,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return SizedBox(
+      height: 56,
       child: TextField(
         controller: controller,
         obscureText: isPassword,
@@ -673,7 +661,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: darkBlue,
+            color: lightBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -686,16 +674,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
+              width: 1,),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
+              width: 1,),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: darkBlue,
+              color: lightBlue,
               width: 2,
             ),
           ),

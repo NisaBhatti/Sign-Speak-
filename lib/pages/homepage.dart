@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
@@ -16,95 +15,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // Color scheme matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
-  static const Color color4 = Color(0xFF6CC2C0);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
-  
-  Map<String, dynamic>? userData;
-  bool isLoading = true;
-  String? userName;
-  String? userEmail;
-  
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-  
-  Future<void> _loadUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    
-    if (user != null) {
-      try {
-        // Try to get user data from Firestore
-        final doc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        
-        if (doc.exists) {
-          setState(() {
-            userData = doc.data();
-            userName = userData?['name'] ?? user.displayName;
-            userEmail = userData?['email'] ?? user.email;
-            isLoading = false;
-          });
-        } else {
-          // If no Firestore document, use Firebase Auth data
-          setState(() {
-            userName = user.displayName;
-            userEmail = user.email;
-            isLoading = false;
-          });
-        }
-      } catch (e) {
-        print('Error loading user data: $e');
-        setState(() {
-          userName = user.displayName;
-          userEmail = user.email;
-          isLoading = false;
-        });
-      }
-    } else {
-      // Guest user
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-  
-  Future<void> _signOut(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/welcome');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signed out successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error signing out: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-  
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Good Morning';
-    } else if (hour < 17) {
-      return 'Good Afternoon';
-    } else {
-      return 'Good Evening';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isGuest = user == null;
     
     return Scaffold(
-      backgroundColor: color1,
-      drawer: DrawerPage(
-        userName: userName ?? (isGuest ? null : 'User'),
-        userEmail: userEmail,
-        isGuest: isGuest,
-        onSignOut: () => _signOut(context),
-      ),
+      drawer: const DrawerPage(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -172,85 +78,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    
-                    // Profile icon or sign out button
-                    if (!isGuest)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: marineBlue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            _showProfileDialog();
-                          },
-                          icon: Icon(Icons.person_outline, color: marineBlue, size: 22),
-                          padding: const EdgeInsets.all(6),
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                        ),
-                      )
-                    else
-                      Container(width: 48), // Empty container for balance
+                    Container(
+                      width: 48, // Same width as left icon for symmetry
+                    ),
                   ],
                 ),
               ),
-              
-              // Welcome Section with User Info
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+             //welcome text
+                          Padding(
+                padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _getGreeting(),
-                      style: TextStyle(
-                        color: lightBlue,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (!isGuest && !isLoading)
-                      Text(
-                        userName ?? 'User',
-                        style: TextStyle(
-                          color: marineBlue,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      )
-                    else if (isGuest)
-                      Text(
-                        'Welcome!',
-                        style: TextStyle(
-                          color: marineBlue,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      )
-                    else
-                      const SizedBox(
-                        height: 28,
-                        width: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    const SizedBox(height: 8),
-                    Text(
                       'What would you like to do today?',
                       style: TextStyle(
                         color: marineBlue.withOpacity(0.7),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -265,11 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 1st: Real-Time Signs
                       _buildFeatureCard(
                         title: 'Real-Time Signs',
-                        subtitle: 'Start camera detection',
-                        description: 'Translate sign language in real-time',
+                        subtitle: 'Start camera detection',  
+                        description: 'Use your camera to recognize signs in real-time.',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue, marineBlue.withOpacity(0.8)],
+                          colors: [marineBlue.withOpacity(0.9),lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -282,12 +130,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                      
                       // 2nd: Signs Dictionary
                       _buildFeatureCard(
                         title: 'Signs Dictionary',
-                        subtitle: 'Browse over 1,000 signs',
-                        description: 'Learn and practice sign language',
+                        subtitle: 'Browse over 5,00 signs',
+                        description: 'Search signs dictionary.',
                         icon: Icons.menu_book_outlined,
                         gradient: LinearGradient(
                           colors: [lightBlue, marineBlue],
@@ -308,12 +155,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildFeatureCard(
                         title: 'Favorites',
                         subtitle: 'Access your saved phrases',
-                        description: isGuest 
-                            ? 'Sign in to save favorites'
-                            : 'Quick access to your favorite signs',
+                        description: 'View  favorite signs.',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
-                          colors: [marineBlue, lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -325,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Favorites feature coming soon!'),
-                                backgroundColor: Colors.orange,
+                                backgroundColor: Color.fromARGB(255, 0, 94, 255),
                               ),
                             );
                           }
@@ -437,88 +282,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
-  void _showProfileDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.person, color: marineBlue),
-              const SizedBox(width: 8),
-              Text(
-                'Profile',
-                style: TextStyle(color: marineBlue),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow(Icons.person_outline, 'Name', userName ?? 'Not set'),
-              const Divider(),
-              _buildInfoRow(Icons.email_outlined, 'Email', userEmail ?? 'Not set'),
-              const Divider(),
-              _buildInfoRow(Icons.calendar_today, 'Member Since', '2024'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Close', style: TextStyle(color: marineBlue)),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await _signOut(context);
-              },
-              child: Text(
-                'Sign Out',
-                style: TextStyle(color: Colors.red.shade700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: lightBlue),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: marineBlue,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  
   void _showGuestDialog() {
     showDialog(
       context: context,
