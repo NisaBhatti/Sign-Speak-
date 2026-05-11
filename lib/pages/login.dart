@@ -254,34 +254,33 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                         ),
-
-                        // Forgot Password Link - UPDATED to navigate to new screen
-                        const SizedBox(height: 12),
+                        
+                        // Forgot Password Link
                         Align(
                           alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              // Navigate to ForgotPasswordScreen
+                          child: TextButton(
+                            onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const Forgot(),
+                                  builder: (context) => const ForgotPasswordScreen(),
                                 ),
                               );
                             },
-                            child: Text(
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                            ),
+                            child: const Text(
                               'Forgot Password?',
                               style: TextStyle(
-                                color: darkBlue,
+                                color: Color.fromARGB(255, 8, 4, 84),
                                 fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                                decorationColor: darkBlue,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
                         ),
-
+                        
                         // Login Button
                         const SizedBox(height: 30),
                         Container(
