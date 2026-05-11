@@ -60,22 +60,14 @@ class MyApp extends StatelessWidget {
           primary: marineBlue, // Teal for primary
           secondary: lightBlue, // Light blue for secondary
           tertiary: marineBlue, // Dark blue for tertiary
-<<<<<<< HEAD
           surface: const Color.fromARGB(255, 230, 240, 245), // Dark blue-green background
-=======
-          surface: const Color(0xFF1A2F3A), // Dark blue-green background
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
           onPrimary: Colors.white,
           onSecondary: Colors.white,
           onSurface: color1, // Light blue-green for text
         ),
         fontFamily: 'Inter',
         appBarTheme: AppBarTheme(
-<<<<<<< HEAD
           backgroundColor: const Color.fromARGB(255, 220, 230, 236), // Dark blue-green background
-=======
-          backgroundColor: const Color(0xFF1A2F3A), // Dark blue-green background
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
@@ -90,13 +82,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         cardTheme: CardThemeData(
-<<<<<<< HEAD
           color: const Color.fromARGB(255, 230, 240, 245), // Darker blue-green
           surfaceTintColor: const Color.fromARGB(255, 220, 230, 236), // Dark blue-green background
-=======
-          color: const Color(0xFF2A4045), // Darker blue-green
-          surfaceTintColor: const Color(0xFF2A4045),
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
+
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -134,14 +122,8 @@ class _SettingsPageState extends State<SettingsPage> {
   ];
 
   // Color scheme matching your app's palette
-<<<<<<< HEAD
   static const Color color1 = Color.fromARGB(255, 207, 232, 234);   // Light blue-green
   static const Color color2 = Color.fromARGB(255, 172, 217, 217);   // Light teal
-=======
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color color4 = Color(0xFF6CC2C0);   // Teal
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
 
@@ -196,11 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-<<<<<<< HEAD
                         colors: [Colors.white, color1],
-=======
-                        colors: [Colors.white, color1.withOpacity(0.3)],
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -229,11 +207,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-<<<<<<< HEAD
                         colors: [Colors.white, color1],
-=======
-                        colors: [Colors.white, color1.withOpacity(0.3)],
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
+
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -354,11 +329,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         ? lightBlue // Changed to lightBlue
                         : isLightMode
                             ? marineBlue.withOpacity(0.3) // Changed to marineBlue
-<<<<<<< HEAD
                             : color1, // Changed to color1
-=======
-                            : color1.withOpacity(0.3), // Changed to color1
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
+
                     width: 2,
                   ),
                 ),
@@ -391,11 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-<<<<<<< HEAD
             colors: [Colors.white, color1],
-=======
-            colors: [Colors.white, color1.withOpacity(0.3)],
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -425,11 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-<<<<<<< HEAD
                       colors: [lightBlue, color2], // Added gradient
-=======
-                      colors: [lightBlue, color4], // Added gradient
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),

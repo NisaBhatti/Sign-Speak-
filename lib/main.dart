@@ -91,14 +91,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-<<<<<<< HEAD
       home: const SplashScreen(), // Start with SplashScreen directly
       routes: {
-=======
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const AuthWrapper(),
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
         '/onboarding': (context) => const OnboardingScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
@@ -108,56 +102,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-<<<<<<< HEAD
 // ====================== SPLASH SCREEN (Fixed) ======================
-=======
-// ====================== AUTH WRAPPER ======================
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashScreen();
-        }
-        
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-        
-        return FutureBuilder<bool>(
-          future: _checkFirstLaunch(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SplashScreen();
-            }
-            if (snapshot.data == true) {
-              return const OnboardingScreen();
-            }
-            return const WelcomeScreen();
-          },
-        );
-      },
-    );
-  }
-
-  Future<bool> _checkFirstLaunch() async {
-    final prefs = await SharedPreferences.getInstance();
-    final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-    if (isFirstLaunch) {
-      await prefs.setBool('isFirstLaunch', false);
-      return true;
-    }
-    return false;
-  }
-}
-
-// ====================== SPLASH SCREEN ======================
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -169,7 +114,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
     _initializeApp();
   }
 
@@ -210,15 +154,6 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/welcome');
       }
-=======
-    _navigateToNext();
-  }
-
-  Future<void> _navigateToNext() async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      // Navigation will be handled by AuthWrapper
->>>>>>> a13f109c93f777c070ae61bb24f2a538d4edf90d
     }
   }
 
