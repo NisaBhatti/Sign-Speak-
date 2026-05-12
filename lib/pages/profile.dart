@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
   static const Color color2 = Color(0xFFACD9D9);   // Light teal
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 46, 114, 157); // Light blue
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
 
   @override
   Widget build(BuildContext context) {
@@ -541,9 +541,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Profile Avatar Section
+                            // Profile Avatar Section - White circle with app logo image
                             _buildProfileAvatar(),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 24),
 
                             // Form Section
                             _buildFormSection(),
@@ -561,127 +561,124 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
+  // Profile avatar with white circle and app logo image
   Widget _buildProfileAvatar() {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 128,
-              height: 128,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: Colors.white, width: 3),
-                gradient: LinearGradient(
-                  colors: [lightBlue, color4],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: marineBlue.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // White circle with app logo image
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white, // White background
+              boxShadow: [
+                BoxShadow(
+                  color: marineBlue.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: marineBlue.withOpacity(0.2),
-                    blurRadius: 15,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuC5LTgjKO7rQdixVkwPkO1hGQfd6-XpkdVOZX7UavW6g5h4B5fmomYUlZO0m7JEjSetoDIuylqZelIlL10KPz1Yu3Toa0kngdrqctQoT1rJX6cRXaQKOEZ7Wg5SBm8Phy144Z__B0SK-LyKhYgZtb6YORzxL8gFxNZls0Cha3vk5Si9L1S1bEbFwk-YLQXqQREdifOuOou66wSg2tVsfWaA11TOrHhTzPUCGkruoL_Hbs_YgVvvEbBhW6c4WK6zVRgs3Dpx2bqAlw4',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 50,
-                    );
-                  },
-                ),
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/logo.png', // Your app logo image
+                width: 35,
+                height: 35,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback icon if image is not found
+                  return Icon(
+                    Icons.translate,
+                    color: lightBlue,
+                    size: 35,
+                  );
+                },
               ),
             ),
-            Positioned(
-              bottom: 0,
-              right: 4,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [color4, lightBlue],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+          ),
+          const SizedBox(width: 16),
+          
+          // Name and email column
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Name
+                Text(
+                  _fullName,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: marineBlue,
+                    letterSpacing: -0.015,
                   ),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: marineBlue.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ),
+                const SizedBox(height: 4),
+                // Email
+                Row(
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      size: 12,
+                      color: lightBlue,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        _email,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: lightBlue,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: Icon(
-                  Icons.photo_camera,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Column(
-          children: [
-            // Name with proper overflow handling
-            Container(
-              width: 250,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: lightBlue.withOpacity(0.3),
-                ),
+          ),
+          
+          // Edit icon
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [lightBlue, color4],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Text(
-                _fullName,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: marineBlue,
-                  letterSpacing: -0.015,
-                ),
-              ),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 8),
-            // Email with proper overflow handling
-            Container(
-              width: 250,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                _email,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: lightBlue,
-                ),
-              ),
+            child: Icon(
+              Icons.edit,
+              color: Colors.white,
+              size: 16,
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -795,7 +792,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         const SizedBox(height: 40),
         Column(
           children: [
-            // Update Profile Button - Now shows confirmation dialog
+            // Update Profile Button
             SizedBox(
               width: double.infinity,
               height: 56,
