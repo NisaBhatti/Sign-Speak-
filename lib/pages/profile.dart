@@ -597,7 +597,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: ClipOval(
               child: Image.asset(
                 'assets/images/logo.png', // Your app logo image
-                width: 35,
+                width: 36,
                 height: 35,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
