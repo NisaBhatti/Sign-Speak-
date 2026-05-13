@@ -602,104 +602,55 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        
-        // MERGED CONTAINER - Name and Email in one box
-        Container(
-          width: 280,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.85),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: lightBlue.withOpacity(0.4),
-              width: 1.5,
+        const SizedBox(height: 16),
+        Column(
+          children: [
+            // Name with proper overflow handling
+            Container(
+              width: 250,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: lightBlue.withOpacity(0.3),
+                ),
+              ),
+              child: Text(
+                _fullName,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: marineBlue,
+                  letterSpacing: -0.015,
+                ),
+              ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: marineBlue.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+            const SizedBox(height: 8),
+            // Email with proper overflow handling
+            Container(
+              width: 250,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Name section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  color: Colors.white.withOpacity(0.5),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 20,
-                      color: lightBlue,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _fullName,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: marineBlue,
-                        letterSpacing: -0.015,
-                      ),
-                    ),
-                  ],
+              child: Text(
+                _email,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: lightBlue,
                 ),
               ),
-              
-              // Divider line
-              Container(
-                height: 1,
-                color: lightBlue.withOpacity(0.2),
-              ),
-              
-              // Email section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.email_outlined,
-                      size: 20,
-                      color: lightBlue,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _email,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: lightBlue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
