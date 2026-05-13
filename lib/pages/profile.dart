@@ -602,18 +602,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24), // Increased spacing
         Column(
           children: [
-            // Name with proper overflow handling
+            // Name container with improved spacing
             Container(
-              width: 250,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              width: 280, // Increased width for better fit
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // More padding
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(25), // Larger radius
                 border: Border.all(
                   color: lightBlue.withOpacity(0.3),
+                  width: 1.5,
                 ),
               ),
               child: Text(
@@ -622,32 +623,50 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 22, // Slightly smaller for better fit
                   fontWeight: FontWeight.bold,
                   color: marineBlue,
                   letterSpacing: -0.015,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            // Email with proper overflow handling
+            const SizedBox(height: 12), // More spacing between name and email
+            // Email container with improved spacing
             Container(
-              width: 250,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              width: 280, // Increased width for better fit
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6), // More padding
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                _email,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: lightBlue,
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(20), // Larger radius
+                border: Border.all(
+                  color: lightBlue.withOpacity(0.2),
+                  width: 1,
                 ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    size: 14,
+                    color: lightBlue,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      _email,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: lightBlue,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
