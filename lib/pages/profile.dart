@@ -586,8 +586,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               child: Center(
                 child: Image.asset(
                   'assets/images/logo.png', // Your app logo image
-                  width: 70,
-                  height: 70,
+                  width: 100,
+                  height: 100,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     // Fallback icon if image is not found
