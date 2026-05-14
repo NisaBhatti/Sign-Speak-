@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
   static const Color color2 = Color(0xFFACD9D9);   // Light teal
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 46, 114, 157); // Light blue
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
 
   @override
   Widget build(BuildContext context) {
@@ -541,7 +541,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Profile Avatar Section
+                            // Profile Avatar Section - White circle with app logo
                             _buildProfileAvatar(),
                             const SizedBox(height: 32),
 
@@ -564,72 +564,43 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget _buildProfileAvatar() {
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 128,
-              height: 128,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: Colors.white, width: 3),
-                gradient: LinearGradient(
-                  colors: [lightBlue, color4],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: marineBlue.withOpacity(0.2),
-                    blurRadius: 15,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+        // White circle with app logo - No network image, no camera overlay
+        Container(
+          width: 128,
+          height: 128,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white, // White background
+            border: Border.all(color: Colors.white, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: marineBlue.withOpacity(0.2),
+                blurRadius: 15,
+                offset: const Offset(0, 4),
               ),
-              child: ClipOval(
-                child: Image.network(
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuC5LTgjKO7rQdixVkwPkO1hGQfd6-XpkdVOZX7UavW6g5h4B5fmomYUlZO0m7JEjSetoDIuylqZelIlL10KPz1Yu3Toa0kngdrqctQoT1rJX6cRXaQKOEZ7Wg5SBm8Phy144Z__B0SK-LyKhYgZtb6YORzxL8gFxNZls0Cha3vk5Si9L1S1bEbFwk-YLQXqQREdifOuOou66wSg2tVsfWaA11TOrHhTzPUCGkruoL_Hbs_YgVvvEbBhW6c4WK6zVRgs3Dpx2bqAlw4',
-                  fit: BoxFit.cover,
+            ],
+          ),
+          child: ClipOval(
+            child: Container(
+              color: Colors.white,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/logo.png', // Your app logo image
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
+                    // Fallback icon if image is not found
                     return Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 50,
+                      Icons.translate,
+                      color: lightBlue,
+                      size: 60,
                     );
                   },
                 ),
               ),
             ),
-            Positioned(
-              bottom: 0,
-              right: 4,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [color4, lightBlue],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: marineBlue.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.photo_camera,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: 16),
         Column(
