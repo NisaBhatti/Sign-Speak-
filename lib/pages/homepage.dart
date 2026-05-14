@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+<<<<<<< HEAD
 import 'package:cloud_firestore/cloud_firestore.dart';
+=======
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
@@ -16,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Color scheme matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
+<<<<<<< HEAD
   static const Color color4 = Color(0xFF6CC2C0);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
@@ -105,6 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Good Evening';
     }
   }
+=======
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isGuest = user == null;
     
     return Scaffold(
+<<<<<<< HEAD
       backgroundColor: color1,
       drawer: DrawerPage(
         userName: userName ?? (isGuest ? null : 'User'),
@@ -119,6 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
         isGuest: isGuest,
         onSignOut: () => _signOut(context),
       ),
+=======
+      drawer: const DrawerPage(),
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -172,6 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+<<<<<<< HEAD
                     
                     // Profile icon or sign out button
                     if (!isGuest)
@@ -201,10 +214,22 @@ class _HomeScreenState extends State<HomeScreen> {
               // Welcome Section with User Info
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+=======
+                    Container(
+                      width: 48, // Same width as left icon for symmetry
+                    ),
+                  ],
+                ),
+              ),
+             //welcome text
+                          Padding(
+                padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
+<<<<<<< HEAD
                       _getGreeting(),
                       style: TextStyle(
                         color: lightBlue,
@@ -251,6 +276,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
+=======
+                      'What would you like to do today?',
+                      style: TextStyle(
+                        color: marineBlue.withOpacity(0.7),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                   ],
                 ),
               ),
@@ -265,11 +300,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       // 1st: Real-Time Signs
                       _buildFeatureCard(
                         title: 'Real-Time Signs',
+<<<<<<< HEAD
                         subtitle: 'Start camera detection',
                         description: 'Translate sign language in real-time',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
                           colors: [marineBlue, marineBlue.withOpacity(0.8)],
+=======
+                        subtitle: 'Start camera detection',  
+                        description: 'Use your camera to recognize signs in real-time.',
+                        icon: Icons.videocam_outlined,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withOpacity(0.9),lightBlue],
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -282,12 +325,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
+<<<<<<< HEAD
                       
                       // 2nd: Signs Dictionary
                       _buildFeatureCard(
                         title: 'Signs Dictionary',
                         subtitle: 'Browse over 1,000 signs',
                         description: 'Learn and practice sign language',
+=======
+                      // 2nd: Signs Dictionary
+                      _buildFeatureCard(
+                        title: 'Signs Dictionary',
+                        subtitle: 'Browse over 5,00 signs',
+                        description: 'Search signs dictionary.',
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                         icon: Icons.menu_book_outlined,
                         gradient: LinearGradient(
                           colors: [lightBlue, marineBlue],
@@ -308,12 +359,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildFeatureCard(
                         title: 'Favorites',
                         subtitle: 'Access your saved phrases',
+<<<<<<< HEAD
                         description: isGuest 
                             ? 'Sign in to save favorites'
                             : 'Quick access to your favorite signs',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
                           colors: [marineBlue, lightBlue],
+=======
+                        description: 'View  favorite signs.',
+                        icon: Icons.favorite_border,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -325,7 +383,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Favorites feature coming soon!'),
+<<<<<<< HEAD
                                 backgroundColor: Colors.orange,
+=======
+                                backgroundColor: Color.fromARGB(255, 0, 94, 255),
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                               ),
                             );
                           }
@@ -437,6 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+<<<<<<< HEAD
   
   void _showProfileDialog() {
     showDialog(
@@ -519,6 +582,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   
+=======
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   void _showGuestDialog() {
     showDialog(
       context: context,

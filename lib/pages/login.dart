@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'signup.dart';
 import 'homepage.dart';
+<<<<<<< HEAD
+=======
+import 'forgot.dart';
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +27,11 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   void _handleLogin() async {
+<<<<<<< HEAD
     // Validate inputs first
+=======
+    // Validate inputs first    
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
     if (!_validateLogin()) return;
 
     setState(() {
@@ -141,7 +149,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return true;
   }
 
+<<<<<<< HEAD
   // Add a method to check if user is already logged in
+=======
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   @override
   void initState() {
     super.initState();
@@ -152,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       print('User already logged in: ${user.email}');
+<<<<<<< HEAD
       // Optional: Auto-navigate to home
       // Future.microtask(() {
       //   Navigator.pushReplacement(
@@ -163,6 +175,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // [REST OF YOUR EXISTING BUILD METHOD AND HELPER WIDGETS REMAIN THE SAME]
+=======
+    }
+  }
+
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,6 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                         ),
+<<<<<<< HEAD
 
                         // Forgot Password
                         const SizedBox(height: 12),
@@ -279,11 +297,39 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.w500,
                                 decoration: TextDecoration.underline,
                                 decorationColor: darkBlue,
+=======
+                        
+                        // Forgot Password Link
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                            ),
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 8, 4, 84),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                               ),
                             ),
                           ),
                         ),
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                         // Login Button
                         const SizedBox(height: 30),
                         Container(
@@ -381,6 +427,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+<<<<<<< HEAD
   void _showForgotPasswordDialog() {
     final TextEditingController resetEmailController = TextEditingController();
     
@@ -456,6 +503,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Your existing helper widgets remain exactly the same
+=======
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   Widget _buildFloatingLabelTextField({
     required TextEditingController controller,
     required String labelText,
