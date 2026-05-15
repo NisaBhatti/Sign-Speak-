@@ -1,122 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Lumina Sign Translator',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.light(
-          primary: lightBlue,
-          secondary: marineBlue,
-          tertiary: marineBlue,
-          surface: color1,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: marineBlue,
-        ),
-        fontFamily: 'Inter',
-        appBarTheme: AppBarTheme(
-          backgroundColor: color1,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.015,
-            color: lightBlue,
-          ),
-          iconTheme: IconThemeData(
-            color: marineBlue,
-          ),
-        ),
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          surfaceTintColor: color1,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.dark(
-          primary: marineBlue,
-          secondary: lightBlue,
-          tertiary: marineBlue,
-          surface: const Color(0xFF1A2F3A),
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: color1,
-        ),
-        fontFamily: 'Inter',
-        appBarTheme: AppBarTheme(
-          backgroundColor: const Color(0xFF1A2F3A),
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.015,
-            color: color1,
-          ),
-          iconTheme: IconThemeData(
-            color: color1,
-          ),
-        ),
-        cardTheme: CardThemeData(
-          color: const Color(0xFF2A4045),
-          surfaceTintColor: const Color(0xFF2A4045),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-      ),
-      themeMode: ThemeMode.system,
-      home: const ProfileSettingsPage(),
-    );
-  }
-}
-
-// Assuming you have a SignUpPage - if not, here's a basic one
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-        backgroundColor: MyApp.lightBlue,
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Sign Up Page',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
 
@@ -728,25 +611,43 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 items: languages.map<DropdownMenuItem<String>>((language) {
                   return DropdownMenuItem<String>(
                     value: language['value'],
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        language['label']!,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: marineBlue,
-                        ),
+                    child: Text(
+                      language['label']!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: marineBlue,
                       ),
                     ),
                   );
                 }).toList(),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  suffixIcon: Icon(Icons.expand_more, color: lightBlue),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  suffixIcon: Container(
+                    width: 36,
+                    height: 36,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [lightBlue, color4],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Icon(
+                      Icons.language,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                  suffixIconConstraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 44,
+                  ),
                 ),
                 style: TextStyle(
                   fontSize: 16,
@@ -755,7 +656,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
                 dropdownColor: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                icon: const SizedBox.shrink(),
                 isExpanded: true,
               ),
             ),
@@ -766,7 +666,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         const SizedBox(height: 40),
         Column(
           children: [
-            // Update Profile Button - Now shows confirmation dialog
+            // Update Profile Button
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -894,8 +794,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           child: TextFormField(
             initialValue: value,
             onChanged: onChanged,
-            keyboardType:
-                isEmail ? TextInputType.emailAddress : TextInputType.text,
+            keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+            textAlign: TextAlign.left,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -904,10 +804,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             maxLines: 1,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               suffixIcon: Container(
                 width: 36,
                 height: 36,
+                margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [lightBlue, color4],
@@ -922,10 +823,36 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   size: 18,
                 ),
               ),
+              suffixIconConstraints: const BoxConstraints(
+                minWidth: 44,
+                minHeight: 44,
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+// SignUpPage - Placeholder
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+        backgroundColor: const Color.fromARGB(255, 0, 109, 176),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text(
+          'Sign Up Page',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }
