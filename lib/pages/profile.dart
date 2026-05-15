@@ -317,9 +317,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
-  // Function to perform logout
+  // Function to perform logout - FIXED: Now navigates to SignUpPage
   void _performLogout(BuildContext context) {
-    // Show a snackbar or perform actual logout logic
+    // Show a snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: marineBlue,
@@ -333,6 +333,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         duration: const Duration(seconds: 2),
       ),
     );
+    
+    // Navigate to SignUpPage after a short delay
+    Future.delayed(const Duration(seconds: 2), () {
+      // Navigate to SignUpPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignUpPage()),
+      );
+    });
   }
 
   @override
