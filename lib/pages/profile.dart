@@ -1,5 +1,122 @@
 import 'package:flutter/material.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // Color scheme matching your app's palette
+  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
+  static const Color color2 = Color(0xFFACD9D9);   // Light teal
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Lumina Sign Translator',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.light(
+          primary: lightBlue,
+          secondary: marineBlue,
+          tertiary: marineBlue,
+          surface: color1,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: marineBlue,
+        ),
+        fontFamily: 'Inter',
+        appBarTheme: AppBarTheme(
+          backgroundColor: color1,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.015,
+            color: lightBlue,
+          ),
+          iconTheme: IconThemeData(
+            color: marineBlue,
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          surfaceTintColor: color1,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.dark(
+          primary: marineBlue,
+          secondary: lightBlue,
+          tertiary: marineBlue,
+          surface: const Color(0xFF1A2F3A),
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: color1,
+        ),
+        fontFamily: 'Inter',
+        appBarTheme: AppBarTheme(
+          backgroundColor: const Color(0xFF1A2F3A),
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.015,
+            color: color1,
+          ),
+          iconTheme: IconThemeData(
+            color: color1,
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF2A4045),
+          surfaceTintColor: const Color(0xFF2A4045),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+      themeMode: ThemeMode.system,
+      home: const ProfileSettingsPage(),
+    );
+  }
+}
+
+// SignUpPage
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+        backgroundColor: MyApp.lightBlue,
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(
+        child: Text(
+          'Sign Up Page',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}
+
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
 
@@ -10,7 +127,7 @@ class ProfileSettingsPage extends StatefulWidget {
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   String _fullName = "Alex Morgan";
   String _email = "alex.morgan@example.com";
-  String _selectedLanguage = "PSL";
+  String _selectedLanguage = "PSL"; // Changed default to PSL
 
   final List<Map<String, String>> languages = [
     {'value': 'ASL', 'label': 'ASL (American Sign Language)'},
@@ -18,12 +135,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   ];
 
   // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);
-  static const Color color2 = Color(0xFFACD9D9);
-  static const Color color4 = Color(0xFF6CC2C0);
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
+  static const Color color2 = Color(0xFFACD9D9);   // Light teal
+  static const Color color4 = Color(0xFF6CC2C0);   // Teal
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
 
+  // Function to show update profile confirmation dialog
   void _showUpdateProfileDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -46,6 +164,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Icon
                 Container(
                   width: 60,
                   height: 60,
@@ -64,6 +183,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                
+                // Title
                 Text(
                   'Update Profile',
                   style: TextStyle(
@@ -73,6 +194,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
+                
+                // Message
                 Text(
                   'Are you sure you want to update your profile?',
                   textAlign: TextAlign.center,
@@ -83,14 +206,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                
+                // Buttons Row
                 Row(
                   children: [
+                    // Cancel Button - Outlined Style
                     Expanded(
                       child: SizedBox(
                         height: 50,
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(); // Close dialog
                           },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: lightBlue, width: 2),
@@ -110,12 +236,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    
+                    // Update Button - Blue Solid Style
                     Expanded(
                       child: SizedBox(
                         height: 50,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(); // Close dialog
                             _performUpdateProfile(context);
                           },
                           style: ElevatedButton.styleFrom(
@@ -146,7 +274,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
+  // Function to perform update profile and navigate to Sign Up page
   void _performUpdateProfile(BuildContext context) {
+    // Show a success snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: lightBlue,
@@ -161,6 +291,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       ),
     );
     
+    // Navigate to Sign Up page after a short delay
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -171,6 +302,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     });
   }
 
+  // Function to show logout confirmation dialog
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -193,6 +325,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Icon
                 Container(
                   width: 60,
                   height: 60,
@@ -211,6 +344,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                
+                // Title
                 Text(
                   'Logout',
                   style: TextStyle(
@@ -220,6 +355,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
+                
+                // Message
                 Text(
                   'Are you sure you want to logout?',
                   textAlign: TextAlign.center,
@@ -230,14 +367,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                
+                // Buttons Row
                 Row(
                   children: [
+                    // Cancel Button - Outlined Style
                     Expanded(
                       child: SizedBox(
                         height: 50,
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(); // Close dialog
                           },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: lightBlue, width: 2),
@@ -257,12 +397,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    
+                    // Logout Button - Red Solid Style
                     Expanded(
                       child: SizedBox(
                         height: 50,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(); // Close dialog
                             _performLogout(context);
                           },
                           style: ElevatedButton.styleFrom(
@@ -293,9 +435,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
-  // FIXED: Proper logout function with immediate navigation
+  // Function to perform logout - FIXED: Now navigates to SignUpPage
   void _performLogout(BuildContext context) {
-    // Show snackbar
+    // Show a snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: marineBlue,
@@ -310,10 +452,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       ),
     );
     
-    // Navigate immediately without delay
+    // Navigate to SignUpPage after a short delay
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
-        // Clear all routes and go to SignUpPage
+        // Clear all routes and navigate to SignUpPage
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const SignUpPage()),
           (route) => false,
@@ -339,6 +481,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             return SafeArea(
               child: Column(
                 children: [
+                  // Header
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Row(
@@ -396,6 +539,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       ],
                     ),
                   ),
+
+                  // Content
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -511,6 +656,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Full Name Field
         _buildFormField(
           label: 'Full Name',
           value: _fullName,
@@ -522,6 +668,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           },
         ),
         const SizedBox(height: 16),
+
+        // Email Field
         _buildFormField(
           label: 'Email',
           value: _email,
@@ -534,6 +682,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           },
         ),
         const SizedBox(height: 16),
+
+        // Preferred Language Dropdown
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -588,29 +738,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 }).toList(),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  suffixIcon: Container(
-                    width: 36,
-                    height: 36,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [lightBlue, color4],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Icon(
-                      Icons.language,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                  suffixIconConstraints: const BoxConstraints(
-                    minWidth: 44,
-                    minHeight: 44,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  suffixIcon: Icon(Icons.expand_more, color: lightBlue),
                 ),
                 style: TextStyle(
                   fontSize: 16,
@@ -619,14 +748,18 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ),
                 dropdownColor: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                icon: const SizedBox.shrink(),
                 isExpanded: true,
               ),
             ),
           ],
         ),
+
+        // Actions
         const SizedBox(height: 40),
         Column(
           children: [
+            // Update Profile Button
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -669,6 +802,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               ),
             ),
             const SizedBox(height: 12),
+
+            // Logout Button
             Container(
               width: double.infinity,
               height: 56,
@@ -708,6 +843,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             ),
           ],
         ),
+        
         const SizedBox(height: 32),
       ],
     );
@@ -788,27 +924,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-        backgroundColor: const Color.fromARGB(255, 0, 109, 176),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Sign Up Page',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
     );
   }
 }
