@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// SignUpPage
+// Assuming you have a SignUpPage - if not, here's a basic one
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
@@ -293,12 +293,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     
     // Navigate to Sign Up page after a short delay
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const SignUpPage()),
-        );
-      }
+      // Navigate to SignUpPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignUpPage()),
+      );
     });
   }
 
@@ -435,9 +434,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
-  // Function to perform logout - FIXED: Now navigates to SignUpPage
+  // Function to perform logout
   void _performLogout(BuildContext context) {
-    // Show a snackbar
+    // Show a snackbar or perform actual logout logic
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: marineBlue,
@@ -448,20 +447,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             fontSize: 16,
           ),
         ),
-        duration: const Duration(seconds: 1),
+        duration: const Duration(seconds: 2),
       ),
     );
-    
-    // Navigate to SignUpPage after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        // Clear all routes and navigate to SignUpPage
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const SignUpPage()),
-          (route) => false,
-        );
-      }
-    });
   }
 
   @override
@@ -481,7 +469,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             return SafeArea(
               child: Column(
                 children: [
-                  // Header
+                  // Header - FIXED: No overflow
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Row(
@@ -515,6 +503,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             padding: EdgeInsets.zero,
                           ),
                         ),
+                        // Flexible title to prevent overflow
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -534,7 +523,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         ),
                         SizedBox(
                           width: 44,
-                          child: Container(),
+                          child: Container(), // Placeholder for balance
                         ),
                       ],
                     ),
@@ -547,13 +536,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight - 76,
+                          minHeight: constraints.maxHeight - 76, // Account for header height
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // Profile Avatar Section - White circle with app logo
                             _buildProfileAvatar(),
                             const SizedBox(height: 32),
+
+                            // Form Section
                             _buildFormSection(),
                           ],
                         ),
@@ -572,12 +564,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget _buildProfileAvatar() {
     return Column(
       children: [
+        // White circle with app logo - No network image, no camera overlay
         Container(
           width: 128,
           height: 128,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white,
+            color: Colors.white, // White background
             border: Border.all(color: Colors.white, width: 3),
             boxShadow: [
               BoxShadow(
@@ -591,10 +584,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             child: Container(
               color: Colors.white,
               child: Center(
-                child: Icon(
-                  Icons.person,
-                  color: lightBlue,
-                  size: 60,
+                child: Image.asset(
+                  'assets/images/logo.png', // Your app logo image
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback icon if image is not found
+                    return Icon(
+                      Icons.translate,
+                      color: lightBlue,
+                      size: 60,
+                    );
+                  },
                 ),
               ),
             ),
@@ -603,6 +605,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         const SizedBox(height: 16),
         Column(
           children: [
+            // Name with proper overflow handling
             Container(
               width: 250,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -627,6 +630,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               ),
             ),
             const SizedBox(height: 8),
+            // Email with proper overflow handling
             Container(
               width: 250,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -713,7 +717,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ],
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedLanguage,
+                initialValue: _selectedLanguage,
                 onChanged: (String? newValue) {
                   if (newValue != null) {
                     setState(() {
@@ -724,14 +728,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 items: languages.map<DropdownMenuItem<String>>((language) {
                   return DropdownMenuItem<String>(
                     value: language['value'],
-                    child: Text(
-                      language['label']!,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: marineBlue,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        language['label']!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: marineBlue,
+                        ),
                       ),
                     ),
                   );
@@ -759,7 +766,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         const SizedBox(height: 40),
         Column(
           children: [
-            // Update Profile Button
+            // Update Profile Button - Now shows confirmation dialog
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -887,8 +894,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           child: TextFormField(
             initialValue: value,
             onChanged: onChanged,
-            keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-            textAlign: TextAlign.left,
+            keyboardType:
+                isEmail ? TextInputType.emailAddress : TextInputType.text,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -897,11 +904,10 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             maxLines: 1,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
               suffixIcon: Container(
                 width: 36,
                 height: 36,
-                margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [lightBlue, color4],
@@ -915,10 +921,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   color: Colors.white,
                   size: 18,
                 ),
-              ),
-              suffixIconConstraints: const BoxConstraints(
-                minWidth: 44,
-                minHeight: 44,
               ),
             ),
           ),
