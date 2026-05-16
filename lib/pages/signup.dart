@@ -365,10 +365,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                         ),
-<<<<<<< HEAD
-=======
-                                            // Terms and Conditions
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 
                         // Password Requirements
                         const SizedBox(height: 16),
@@ -430,13 +426,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 });
                               },
                               activeColor: darkBlue,
-<<<<<<< HEAD
                               checkColor: Colors.white,
-=======
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                             ),
                             Expanded(
                               child: GestureDetector(
@@ -586,7 +576,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-<<<<<<< HEAD
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -598,11 +587,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ],
       ),
-=======
-    return SizedBox(
-      height: 56,
-
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -617,18 +601,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-<<<<<<< HEAD
-            color: darkBlue,
-=======
             color: lightBlue,
 
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
             fontSize: 14,
           ),
           filled: true,
@@ -639,22 +615,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-<<<<<<< HEAD
-            borderSide: BorderSide.none,
-=======
             borderSide: BorderSide( color: lightBlue.withOpacity(0.3),
               width: 1,)
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-<<<<<<< HEAD
               color: darkBlue,
-=======
-              color: lightBlue,
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
-              width: 2,
             ),
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -678,22 +645,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required bool isPassword,
     required VoidCallback onToggleVisibility,
   }) {
-<<<<<<< HEAD
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-=======
     return SizedBox(
       height: 56,
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
       child: TextField(
         controller: controller,
         obscureText: isPassword,
@@ -708,11 +661,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-<<<<<<< HEAD
-            color: darkBlue,
-=======
             color: lightBlue,
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -725,13 +674,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-<<<<<<< HEAD
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-=======
             borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
               width: 1,),
           ),
@@ -739,16 +681,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
               width: 1,),
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-<<<<<<< HEAD
-              color: darkBlue,
-=======
               color: lightBlue,
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
               width: 2,
             ),
           ),
