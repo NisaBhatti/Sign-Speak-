@@ -1,5 +1,6 @@
+// lib/app_intro_document.dart
 import 'package:flutter/material.dart';
-import 'terms-to-services.dart';
+import 'terms_of_service.dart'; // Fixed import name
 
 class AppIntroDocument extends StatelessWidget {
   const AppIntroDocument({super.key});
@@ -122,7 +123,7 @@ class AppIntroDocument extends StatelessWidget {
               _buildKeyNotesSection(),
               const SizedBox(height: 40),
 
-              // Footer with Terms
+              // Footer with Terms - UPDATED with navigation
               _buildFooterSection(context),
               const SizedBox(height: 20),
             ],
@@ -542,11 +543,11 @@ class AppIntroDocument extends StatelessWidget {
           children: [
             TextButton(
               onPressed: () {
-                // Navigate to Terms of Service
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: lightBlue,
-                    content: const Text('Terms of Service page'),
+                // Navigate to Terms of Service Page - FIXED
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsOfServicePage(),
                   ),
                 );
               },
@@ -562,11 +563,11 @@ class AppIntroDocument extends StatelessWidget {
             const SizedBox(width: 20),
             TextButton(
               onPressed: () {
-                // Navigate to Privacy Policy
+                // Navigate to Privacy Policy (create this page similarly)
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     backgroundColor: lightBlue,
-                    content: const Text('Privacy Policy page'),
+                    content: const Text('Privacy Policy page coming soon'),
                   ),
                 );
               },

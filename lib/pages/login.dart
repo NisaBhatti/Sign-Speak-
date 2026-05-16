@@ -24,8 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   void _handleLogin() async {
-    // Validate inputs first
-    // Validate inputs first    
+    // Validate inputs first  
     if (!_validateLogin()) return;
 
     setState(() {
@@ -166,8 +165,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // [REST OF YOUR EXISTING BUILD METHOD AND HELPER WIDGETS REMAIN THE SAME]
     }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

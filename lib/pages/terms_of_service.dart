@@ -1,43 +1,6 @@
+// lib/terms_of_service.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sign Speak',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'PublicSans',
-        scaffoldBackgroundColor: const Color(0xFFF8F6F6),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF4B2038),
-          elevation: 0,
-          centerTitle: false,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF4B2038), // brand-purple
-          secondary: Color(0xFFEC5B13), // primary orange
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-      home: const TermsOfServicePage(),
-    );
-  }
-}
 
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
@@ -62,6 +25,8 @@ class TermsOfServicePage extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -74,20 +39,26 @@ class TermsOfServicePage extends StatelessWidget {
               const SizedBox(height: 24),
               
               // Welcome text
-              Text(
-                'Welcome to ',
-                style: _bodyTextStyle(),
-              ) +
-              TextSpan(
-                text: 'Sign Speak',
-                style: _bodyTextStyle().copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF4B2038),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Welcome to ',
+                      style: _bodyTextStyle(),
+                    ),
+                    TextSpan(
+                      text: 'Sign Speak',
+                      style: _bodyTextStyle().copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF4B2038),
+                      ),
+                    ),
+                    TextSpan(
+                      text: '. These Terms of Service ("Terms") govern your access to and use of our mobile application and related services. By using Sign Speak, you agree to be bound by these terms.',
+                      style: _bodyTextStyle(),
+                    ),
+                  ],
                 ),
-              ) +
-              TextSpan(
-                text: '. These Terms of Service ("Terms") govern your access to and use of our mobile application and related services. By using Sign Speak, you agree to be bound by these terms.',
-                style: _bodyTextStyle(),
               ),
               
               const SizedBox(height: 32),
@@ -131,7 +102,7 @@ class TermsOfServicePage extends StatelessWidget {
               const SizedBox(height: 32),
               
               // Footer Section
-              _buildFooter(),
+              _buildFooter(context),
               
               const SizedBox(height: 40),
             ],
@@ -147,7 +118,7 @@ class TermsOfServicePage extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF221610), // brand-bg
+        color: const Color(0xFF221610),
       ),
       child: Stack(
         fit: StackFit.expand,
@@ -159,6 +130,28 @@ class TermsOfServicePage extends StatelessWidget {
               fit: BoxFit.cover,
               colorBlendMode: BlendMode.darken,
               color: Colors.black.withOpacity(0.4),
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: const Color(0xFF4B2038),
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_not_supported,
+                          color: Colors.white54,
+                          size: 48,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Image not available',
+                          style: TextStyle(color: Colors.white54),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           Center(
@@ -174,7 +167,7 @@ class TermsOfServicePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Last Updated: May 2026',
+                  'Last Updated: October 2023',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white.withOpacity(0.8),
                   ),
@@ -203,7 +196,7 @@ class TermsOfServicePage extends StatelessWidget {
                 width: 6,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEC5B13), // primary
+                  color: const Color(0xFFEC5B13),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -214,7 +207,7 @@ class TermsOfServicePage extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF4B2038), // brand-purple
+                    color: Color(0xFF4B2038),
                   ),
                 ),
               ),
@@ -253,7 +246,7 @@ class TermsOfServicePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Column(
       children: [
         Divider(
@@ -275,7 +268,9 @@ class TermsOfServicePage extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Color(0xFF4B2038)),
                   shape: RoundedRectangleBorder(
@@ -296,7 +291,9 @@ class TermsOfServicePage extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF4B2038),
                   foregroundColor: Colors.white,
@@ -325,7 +322,7 @@ class TermsOfServicePage extends StatelessWidget {
     return TextStyle(
       fontSize: fontSize,
       height: 1.5,
-      color: const Color(0xFF4B5563), // gray-600 equivalent
+      color: const Color(0xFF4B5563),
     );
   }
 }
