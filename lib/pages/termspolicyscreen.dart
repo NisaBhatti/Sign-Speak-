@@ -243,7 +243,11 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
+<<<<<<< HEAD
+            colors: [Colors.white, color1.withOpacity(0.3)],
+=======
             colors: [Colors.white, color1],
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -346,7 +350,11 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
+<<<<<<< HEAD
+            colors: [Colors.white, color1.withOpacity(0.3)],
+=======
             colors: [Colors.white,color1],
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -810,7 +818,11 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
+<<<<<<< HEAD
+            colors: [Colors.white, color1.withOpacity(0.3)],
+=======
             colors: [Colors.white, color1],
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -928,6 +940,10 @@ class PolicyDocumentViewer extends StatelessWidget {
   // Colors from main palette
   Color get color1 => const Color(0xFFCFE8EA);
   Color get color2 => const Color(0xFFACD9D9);
+<<<<<<< HEAD
+  Color get color4 => const Color(0xFF6CC2C0);
+=======
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   Color get marineBlue => const Color.fromARGB(255, 8, 4, 84);
   Color get lightBlue => const Color.fromARGB(255, 0, 109, 176);
 

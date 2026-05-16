@@ -365,7 +365,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                         ),
-                                            // Terms and Conditions
 
                         // Password Requirements
                         const SizedBox(height: 16),
@@ -427,9 +426,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 });
                               },
                               activeColor: darkBlue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
+                              checkColor: Colors.white,
                             ),
                             Expanded(
                               child: GestureDetector(
@@ -579,9 +576,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return SizedBox(
-      height: 56,
-
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -598,12 +603,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           floatingLabelStyle: TextStyle(
             color: lightBlue,
 
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
             fontSize: 14,
           ),
           filled: true,
@@ -620,8 +621,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
-              width: 2,
+              color: darkBlue,
             ),
           ),
           contentPadding: const EdgeInsets.symmetric(

@@ -5,7 +5,11 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
+<<<<<<< HEAD
+  sdk: ">=3.0.0 <4.0.0"  # More specific version range
+=======
   sdk: ">=3.0.0 <4.0.0"
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 
 dependencies:
   flutter:
@@ -15,6 +19,15 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # Camera
+<<<<<<< HEAD
+  camera: ^0.10.5
+  
+  # Firebase - Using BoM (Bill of Materials) recommended versions
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
+  cloud_firestore: ^5.5.0
+  firebase_storage: ^12.3.3
+=======
   camera: ^0.10.6
   
   # Firebase
@@ -22,6 +35,7 @@ dependencies:
   firebase_auth: ^4.16.0
   cloud_firestore: ^4.13.6
   firebase_storage: ^11.5.6
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   
   # State management and utilities
   shared_preferences: ^2.3.2
@@ -36,7 +50,12 @@ dependencies:
   # Navigation
   go_router: ^14.2.8
   
+<<<<<<< HEAD
+  # Add these for better compatibility
+  flutter_plugin_android_lifecycle: ^2.0.21
+=======
   # Path utilities
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
   path_provider: ^2.1.4
   path: ^1.9.0
 
@@ -55,4 +74,16 @@ flutter:
     - assets/images/image3.png
     - assets/images/wel.png
     - assets/images/real.png
+<<<<<<< HEAD
     - assets/images/communi.png
+    
+  # Optional: Add fonts if needed
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
+=======
+    - assets/images/communi.png
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee

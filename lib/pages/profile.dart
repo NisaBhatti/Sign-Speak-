@@ -541,7 +541,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+<<<<<<< HEAD
+                            // Profile Avatar Section
+=======
                             // Profile Avatar Section - White circle with app logo
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                             _buildProfileAvatar(),
                             const SizedBox(height: 32),
 
@@ -564,6 +568,39 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget _buildProfileAvatar() {
     return Column(
       children: [
+<<<<<<< HEAD
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 128,
+              height: 128,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white, width: 3),
+                gradient: LinearGradient(
+                  colors: [lightBlue, color4],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: marineBlue.withOpacity(0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  'https://lh3.googleusercontent.com/aida-public/AB6AXuC5LTgjKO7rQdixVkwPkO1hGQfd6-XpkdVOZX7UavW6g5h4B5fmomYUlZO0m7JEjSetoDIuylqZelIlL10KPz1Yu3Toa0kngdrqctQoT1rJX6cRXaQKOEZ7Wg5SBm8Phy144Z__B0SK-LyKhYgZtb6YORzxL8gFxNZls0Cha3vk5Si9L1S1bEbFwk-YLQXqQREdifOuOou66wSg2tVsfWaA11TOrHhTzPUCGkruoL_Hbs_YgVvvEbBhW6c4WK6zVRgs3Dpx2bqAlw4',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 50,
+=======
         // White circle with app logo - No network image, no camera overlay
         Container(
           width: 128,
@@ -595,12 +632,46 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       Icons.translate,
                       color: lightBlue,
                       size: 60,
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                     );
                   },
                 ),
               ),
             ),
+<<<<<<< HEAD
+            Positioned(
+              bottom: 0,
+              right: 4,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [color4, lightBlue],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: marineBlue.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.photo_camera,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
+            ),
+          ],
+=======
           ),
+>>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
         ),
         const SizedBox(height: 16),
         Column(
