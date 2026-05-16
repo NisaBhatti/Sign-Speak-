@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:signspeak/pages/login.dart';
+import 'package:signspeak/pages/homepage.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -601,10 +602,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
-
+            color: darkBlue,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
           hintText: hintText,
           hintStyle: TextStyle(
+            color: lightBlue.withOpacity(0.5),
             fontSize: 14,
           ),
           filled: true,
@@ -615,13 +619,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide( color: lightBlue.withOpacity(0.3),
-              width: 1,)
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
               color: darkBlue,
+              width: 2,
             ),
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -645,8 +649,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required bool isPassword,
     required VoidCallback onToggleVisibility,
   }) {
-    return SizedBox(
-      height: 56,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
@@ -661,7 +674,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -674,18 +687,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
-              width: 1,),
+            borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
-              width: 1,),
+            borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
+              color: darkBlue,
               width: 2,
             ),
           ),
