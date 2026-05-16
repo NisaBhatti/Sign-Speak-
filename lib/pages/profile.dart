@@ -541,11 +541,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-<<<<<<< HEAD
                             // Profile Avatar Section
-=======
-                            // Profile Avatar Section - White circle with app logo
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                             _buildProfileAvatar(),
                             const SizedBox(height: 32),
 
@@ -568,7 +564,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   Widget _buildProfileAvatar() {
     return Column(
       children: [
-<<<<<<< HEAD
         Stack(
           alignment: Alignment.center,
           children: [
@@ -600,45 +595,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       Icons.person,
                       color: Colors.white,
                       size: 50,
-=======
-        // White circle with app logo - No network image, no camera overlay
-        Container(
-          width: 128,
-          height: 128,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white, // White background
-            border: Border.all(color: Colors.white, width: 3),
-            boxShadow: [
-              BoxShadow(
-                color: marineBlue.withOpacity(0.2),
-                blurRadius: 15,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: Container(
-              color: Colors.white,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/logo.png', // Your app logo image
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback icon if image is not found
-                    return Icon(
-                      Icons.translate,
-                      color: lightBlue,
-                      size: 60,
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
                     );
                   },
                 ),
               ),
             ),
-<<<<<<< HEAD
             Positioned(
               bottom: 0,
               right: 4,
@@ -669,9 +630,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               ),
             ),
           ],
-=======
-          ),
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
         ),
         const SizedBox(height: 16),
         Column(

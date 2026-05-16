@@ -91,14 +91,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-<<<<<<< HEAD
       initialRoute: '/',
       routes: {
         '/': (context) => const AuthWrapper(),
-=======
-      home: const SplashScreen(), // Start with SplashScreen directly
-      routes: {
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
         '/onboarding': (context) => const OnboardingScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
@@ -108,7 +103,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-<<<<<<< HEAD
 
 // ====================== AUTH WRAPPER ======================
 class AuthWrapper extends StatelessWidget {
@@ -155,9 +149,6 @@ class AuthWrapper extends StatelessWidget {
 }
 
 // ====================== SPLASH SCREEN ======================
-=======
-// ====================== SPLASH SCREEN (Fixed) ======================
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -169,7 +160,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
     _navigateToNext();
   }
 
@@ -177,48 +167,6 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       // Navigation will be handled by AuthWrapper
-=======
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    try {
-      // Check if it's first launch
-      final prefs = await SharedPreferences.getInstance();
-      final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
-      
-      // Wait for 2 seconds to show splash screen
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // Mark as not first launch if it was first launch
-      if (isFirstLaunch) {
-        await prefs.setBool('isFirstLaunch', false);
-        
-        if (mounted) {
-          // Navigate to onboarding for first time users
-          Navigator.pushReplacementNamed(context, '/onboarding');
-        }
-      } else {
-        // Check authentication status after showing splash
-        final user = FirebaseAuth.instance.currentUser;
-        
-        if (mounted) {
-          if (user != null) {
-            // User is logged in
-            Navigator.pushReplacementNamed(context, '/home');
-          } else {
-            // User is not logged in
-            Navigator.pushReplacementNamed(context, '/welcome');
-          }
-        }
-      }
-    } catch (e) {
-      // Error handling - default to welcome screen
-      await Future.delayed(const Duration(seconds: 2));
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/welcome');
-      }
->>>>>>> bd07d5303f89c6336f5bb47fb3f1f526f7a7a6ee
     }
   }
 
