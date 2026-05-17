@@ -167,23 +167,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              // Tagline Text
+              // Tagline Text - Larger size
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'What would you like to do today?',
                     style: TextStyle(
                       color: marineBlue.withOpacity(0.8),
-                      fontSize: 28,
+                      fontSize: 28, // Increased from 22 to 28
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
               
-              // Feature Cards - Slightly larger cards
+              // Feature Cards - Without descriptions
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       
                       // 2nd: Signs Dictionary
                       Expanded(
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       
                       // 3rd: Favorites
                       Expanded(
@@ -271,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -302,12 +302,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             children: [
               Container(
-                width: 65,
-                height: 65,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
@@ -315,10 +315,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 32,
+                  size: 30,
                 ),
               ),
-              const SizedBox(width: 18),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,33 +331,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 1, // Force title to be in one line
-                      overflow: TextOverflow.visible,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 13,
+                        fontSize: 12,
                       ),
-                      maxLines: 1, // Force subtitle to be in one line
-                      overflow: TextOverflow.visible,
                     ),
                   ],
                 ),
               ),
               Container(
-                width: 36,
-                height: 36,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.arrow_forward,
                   color: Colors.white.withOpacity(0.8),
-                  size: 20,
+                  size: 18,
                 ),
               ),
             ],
