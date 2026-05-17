@@ -167,9 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              // Tagline Text - Increased size
+              // Tagline Text
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -183,92 +183,98 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              // Feature Cards - Adjusted layout with larger cards
-              Expanded(
-                child: SingleChildScrollView(
+              // Feature Cards - NO SCROLLING, using Flexible and fixed heights
+              Flexible(
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // 1st: Real-Time Signs
-                      _buildFeatureCard(
-                        title: 'Real-Time Signs',
-                        subtitle: 'Start camera detection',
-                        description: 'Translate sign language in real-time',
-                        icon: Icons.videocam_outlined,
-                        gradient: LinearGradient(
-                          colors: [marineBlue, marineBlue.withOpacity(0.8)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CameraAccessScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // 2nd: Signs Dictionary
-                      _buildFeatureCard(
-                        title: 'Signs Dictionary',
-                        subtitle: 'Browse over 1,000 signs',
-                        description: 'Learn and practice sign language',
-                        icon: Icons.menu_book_outlined,
-                        gradient: LinearGradient(
-                          colors: [lightBlue, marineBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DictionaryPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // 3rd: Favorites - Fixed overflow issue
-                      _buildFeatureCard(
-                        title: 'Favorites',
-                        subtitle: 'Access your saved phrases',
-                        description: isGuest 
-                            ? 'Sign in to save favorites'
-                            : 'Quick access to your favorite signs',
-                        icon: Icons.favorite_border,
-                        gradient: LinearGradient(
-                          colors: [marineBlue, lightBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          if (isGuest) {
-                            _showGuestDialog();
-                          } else {
-                            // Navigate to favorites page
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Favorites feature coming soon!'),
-                                backgroundColor: Colors.orange,
+                      Expanded(
+                        child: _buildFeatureCard(
+                          title: 'Real-Time Signs',
+                          subtitle: 'Start camera detection',
+                          description: 'Translate sign language in real-time',
+                          icon: Icons.videocam_outlined,
+                          gradient: LinearGradient(
+                            colors: [marineBlue, marineBlue.withOpacity(0.8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CameraAccessScreen(),
                               ),
                             );
-                          }
-                        },
+                          },
+                        ),
                       ),
                       
-                      const SizedBox(height: 30), // Extra bottom padding
+                      const SizedBox(height: 16),
+                      
+                      // 2nd: Signs Dictionary
+                      Expanded(
+                        child: _buildFeatureCard(
+                          title: 'Signs Dictionary',
+                          subtitle: 'Browse over 1,000 signs',
+                          description: 'Learn and practice sign language',
+                          icon: Icons.menu_book_outlined,
+                          gradient: LinearGradient(
+                            colors: [lightBlue, marineBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DictionaryPage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // 3rd: Favorites
+                      Expanded(
+                        child: _buildFeatureCard(
+                          title: 'Favorites',
+                          subtitle: 'Access your saved phrases',
+                          description: isGuest 
+                              ? 'Sign in to save favorites'
+                              : 'Quick access to your favorite signs',
+                          icon: Icons.favorite_border,
+                          gradient: LinearGradient(
+                            colors: [marineBlue, lightBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          onTap: () {
+                            if (isGuest) {
+                              _showGuestDialog();
+                            } else {
+                              // Navigate to favorites page
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Favorites feature coming soon!'),
+                                  backgroundColor: Colors.orange,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
+              
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -288,36 +294,35 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 150, // Increased from 120 to 150
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(24), // Increased from 20 to 24
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.2),
-              blurRadius: 20, // Increased from 15 to 20
-              offset: const Offset(0, 8), // Increased offset for better shadow
+              color: marineBlue.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20), // Increased from 16 to 20
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Row(
             children: [
               Container(
-                width: 70, // Increased from 56 to 70
-                height: 70, // Increased from 56 to 70
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20), // Increased from 16 to 20
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 34, // Increased from 28 to 34
+                  size: 30,
                 ),
               ),
-              const SizedBox(width: 20), // Increased from 16 to 20
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,44 +332,42 @@ class _HomeScreenState extends State<HomeScreen> {
                       title,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22, // Increased from 18 to 22
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6), // Increased from 4 to 6
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 14, // Increased from 12 to 14
+                        fontSize: 12,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4), // Increased from 2 to 4
+                    const SizedBox(height: 2),
                     Text(
                       description,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
-                        fontSize: 12, // Increased from 10 to 12
+                        fontSize: 11,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                      maxLines: 2, // Allow 2 lines for description
+                      overflow: TextOverflow.visible, // Show full text
                     ),
                   ],
                 ),
               ),
               Container(
-                width: 40, // Increased from 32 to 40
-                height: 40, // Increased from 32 to 40
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12), // Increased from 8 to 12
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.arrow_forward,
                   color: Colors.white.withOpacity(0.8),
-                  size: 22, // Increased from 18 to 22
+                  size: 18,
                 ),
               ),
             ],
