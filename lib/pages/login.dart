@@ -22,9 +22,20 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
+  @override
+  void initState() {
+    super.initState();
+    _checkCurrentUser();
+  }
+
+  void _checkCurrentUser() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('User already logged in: ${user.email}');
+    }
+  }
+
   void _handleLogin() async {
-    // Validate inputs first
-    // Validate inputs first    
     if (!_validateLogin()) return;
 
     setState(() {
@@ -37,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
       
       print('Attempting login with email: $email');
       
-      // Actual Firebase login
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: email,
@@ -49,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Login successful!'),
@@ -58,14 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
 
-      // Navigate to home screen on success
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException Error Code: ${e.code}');
-      print('FirebaseAuthException Error Message: ${e.message}');
       
       String message = 'Login failed';
       if (e.code == 'user-not-found') {
@@ -119,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return false;
     }
 
-    // require gmail only
     final gmailRegex = RegExp(r'^[^@\s]+@gmail\.com$');
     if (!gmailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,31 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return true;
-  }
-
-  // Add a method to check if user is already logged in
-  @override
-  void initState() {
-    super.initState();
-    _checkCurrentUser();
-  }
-
-  void _checkCurrentUser() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      print('User already logged in: ${user.email}');
-      // Optional: Auto-navigate to home
-      // Future.microtask(() {
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => const HomeScreen()),
-      //   );
-      // });
-    }
-  }
-
-  // [REST OF YOUR EXISTING BUILD METHOD AND HELPER WIDGETS REMAIN THE SAME]
-    }
   }
 
   @override
@@ -222,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title
                         Text(
                           'Log In',
                           style: TextStyle(
@@ -233,8 +213,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-
-                        // Subtitle
                         Text(
                           'Welcome back! Sign in to continue',
                           style: TextStyle(
@@ -243,8 +221,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 40),
-
-                        // Email Field
                         _buildFloatingLabelTextField(
                           controller: _emailController,
                           labelText: 'Email Address',
@@ -253,8 +229,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 20),
-
-                        // Password Field
                         _buildFloatingLabelPasswordField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -266,8 +240,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                         ),
-
-                        // Forgot Password
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
@@ -287,8 +259,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
-                        // Login Button
                         const SizedBox(height: 30),
                         Container(
                           width: double.infinity,
@@ -339,8 +309,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-
-              // Sign Up Link
               Container(
                 padding: const EdgeInsets.all(24.0),
                 child: Text.rich(
@@ -459,7 +427,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Your existing helper widgets remain exactly the same
   Widget _buildFloatingLabelTextField({
     required TextEditingController controller,
     required String labelText,

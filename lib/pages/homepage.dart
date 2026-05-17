@@ -16,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Color scheme matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
-  static const Color color4 = Color(0xFF6CC2C0);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
   
