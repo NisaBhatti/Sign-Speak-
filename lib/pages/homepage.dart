@@ -167,25 +167,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              // Tagline Text
+              // Tagline Text - Increased size
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'What would you like to do today?',
                     style: TextStyle(
-                      color: marineBlue.withOpacity(0.7),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      color: marineBlue.withOpacity(0.8),
+                      fontSize: 22, // Increased from 16 to 22
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
               
-              // Feature Cards
+              // Feature Cards - Adjusted layout to prevent overflow
               Expanded(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       
                       const SizedBox(height: 16),
                       
-                      // 3rd: Favorites
+                      // 3rd: Favorites - Fixed overflow issue
                       _buildFeatureCard(
                         title: 'Favorites',
                         subtitle: 'Access your saved phrases',
@@ -263,13 +263,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                       ),
+                      
+                      const SizedBox(height: 20), // Extra bottom padding
                     ],
                   ),
                 ),
               ),
-              
-              // Small bottom padding
-              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -288,6 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        width: double.infinity, // Ensure full width
         height: 120,
         decoration: BoxDecoration(
           gradient: gradient,
@@ -330,6 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -338,6 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 12,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -346,6 +348,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 10,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ],
                 ),
