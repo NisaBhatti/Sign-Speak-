@@ -176,14 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     'What would you like to do today?',
                     style: TextStyle(
                       color: marineBlue.withOpacity(0.8),
-                      fontSize: 22, // Increased from 16 to 22
+                      fontSize: 22,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
               
-              // Feature Cards - Adjusted layout to prevent overflow
+              // Feature Cards - Adjusted layout with larger cards
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       
                       // 2nd: Signs Dictionary
                       _buildFeatureCard(
@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       
                       // 3rd: Favorites - Fixed overflow issue
                       _buildFeatureCard(
@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       
-                      const SizedBox(height: 20), // Extra bottom padding
+                      const SizedBox(height: 30), // Extra bottom padding
                     ],
                   ),
                 ),
@@ -287,37 +287,37 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity, // Ensure full width
-        height: 120,
+        width: double.infinity,
+        height: 150, // Increased from 120 to 150
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24), // Increased from 20 to 24
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.15),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: marineBlue.withOpacity(0.2),
+              blurRadius: 20, // Increased from 15 to 20
+              offset: const Offset(0, 8), // Increased offset for better shadow
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20), // Increased from 16 to 20
           child: Row(
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 70, // Increased from 56 to 70
+                height: 70, // Increased from 56 to 70
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20), // Increased from 16 to 20
                 ),
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 28,
+                  size: 34, // Increased from 28 to 34
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20), // Increased from 16 to 20
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,26 +327,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       title,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 22, // Increased from 18 to 22
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6), // Increased from 4 to 6
                     Text(
                       subtitle,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 12,
+                        fontSize: 14, // Increased from 12 to 14
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4), // Increased from 2 to 4
                     Text(
                       description,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
-                        fontSize: 10,
+                        fontSize: 12, // Increased from 10 to 12
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -355,16 +355,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Container(
-                width: 32,
-                height: 32,
+                width: 40, // Increased from 32 to 40
+                height: 40, // Increased from 32 to 40
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12), // Increased from 8 to 12
                 ),
                 child: Icon(
                   Icons.arrow_forward,
                   color: Colors.white.withOpacity(0.8),
-                  size: 18,
+                  size: 22, // Increased from 18 to 22
                 ),
               ),
             ],
