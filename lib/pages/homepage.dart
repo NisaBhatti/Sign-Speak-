@@ -93,17 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
-  
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Good Morning';
-    } else if (hour < 17) {
-      return 'Good Afternoon';
-    } else {
-      return 'Good Evening';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,12 +167,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
+              // Tagline Text
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'What would you like to do today?',
+                    style: TextStyle(
+                      color: marineBlue.withOpacity(0.7),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              
               // Feature Cards
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       // 1st: Real-Time Signs
                       _buildFeatureCard(
