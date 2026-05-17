@@ -172,84 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     
-                    // Profile icon or sign out button
-                    if (!isGuest)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: marineBlue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            _showProfileDialog();
-                          },
-                          icon: Icon(Icons.person_outline, color: marineBlue, size: 22),
-                          padding: const EdgeInsets.all(6),
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
-                        ),
-                      )
-                    else
-                      Container(width: 48), // Empty container for balance
-                  ],
-                ),
-              ),
-              
-              // Welcome Section with User Info
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getGreeting(),
-                      style: TextStyle(
-                        color: lightBlue,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (!isGuest && !isLoading)
-                      Text(
-                        userName ?? 'User',
-                        style: TextStyle(
-                          color: marineBlue,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      )
-                    else if (isGuest)
-                      Text(
-                        'Welcome!',
-                        style: TextStyle(
-                          color: marineBlue,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      )
-                    else
-                      const SizedBox(
-                        height: 28,
-                        width: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'What would you like to do today?',
-                      style: TextStyle(
-                        color: marineBlue.withOpacity(0.7),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+                    // Empty container for balance (right side)
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -259,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // 1st: Real-Time Signs
                       _buildFeatureCard(
@@ -282,6 +206,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       
+                      const SizedBox(height: 16),
+                      
                       // 2nd: Signs Dictionary
                       _buildFeatureCard(
                         title: 'Signs Dictionary',
@@ -302,6 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
+                      
+                      const SizedBox(height: 16),
                       
                       // 3rd: Favorites
                       _buildFeatureCard(
@@ -433,87 +361,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-  
-  void _showProfileDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.person, color: marineBlue),
-              const SizedBox(width: 8),
-              Text(
-                'Profile',
-                style: TextStyle(color: marineBlue),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow(Icons.person_outline, 'Name', userName ?? 'Not set'),
-              const Divider(),
-              _buildInfoRow(Icons.email_outlined, 'Email', userEmail ?? 'Not set'),
-              const Divider(),
-              _buildInfoRow(Icons.calendar_today, 'Member Since', '2024'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Close', style: TextStyle(color: marineBlue)),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await _signOut(context);
-              },
-              child: Text(
-                'Sign Out',
-                style: TextStyle(color: Colors.red.shade700),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: lightBlue),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: marineBlue,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
