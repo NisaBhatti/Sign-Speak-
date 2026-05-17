@@ -167,23 +167,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               
-              // Tagline Text
+              // Tagline Text - Larger size
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'What would you like to do today?',
                     style: TextStyle(
                       color: marineBlue.withOpacity(0.8),
-                      fontSize: 22,
+                      fontSize: 28, // Increased from 22 to 28
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
               
-              // Feature Cards - NO SCROLLING, using Flexible and fixed heights
+              // Feature Cards - Without descriptions
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -195,7 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _buildFeatureCard(
                           title: 'Real-Time Signs',
                           subtitle: 'Start camera detection',
-                          description: 'Translate sign language in real-time',
                           icon: Icons.videocam_outlined,
                           gradient: LinearGradient(
                             colors: [marineBlue, marineBlue.withOpacity(0.8)],
@@ -220,7 +219,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _buildFeatureCard(
                           title: 'Signs Dictionary',
                           subtitle: 'Browse over 1,000 signs',
-                          description: 'Learn and practice sign language',
                           icon: Icons.menu_book_outlined,
                           gradient: LinearGradient(
                             colors: [lightBlue, marineBlue],
@@ -244,10 +242,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: _buildFeatureCard(
                           title: 'Favorites',
-                          subtitle: 'Access your saved phrases',
-                          description: isGuest 
+                          subtitle: isGuest 
                               ? 'Sign in to save favorites'
-                              : 'Quick access to your favorite signs',
+                              : 'Access your saved phrases',
                           icon: Icons.favorite_border,
                           gradient: LinearGradient(
                             colors: [marineBlue, lightBlue],
@@ -285,98 +282,83 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeatureCard({
     required String title,
     required String subtitle,
-    required String description,
     required IconData icon,
     required Gradient gradient,
     VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: gradient,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: marineBlue.withOpacity(0.15),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: marineBlue.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 26,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 11,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          description,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 10,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.visible,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white.withOpacity(0.8),
-                      size: 16,
-                    ),
-                  ),
-                ],
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
-            ),
-          );
-        },
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
