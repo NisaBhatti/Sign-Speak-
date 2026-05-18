@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
@@ -18,81 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color color2 = Color(0xFFACD9D9);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
-  
-  Map<String, dynamic>? userData;
-  bool isLoading = true;
-  String? userName;
-  String? userEmail;
-  
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-  
-  Future<void> _loadUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    
-    if (user != null) {
-      try {
-        // Try to get user data from Firestore
-        final doc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
-        
-        if (doc.exists) {
-          setState(() {
-            userData = doc.data();
-            userName = userData?['name'] ?? user.displayName;
-            userEmail = userData?['email'] ?? user.email;
-            isLoading = false;
-          });
-        } else {
-          // If no Firestore document, use Firebase Auth data
-          setState(() {
-            userName = user.displayName;
-            userEmail = user.email;
-            isLoading = false;
-          });
-        }
-      } catch (e) {
-        print('Error loading user data: $e');
-        setState(() {
-          userName = user.displayName;
-          userEmail = user.email;
-          isLoading = false;
-        });
-      }
-    } else {
-      // Guest user
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-  
-  Future<void> _signOut(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/welcome');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signed out successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error signing out: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isGuest = user == null;
     
     return Scaffold(
-      backgroundColor: color1,
-      drawer: DrawerPage(
-        userName: userName ?? (isGuest ? null : 'User'),
-        userEmail: userEmail,
-        isGuest: isGuest,
-        onSignOut: () => _signOut(context),
-      ),
+      drawer: const DrawerPage(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -160,118 +78,111 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    
-                    // Empty container for balance (right side)
-                    const SizedBox(width: 48),
+                    Container(
+                      width: 48, // Same width as left icon for symmetry
+                    ),
+                  ],
+                ),
+              ),
+             //welcome text
+                          Padding(
+                padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'What would you like to do today?',
+                      style: TextStyle(
+                        color: marineBlue.withOpacity(0.7),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
               
-              // Tagline Text - Larger size
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'What would you like to do today?',
-                    style: TextStyle(
-                      color: marineBlue.withOpacity(0.8),
-                      fontSize: 28, // Increased from 22 to 28
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Feature Cards - Without descriptions
-              Flexible(
+              // Feature Cards
+              Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // 1st: Real-Time Signs
-                      Expanded(
-                        child: _buildFeatureCard(
-                          title: 'Real-Time Signs',
-                          subtitle: 'Start camera detection',
-                          icon: Icons.videocam_outlined,
-                          gradient: LinearGradient(
-                            colors: [marineBlue, marineBlue.withOpacity(0.8)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CameraAccessScreen(),
-                              ),
-                            );
-                          },
+                      _buildFeatureCard(
+                        title: 'Real-Time Signs',
+                        subtitle: 'Start camera detection',  
+                        description: 'Use your camera to recognize signs in real-time.',
+                        icon: Icons.videocam_outlined,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withOpacity(0.9),lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CameraAccessScreen(),
+                            ),
+                          );
+                        },
                       ),
-                      
-                      const SizedBox(height: 12),
-                      
                       // 2nd: Signs Dictionary
-                      Expanded(
-                        child: _buildFeatureCard(
-                          title: 'Signs Dictionary',
-                          subtitle: 'Browse over 1,000 signs',
-                          icon: Icons.menu_book_outlined,
-                          gradient: LinearGradient(
-                            colors: [lightBlue, marineBlue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DictionaryPage(),
-                              ),
-                            );
-                          },
+                      _buildFeatureCard(
+                        title: 'Signs Dictionary',
+                        subtitle: 'Browse over 5,00 signs',
+                        description: 'Search signs dictionary.',
+                        icon: Icons.menu_book_outlined,
+                        gradient: LinearGradient(
+                          colors: [lightBlue, marineBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DictionaryPage(),
+                            ),
+                          );
+                        },
                       ),
-                      
-                      const SizedBox(height: 12),
                       
                       // 3rd: Favorites
-                      Expanded(
-                        child: _buildFeatureCard(
-                          title: 'Favorites',
-                          subtitle: isGuest 
-                              ? 'Sign in to save favorites'
-                              : 'Access your saved phrases',
-                          icon: Icons.favorite_border,
-                          gradient: LinearGradient(
-                            colors: [marineBlue, lightBlue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          onTap: () {
-                            if (isGuest) {
-                              _showGuestDialog();
-                            } else {
-                              // Navigate to favorites page
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Favorites feature coming soon!'),
-                                  backgroundColor: Colors.orange,
-                                ),
-                              );
-                            }
-                          },
+                      _buildFeatureCard(
+                        title: 'Favorites',
+                        subtitle: 'Access your saved phrases',
+                        description: 'View  favorite signs.',
+                        icon: Icons.favorite_border,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        onTap: () {
+                          if (isGuest) {
+                            _showGuestDialog();
+                          } else {
+                            // Navigate to favorites page
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Favorites feature coming soon!'),
+                                backgroundColor: Color.fromARGB(255, 0, 94, 255),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
               
-              const SizedBox(height: 12),
+              // Small bottom padding
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -282,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeatureCard({
     required String title,
     required String subtitle,
+    required String description,
     required IconData icon,
     required Gradient gradient,
     VoidCallback? onTap,
@@ -289,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
+        height: 120,
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(20),
@@ -302,12 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
@@ -315,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 30,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: 16),
@@ -340,6 +252,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 12,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -362,7 +282,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
   void _showGuestDialog() {
     showDialog(
       context: context,
