@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:signspeak/pages/login.dart';
+import 'package:signspeak/pages/homepage.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -181,27 +182,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return false;
     }
 
-    // Strong password validation
+    // Simple password validation (only check if not empty)
     if (password.length < 6) {
       _showSnackBar('Password must be at least 6 characters long');
-      return false;
-    }
-
-    // Check for at least one letter
-    if (!RegExp(r'[A-Za-z]').hasMatch(password)) {
-      _showSnackBar('Password must contain at least one letter');
-      return false;
-    }
-
-    // Check for at least one number
-    if (!RegExp(r'[0-9]').hasMatch(password)) {
-      _showSnackBar('Password must contain at least one number');
-      return false;
-    }
-
-    // Check for at least one special character
-    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
-      _showSnackBar('Password must contain at least one special character');
       return false;
     }
 
@@ -365,55 +348,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                         ),
-                                            // Terms and Conditions
-
-                        // Password Requirements
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: lightBlue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: lightBlue.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    size: 14,
-                                    color: lightBlue,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Password Requirements:',
-                                    style: TextStyle(
-                                      color: darkBlue,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '• At least 6 characters\n'
-                                '• At least one letter\n'
-                                '• At least one number\n'
-                                '• At least one special character (!@#\$%^&*)',
-                                style: TextStyle(
-                                  color: lightBlue,
-                                  fontSize: 11,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
 
                         // Terms and Conditions
                         const SizedBox(height: 20),
@@ -427,9 +361,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 });
                               },
                               activeColor: darkBlue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
+                              checkColor: Colors.white,
                             ),
                             Expanded(
                               child: GestureDetector(
@@ -579,9 +511,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return SizedBox(
-      height: 56,
-
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -596,8 +536,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
-
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -610,17 +549,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: BorderSide(
+              color: lightBlue,
+              width: 1.5,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide( color: lightBlue.withOpacity(0.3),
-              width: 1,)
+            borderSide: BorderSide(
+              color: lightBlue.withOpacity(0.5),
+              width: 1.5,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
+              color: darkBlue,
               width: 2,
             ),
           ),
@@ -645,8 +589,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required bool isPassword,
     required VoidCallback onToggleVisibility,
   }) {
-    return SizedBox(
-      height: 56,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
@@ -661,7 +614,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             fontSize: 14,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -674,18 +627,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
-              width: 1,),
+            borderSide: BorderSide(
+              color: lightBlue,
+              width: 1.5,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.3),
-              width: 1,),
+            borderSide: BorderSide(
+              color: lightBlue.withOpacity(0.5),
+              width: 1.5,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
+              color: darkBlue,
               width: 2,
             ),
           ),
