@@ -451,7 +451,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontSize: 16,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -523,7 +523,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontSize: 16,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -551,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
+              color: darkBlue,
               width: 2,
             ),
           ),
