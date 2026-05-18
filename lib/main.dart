@@ -102,6 +102,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 // ====================== SPLASH SCREEN (Fixed) ======================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -551,14 +551,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
               color: lightBlue,
-              width: 1.5,
+              width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
               color: lightBlue.withOpacity(0.5),
-              width: 1.5,
+              width: 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(
@@ -629,14 +629,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
               color: lightBlue,
-              width: 1.5,
+              width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
               color: lightBlue.withOpacity(0.5),
-              width: 1.5,
+              width: 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(

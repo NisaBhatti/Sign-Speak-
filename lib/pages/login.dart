@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'signup.dart';
 import 'homepage.dart';
-import 'forgot.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,8 +22,20 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
+  @override
+  void initState() {
+    super.initState();
+    _checkCurrentUser();
+  }
+
+  void _checkCurrentUser() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      print('User already logged in: ${user.email}');
+    }
+  }
+
   void _handleLogin() async {
-    // Validate inputs first    
     if (!_validateLogin()) return;
 
     setState(() {
@@ -37,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
       
       print('Attempting login with email: $email');
       
-      // Actual Firebase login
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
             email: email,
@@ -49,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Login successful!'),
@@ -58,14 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
 
-      // Navigate to home screen on success
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException Error Code: ${e.code}');
-      print('FirebaseAuthException Error Message: ${e.message}');
       
       String message = 'Login failed';
       if (e.code == 'user-not-found') {
@@ -119,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return false;
     }
 
-    // require gmail only
     final gmailRegex = RegExp(r'^[^@\s]+@gmail\.com$');
     if (!gmailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,19 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return true;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCurrentUser();
-  }
-
-  void _checkCurrentUser() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      print('User already logged in: ${user.email}');
-    }
   }
 
   @override
@@ -210,7 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title
                         Text(
                           'Log In',
                           style: TextStyle(
@@ -221,8 +213,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-
-                        // Subtitle
                         Text(
                           'Welcome back! Sign in to continue',
                           style: TextStyle(
@@ -231,8 +221,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 40),
-
-                        // Email Field
                         _buildFloatingLabelTextField(
                           controller: _emailController,
                           labelText: 'Email Address',
@@ -241,8 +229,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 20),
-
-                        // Password Field
                         _buildFloatingLabelPasswordField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -254,34 +240,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                         ),
-                        
-                        // Forgot Password Link
+                        const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ForgotPasswordScreen(),
-                                ),
-                              );
+                          child: GestureDetector(
+                            onTap: () {
+                              _showForgotPasswordDialog();
                             },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                            ),
-                            child: const Text(
+                            child: Text(
                               'Forgot Password?',
                               style: TextStyle(
-                                color: Color.fromARGB(255, 8, 4, 84),
+                                color: darkBlue,
                                 fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                                decorationColor: darkBlue,
                               ),
                             ),
                           ),
                         ),
-                        
-                        // Login Button
                         const SizedBox(height: 30),
                         Container(
                           width: double.infinity,
@@ -332,8 +309,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-
-              // Sign Up Link
               Container(
                 padding: const EdgeInsets.all(24.0),
                 child: Text.rich(
@@ -378,6 +353,80 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _showForgotPasswordDialog() {
+    final TextEditingController resetEmailController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Reset Password',
+            style: TextStyle(color: darkBlue),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Enter your email address to receive a password reset link.'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: resetEmailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'example@gmail.com',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = resetEmailController.text.trim().toLowerCase();
+                if (email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter your email')),
+                  );
+                  return;
+                }
+                
+                try {
+                  await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Password reset email sent! Check your inbox.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to send reset email: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: darkBlue,
+              ),
+              child: const Text('Send Reset Link'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildFloatingLabelTextField({
     required TextEditingController controller,
     required String labelText,
@@ -402,7 +451,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontSize: 16,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -474,7 +523,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontSize: 16,
           ),
           floatingLabelStyle: TextStyle(
-            color: lightBlue,
+            color: darkBlue,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -502,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue,
+              color: darkBlue,
               width: 2,
             ),
           ),
