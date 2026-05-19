@@ -18,12 +18,16 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
+  // Create a GlobalKey for the Scaffold
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final isGuest = user == null;
     
     return Scaffold(
+      key: _scaffoldKey, // Add this key
       drawer: const DrawerPage(),
       body: Container(
         decoration: BoxDecoration(
@@ -46,22 +50,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Hamburger menu on left
-                    Builder(
-                      builder: (context) => Container(
-                        decoration: BoxDecoration(
-                          color: marineBlue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                          icon: Icon(Icons.menu, color: marineBlue, size: 22),
-                          padding: const EdgeInsets.all(6),
-                          constraints: const BoxConstraints(
-                            minWidth: 40,
-                            minHeight: 40,
-                          ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          // Use the key to open drawer
+                          _scaffoldKey.currentState?.openDrawer();
+                        },
+                        icon: Icon(Icons.menu, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 40,
                         ),
                       ),
                     ),
@@ -84,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-             //welcome text
-                          Padding(
+              //welcome text
+              Padding(
                 padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: 'Use your camera to recognize signs in real-time.',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9),lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -155,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildFeatureCard(
                         title: 'Favorites',
                         subtitle: 'Access your saved phrases',
-                        description: 'View  favorite signs.',
+                        description: 'View favorite signs.',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
                           colors: [marineBlue.withOpacity(0.9), lightBlue],
@@ -282,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  
   void _showGuestDialog() {
     showDialog(
       context: context,
@@ -307,6 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
+                // Make sure you have a login route defined
                 Navigator.pushReplacementNamed(context, '/login');
               },
               style: ElevatedButton.styleFrom(
