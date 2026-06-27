@@ -1,6 +1,6 @@
 // lib/app_intro_document.dart
 import 'package:flutter/material.dart';
-import 'terms_of_service.dart'; // Fixed import name
+import 'terms_of_service.dart'; 
 
 class AppIntroDocument extends StatelessWidget {
   const AppIntroDocument({super.key});
