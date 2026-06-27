@@ -57,6 +57,7 @@ flutter:
     - assets/images/wel.png
     - assets/images/real.png
     - assets/images/communi.png
+    - assets/images/services.png
     
   # Optional: Add fonts if needed
   # fonts:
