@@ -317,8 +317,8 @@ class _MainContent extends StatelessWidget {
               ),
             ],
             image: const DecorationImage(
-              image: NetworkImage(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuD-bERHpCA4ydLYdgrtVUVeM5zyfO2W0be27eUytl3HKRgleXqytCA1RMckzp0088VSzIBqyhF9KU5DyBhAQbOoJ5OnVLWKQuBgGqY34t0CaB0y1LjOSsksz_okEgjX5niXhUWMvfvq6Vf9e2EpmW2q1T7c8hDMt0pCUuZeqmWrxenwhqlvGLcavZsAc06Nuw73ICfMKW-XSVRhSSSBoekeajEPnBm-h_AA4HP73ePOJaY-NEZ4UwR-NsF2k6K4sKf5FBz2iPEWh88'
+              image: AssetImage(
+                'assets/images/privacy.png',
               ),
               fit: BoxFit.cover,
             ),
