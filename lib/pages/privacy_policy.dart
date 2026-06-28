@@ -179,7 +179,7 @@ class _MainContent extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Last Updated: October 2023',
+          'Last Updated: June 2026',
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,

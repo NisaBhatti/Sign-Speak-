@@ -1,6 +1,7 @@
 // lib/app_intro_document.dart
 import 'package:flutter/material.dart';
-import 'terms_of_service.dart'; 
+import 'terms_of_service.dart';
+import 'privacy_policy.dart'; // Import the Privacy Policy page
 
 class AppIntroDocument extends StatelessWidget {
   const AppIntroDocument({super.key});
@@ -543,7 +544,7 @@ class AppIntroDocument extends StatelessWidget {
           children: [
             TextButton(
               onPressed: () {
-                // Navigate to Terms of Service Page - FIXED
+                // Navigate to Terms of Service Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -563,11 +564,11 @@ class AppIntroDocument extends StatelessWidget {
             const SizedBox(width: 20),
             TextButton(
               onPressed: () {
-                // Navigate to Privacy Policy (create this page similarly)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: lightBlue,
-                    content: const Text('Privacy Policy page coming soon'),
+                // Navigate to Privacy Policy Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPolicyPage(),
                   ),
                 );
               },
