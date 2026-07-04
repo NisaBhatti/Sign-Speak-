@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
+import 'pages/alif_detection_page.dart';  // ADD THIS IMPORT
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,19 +92,20 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashScreen(), // Start with SplashScreen directly
+      home: const SplashScreen(),
       routes: {
         '/onboarding': (context) => const OnboardingScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
+        '/alif-detection': (context) => const AlifDetectionPage(),  // ADD THIS ROUTE
       },
     );
   }
 }
 
-// ====================== SPLASH SCREEN (Fixed) ======================
+// ====================== SPLASH SCREEN ======================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -120,37 +122,29 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initializeApp() async {
     try {
-      // Check if it's first launch
       final prefs = await SharedPreferences.getInstance();
       final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
       
-      // Wait for 2 seconds to show splash screen
       await Future.delayed(const Duration(seconds: 2));
       
-      // Mark as not first launch if it was first launch
       if (isFirstLaunch) {
         await prefs.setBool('isFirstLaunch', false);
         
         if (mounted) {
-          // Navigate to onboarding for first time users
           Navigator.pushReplacementNamed(context, '/onboarding');
         }
       } else {
-        // Check authentication status after showing splash
         final user = FirebaseAuth.instance.currentUser;
         
         if (mounted) {
           if (user != null) {
-            // User is logged in
             Navigator.pushReplacementNamed(context, '/home');
           } else {
-            // User is not logged in
             Navigator.pushReplacementNamed(context, '/welcome');
           }
         }
       }
     } catch (e) {
-      // Error handling - default to welcome screen
       await Future.delayed(const Duration(seconds: 2));
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/welcome');
@@ -679,8 +673,8 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // Continue as Guest
-                            Navigator.pushReplacementNamed(context, '/home');
+                            // Navigate to Alif Detection for now
+                            Navigator.pushReplacementNamed(context, '/alif-detection');
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -695,7 +689,7 @@ class WelcomeScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: const Text(
-                              'Continue as Guest',
+                              'Try Alif Detection (Demo)',
                               style: TextStyle(
                                 color: MyApp.darkBlue,
                                 fontSize: 14,
