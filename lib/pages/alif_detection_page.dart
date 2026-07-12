@@ -1,8 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../services/alif_detector.dart';
-import '../services/hand_detector.dart';
+import 'package:path_provider/path_provider.dart';
+
+// ✅ Platform-specific imports
+import 'package:tflite_flutter/tflite_flutter.dart' 
+    if (dart.library.html) 'package:tflite_flutter/tflite_flutter_web.dart';
 
 class AlifDetectionPage extends StatefulWidget {
   const AlifDetectionPage({super.key});
@@ -13,212 +20,410 @@ class AlifDetectionPage extends StatefulWidget {
 
 class _AlifDetectionPageState extends State<AlifDetectionPage> {
   CameraController? _cameraController;
-  HandDetectorService? _handDetector;
-  AlifDetector? _alifDetector;
-  
-  bool _isInitialized = false;
-  bool _isDetecting = false;
+  Interpreter? _interpreter;
+  bool _isModelLoaded = false;
+  bool _isCameraReady = false;
+  String _prediction = 'Waiting for input...';
   double _confidence = 0.0;
-  String _feedback = "Initializing camera...";
-  Color _feedbackColor = Colors.grey;
+  List<CameraDescription>? _cameras;
+
+  final int _inputSize = 224;
+  final int _numClasses = 10;
 
   @override
   void initState() {
     super.initState();
-    _initialize();
+    _initializeApp();
   }
 
-  Future<void> _initialize() async {
-    try {
-      // Request permissions
-      await Permission.camera.request();
-      
-      // Initialize detectors
-      _handDetector = HandDetectorService();
-      _alifDetector = AlifDetector();
-      await _alifDetector!.initialize();
-      
-      // Initialize camera
-      final cameras = await availableCameras();
-      final frontCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,
-        orElse: () => cameras.first,
-      );
-      
-      _cameraController = CameraController(
-        frontCamera,
-        ResolutionPreset.medium,
-        imageFormatGroup: ImageFormatGroup.yuv420,
-      );
-      
-      await _cameraController!.initialize();
-      await _cameraController!.startImageStream(_processCameraImage);
-      
-      setState(() {
-        _isInitialized = true;
-        _feedback = "Show Alif sign (Index finger up)";
-        _feedbackColor = Colors.amber;
-      });
-    } catch (e) {
-      setState(() {
-        _feedback = "Error: $e";
-        _feedbackColor = Colors.red;
-      });
+  Future<void> _initializeApp() async {
+    await _requestPermissions();
+    await _loadModel();
+    await _initCamera();
+  }
+
+  Future<void> _requestPermissions() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      await [
+        Permission.camera,
+        Permission.storage,
+      ].request();
     }
   }
 
-  void _processCameraImage(CameraImage image) async {
-    if (!_isInitialized || _isDetecting) return;
-    
-    _isDetecting = true;
-    
+  Future<void> _loadModel() async {
     try {
-      // Detect hand landmarks
-      final landmarks = await _handDetector!.detectHandLandmarks(image);
+      print('📥 Loading model...');
       
-      if (landmarks != null && landmarks.length == 21) {
-        // Get Alif detection confidence
-        final confidence = await _alifDetector!.getAlifConfidence(landmarks);
-        final isAlif = confidence > 0.5;
+      // ✅ Different loading for Windows vs Mobile
+      if (Platform.isWindows) {
+        // For Windows: Load from local file
+        final dir = await getApplicationDocumentsDirectory();
+        final modelPath = '${dir.path}/alif_model.tflite';
         
-        setState(() {
-          _confidence = confidence;
-          
-          if (isAlif) {
-            if (confidence > 0.8) {
-              _feedback = "✅ ALIF (ا) - Perfect!";
-              _feedbackColor = Colors.green;
-            } else if (confidence > 0.6) {
-              _feedback = "✅ ALIF (ا) - Good";
-              _feedbackColor = Colors.lightGreen;
-            } else {
-              _feedback = "✅ ALIF (ا) - Almost there";
-              _feedbackColor = Colors.yellow.shade700;
-            }
-          } else {
-            if (confidence < 0.2) {
-              _feedback = "❌ Not Alif";
-              _feedbackColor = Colors.red;
-            } else if (confidence < 0.4) {
-              _feedback = "🔄 Raise your index finger";
-              _feedbackColor = Colors.orange;
-            } else {
-              _feedback = "⚠️ Keep index finger up, others down";
-              _feedbackColor = Colors.amber;
-            }
-          }
-        });
+        // Copy from assets to local storage
+        // (You'll need to pre-copy the model file)
+        _interpreter = Interpreter.fromFile(modelPath);
       } else {
+        // For Mobile: Load from assets
+        _interpreter = await Interpreter.fromAsset(
+          'assets/models/alif_model.tflite',
+          options: InterpreterOptions()..threads = 4,
+        );
+      }
+      
+      setState(() {
+        _isModelLoaded = true;
+      });
+      print('✅ Model loaded successfully!');
+    } catch (e) {
+      print('❌ Failed to load model: $e');
+      // ✅ Use fallback prediction for Windows testing
+      if (Platform.isWindows) {
         setState(() {
-          _feedback = "🖐️ Show your hand to camera";
-          _feedbackColor = Colors.grey;
-          _confidence = 0.0;
+          _isModelLoaded = true; // Allow testing UI
+          _prediction = 'Alif (Demo)';
         });
       }
+    }
+  }
+
+  Future<void> _initCamera() async {
+    try {
+      // ✅ Skip camera on Windows for now
+      if (Platform.isWindows) {
+        setState(() {
+          _isCameraReady = true;
+        });
+        print('✅ Windows: Camera simulation mode');
+        return;
+      }
+
+      _cameras = await availableCameras();
+      if (_cameras == null || _cameras!.isEmpty) {
+        throw Exception('No cameras available');
+      }
+
+      _cameraController = CameraController(
+        _cameras![0],
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+
+      await _cameraController!.initialize();
+      
+      setState(() {
+        _isCameraReady = true;
+      });
+      print('✅ Camera initialized!');
     } catch (e) {
-      print('Error processing image: $e');
+      print('❌ Camera initialization failed: $e');
+      // ✅ Fallback for Windows
+      if (Platform.isWindows) {
+        setState(() {
+          _isCameraReady = true;
+        });
+      }
+    }
+  }
+
+  // ✅ Mock prediction for Windows testing
+  Future<void> _simulatePrediction() async {
+    setState(() {
+      _prediction = 'الف';
+      _confidence = 0.92;
+    });
+  }
+
+  Future<void> _captureAndPredict() async {
+    if (!_isCameraReady || !_isModelLoaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Camera or model not ready!')),
+      );
+      return;
+    }
+
+    // ✅ Windows simulation
+    if (Platform.isWindows) {
+      await _simulatePrediction();
+      return;
+    }
+
+    try {
+      final XFile imageFile = await _cameraController!.takePicture();
+      final File image = File(imageFile.path);
+      
+      final img.Image? inputImage = img.decodeImage(await image.readAsBytes());
+      if (inputImage == null) throw Exception('Failed to decode image');
+
+      final preprocessed = _preprocessImage(inputImage);
+      final output = await _runInference(preprocessed);
+      final (predictedClass, confidence) = _getPrediction(output);
+      
+      setState(() {
+        _prediction = _getSignLabel(predictedClass);
+        _confidence = confidence;
+      });
+      
+      print('🎯 Prediction: $_prediction (${(confidence * 100).toStringAsFixed(1)}%)');
+    } catch (e) {
+      print('❌ Prediction error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  List<List<double>> _preprocessImage(img.Image image) {
+    final resized = img.copyResize(image, width: _inputSize, height: _inputSize);
+    
+    List<List<double>> input = List.generate(
+      _inputSize,
+      (y) => List.generate(
+        _inputSize,
+        (x) {
+          final pixel = resized.getPixel(x, y);
+          return (pixel.r + pixel.g + pixel.b) / (3 * 255.0);
+        },
+      ),
+    );
+    
+    return input;
+  }
+
+  Future<List<List<double>>> _runInference(List<List<double>> input) async {
+    var inputTensor = [input];
+    var outputTensor = List.generate(
+      1,
+      (i) => List.generate(_numClasses, (j) => 0.0),
+    );
+    
+    _interpreter?.run(inputTensor, outputTensor);
+    return outputTensor;
+  }
+
+  (int, double) _getPrediction(List<List<double>> output) {
+    final predictions = output[0];
+    int maxIndex = 0;
+    double maxValue = predictions[0];
+    
+    for (int i = 1; i < predictions.length; i++) {
+      if (predictions[i] > maxValue) {
+        maxValue = predictions[i];
+        maxIndex = i;
+      }
     }
     
-    _isDetecting = false;
+    return (maxIndex, maxValue);
+  }
+
+  String _getSignLabel(int index) {
+    const labels = [
+      'الف', 'بے', 'پے', 'تے', 'ٹے', 
+      'ثے', 'جیم', 'چے', 'حے', 'خے'
+    ];
+    
+    if (index < labels.length) {
+      return labels[index];
+    }
+    return 'Unknown';
+  }
+
+  Future<void> _pickImageAndPredict() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? imageFile = await picker.pickImage(source: ImageSource.gallery);
+    
+    if (imageFile == null) return;
+    
+    try {
+      final File image = File(imageFile.path);
+      final img.Image? inputImage = img.decodeImage(await image.readAsBytes());
+      if (inputImage == null) throw Exception('Failed to decode image');
+      
+      final preprocessed = _preprocessImage(inputImage);
+      final output = await _runInference(preprocessed);
+      final (predictedClass, confidence) = _getPrediction(output);
+      
+      setState(() {
+        _prediction = _getSignLabel(predictedClass);
+        _confidence = confidence;
+      });
+    } catch (e) {
+      print('❌ Error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    _interpreter?.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_isInitialized || _cameraController == null) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(_feedback),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Alif Detection - Urdu Sign"),
-        backgroundColor: Colors.teal,
+        title: const Text('Alif Detection - Urdu Sign Language'),
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          // Camera preview
           Expanded(
             flex: 3,
             child: Container(
-              color: Colors.black,
-              child: CameraPreview(_cameraController!),
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: _isCameraReady
+                  ? _cameraController != null && _cameraController!.value.isInitialized
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: CameraPreview(_cameraController!),
+                        )
+                      : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.camera_alt, size: 64, color: Colors.grey),
+                              SizedBox(height: 8),
+                              Text('Camera Preview', style: TextStyle(color: Colors.grey)),
+                              Text('(Windows: Simulation Mode)', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                            ],
+                          ),
+                        )
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    ),
             ),
           ),
           
-          // Detection feedback panel
           Container(
             padding: const EdgeInsets.all(20),
-            color: Colors.grey.shade900,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.deepPurple, Colors.purple[300]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(15),
+            ),
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  decoration: BoxDecoration(
-                    color: _feedbackColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: _feedbackColor, width: 2),
-                  ),
-                  child: Text(
-                    _feedback,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: _feedbackColor,
-                    ),
-                    textAlign: TextAlign.center,
+                const Text(
+                  'Detection Result',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
                   ),
                 ),
-                
-                const SizedBox(height: 15),
-                
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Confidence: ${(_confidence * 100).toStringAsFixed(1)}%",
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                const SizedBox(height: 8),
+                Text(
+                  _prediction,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (_confidence > 0)
+                  Text(
+                    '${(_confidence * 100).toStringAsFixed(1)}% confidence',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
                     ),
-                    const SizedBox(height: 5),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: _confidence,
-                        minHeight: 10,
-                        backgroundColor: Colors.grey.shade700,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _confidence > 0.5 ? Colors.green : Colors.orange,
-                        ),
+                  ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isCameraReady && _isModelLoaded
+                        ? _captureAndPredict
+                        : null,
+                    icon: const Icon(Icons.camera_alt),
+                    label: Text(Platform.isWindows ? 'Simulate' : 'Capture & Detect'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
-                ),
-                
-                const SizedBox(height: 15),
-                
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade900.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      InstructionWidget("☝️", "Index finger up"),
-                      InstructionWidget("✊", "Other fingers folded"),
-                      InstructionWidget("🎯", "Clear background"),
-                    ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isModelLoaded ? _pickImageAndPredict : null,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Upload Image'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[800],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _isModelLoaded ? Icons.check_circle : Icons.warning,
+                  color: _isModelLoaded ? Colors.green : Colors.orange,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _isModelLoaded ? 'Model Ready' : 'Loading Model...',
+                  style: TextStyle(
+                    color: _isModelLoaded ? Colors.green : Colors.orange,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    Platform.isWindows ? '💻 Windows' : '📱 Mobile',
+                    style: const TextStyle(fontSize: 10),
                   ),
                 ),
               ],
@@ -226,32 +431,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    _handDetector?.dispose();
-    _alifDetector?.dispose();
-    super.dispose();
-  }
-}
-
-class InstructionWidget extends StatelessWidget {
-  final String emoji;
-  final String text;
-  
-  const InstructionWidget(this.emoji, this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 30)),
-        const SizedBox(height: 5),
-        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-      ],
     );
   }
 }
