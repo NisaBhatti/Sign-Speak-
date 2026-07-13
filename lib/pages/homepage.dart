@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
-import 'pages/alif_detection_page.dart';   // ← new import
+import 'package:signspeak/pages/alif_detection_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
