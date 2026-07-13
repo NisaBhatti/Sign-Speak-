@@ -4,36 +4,19 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_hand_landmark/google_mlkit_hand_landmark.dart';
-import 'package:google_mlkit_commons/google_mlkit_commons.dart'; // important
+import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:collection';
 
-// ========== HARDCODED REFERENCE ALIF (placeholder) ==========
+// Placeholder – replace with your actual average coordinates
 const List<List<double>> REFERENCE_ALIF = [
-  [0.5, 0.2],
-  [0.5, 0.25],
-  [0.5, 0.3],
-  [0.5, 0.35],
-  [0.5, 0.4],
-  [0.55, 0.5],
-  [0.6, 0.55],
-  [0.65, 0.6],
-  [0.7, 0.65],
-  [0.5, 0.5],
-  [0.45, 0.6],
-  [0.45, 0.7],
-  [0.45, 0.8],
-  [0.5, 0.5],
-  [0.5, 0.65],
-  [0.5, 0.75],
-  [0.5, 0.85],
-  [0.5, 0.5],
-  [0.55, 0.65],
-  [0.6, 0.75],
-  [0.6, 0.85],
+  [0.5, 0.2], [0.5, 0.25], [0.5, 0.3], [0.5, 0.35], [0.5, 0.4],
+  [0.55, 0.5], [0.6, 0.55], [0.65, 0.6], [0.7, 0.65],
+  [0.5, 0.5], [0.45, 0.6], [0.45, 0.7], [0.45, 0.8],
+  [0.5, 0.5], [0.5, 0.65], [0.5, 0.75], [0.5, 0.85],
+  [0.5, 0.5], [0.55, 0.65], [0.6, 0.75], [0.6, 0.85],
 ];
-// ===========================================================
 
 class AlifDetectionPage extends StatefulWidget {
   const AlifDetectionPage({super.key});
@@ -45,7 +28,7 @@ class AlifDetectionPage extends StatefulWidget {
 class _AlifDetectionPageState extends State<AlifDetectionPage> {
   CameraController? _cameraController;
   Interpreter? _interpreter;
-  HandLandmarker? _handLandmarker;  // ← changed
+  HandLandmarker? _handLandmarker;   // ✅ correct type
 
   bool _isModelLoaded = false;
   bool _isCameraReady = false;
@@ -93,14 +76,14 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
       print('✅ Robust model loaded');
     } catch (e) {
       print('❌ Model error: $e');
-      setState(() => _isModelLoaded = true); // fallback
+      setState(() => _isModelLoaded = true);
     }
   }
 
   void _initHandLandmarker() {
     _handLandmarker = HandLandmarker(
       options: HandLandmarkerOptions(
-        mode: HandLandmarkerMode.liveStream,   // ← correct
+        mode: HandLandmarkerMode.liveStream,
         numHands: 1,
         minHandDetectionConfidence: 0.5,
         minHandPresenceConfidence: 0.5,
@@ -116,7 +99,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
       cameras[0],
       ResolutionPreset.high,
       enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420, // ML Kit needs YUV
+      imageFormatGroup: ImageFormatGroup.yuv420,
     );
     await _cameraController!.initialize();
     _imageSize = Size(
@@ -127,8 +110,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     print('✅ Camera ready');
   }
 
-  // ========== TOGGLE ==========
-  void _toggleLiveDetection(bool value) async {
+  void _toggleLiveDetection(bool value) {
     setState(() => _isLiveDetecting = value);
     if (value) {
       _startImageStream();
@@ -165,19 +147,19 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     final hand = hands.first;
     final landmarks = hand.landmarks;
 
-    // Normalize landmarks to 0-1 (relative to image size)
+    // Normalise to 0‑1
     final normX = landmarks.map((lm) => lm.x / inputImage.size.width).toList();
     final normY = landmarks.map((lm) => lm.y / inputImage.size.height).toList();
 
-    final List<double> features = [];
+    final features = <double>[];
     for (int i = 0; i < landmarks.length; i++) {
       features.add(normX[i]);
       features.add(normY[i]);
     }
 
-    // TFLite inference
-    final inputTensor = [features];        // [1,42]
-    final outputTensor = List.generate(1, (_) => [0.0]); // [1,1]
+    // Inference
+    final inputTensor = [features];
+    final outputTensor = List.generate(1, (_) => [0.0]);
     _interpreter!.run(inputTensor, outputTensor);
     double rawPred = outputTensor[0][0];
 
@@ -186,7 +168,8 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     if (_predictionHistory.length > smoothWindow) {
       _predictionHistory.removeFirst();
     }
-    double smoothPred = _predictionHistory.reduce((a,b) => a+b) / _predictionHistory.length;
+    double smoothPred =
+        _predictionHistory.reduce((a, b) => a + b) / _predictionHistory.length;
 
     bool isAlif = smoothPred > 0.5;
     double confidence = isAlif ? smoothPred : (1 - smoothPred);
@@ -199,9 +182,22 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     });
   }
 
-  // ✅ CORRECT YUV -> InputImage conversion
+  // ✅ CORRECT YUV → InputImage (works with google_mlkit_commons)
   InputImage? _convertCameraImage(CameraImage image) {
-    // Build ML Kit planes from camera planes
+    // Get the correct image format
+    InputImageFormat format;
+    switch (image.format.raw) {
+      case 35: // YUV_420_888
+        format = InputImageFormat.yuv_420_888;
+        break;
+      case 17: // NV21
+        format = InputImageFormat.nv21;
+        break;
+      default:
+        return null;
+    }
+
+    // Create plane data
     final planes = image.planes.map((plane) {
       return InputImagePlane(
         bytes: plane.bytes,
@@ -213,8 +209,8 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
 
     final inputImageData = InputImageData(
       size: Size(image.width.toDouble(), image.height.toDouble()),
-      imageRotation: InputImageRotation.rotation0deg, // adjust if needed
-      inputImageFormat: InputImageFormat.yuv_420_888,
+      imageRotation: InputImageRotation.rotation0deg,  // adjust for front camera
+      inputImageFormat: format,
       planeData: planes,
     );
 
@@ -226,7 +222,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     _stopImageStream();
     _cameraController?.dispose();
     _interpreter?.close();
-    _handLandmarker?.close();  // ← changed
+    _handLandmarker?.close();
     super.dispose();
   }
 
@@ -250,7 +246,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
         ),
         child: Column(
           children: [
-            // Camera preview + overlay
             Expanded(
               flex: 3,
               child: Container(
@@ -288,8 +283,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
                     : const Center(child: CircularProgressIndicator()),
               ),
             ),
-
-            // Real‑time toggle
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -306,8 +299,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
                 ],
               ),
             ),
-
-            // Result card
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -322,11 +313,11 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
               ),
               child: Column(
                 children: [
-                  const Text(
-                    'Detection Result',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300),
-                  ),
+                  const Text('Detection Result',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300)),
                   const SizedBox(height: 8),
                   Text(
                     _prediction,
@@ -348,8 +339,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
                 ],
               ),
             ),
-
-            // Status
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -378,7 +367,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   }
 }
 
-// ========== HAND PAINTER (unchanged) ==========
 class HandPainter extends CustomPainter {
   final List<HandLandmark> landmarks;
   final Size imageSize;
@@ -397,7 +385,6 @@ class HandPainter extends CustomPainter {
     final double scaleX = size.width / imageSize.width;
     final double scaleY = size.height / imageSize.height;
 
-    // Draw reference Alif skeleton
     final refPaint = Paint()
       ..color = Colors.white.withOpacity(0.5)
       ..strokeWidth = 2.0
@@ -414,7 +401,6 @@ class HandPainter extends CustomPainter {
       canvas.drawLine(p1, p2, refPaint);
     }
 
-    // Draw current hand
     final handColor = isAlif ? Colors.green : Colors.yellow;
     final handPaint = Paint()
       ..color = handColor
