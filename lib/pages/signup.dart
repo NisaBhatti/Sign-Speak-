@@ -21,7 +21,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   bool _acceptTerms = false;
 
-  // Color palette matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
@@ -37,7 +36,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _handleSignUp() async {
-    // Validate inputs first
     if (!_validateSignUp()) return;
 
     setState(() {
@@ -51,7 +49,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       
       print('Attempting to create user: $email');
       
-      // Create user with Firebase Authentication
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: email,
@@ -60,13 +57,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       
       print('User created successfully: ${userCredential.user?.uid}');
       
-      // Update user profile with name
       await userCredential.user?.updateDisplayName(name);
-      
-      // Send email verification
       await userCredential.user?.sendEmailVerification();
       
-      // Save user details to Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
@@ -84,24 +77,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (!mounted) return;
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Account created successfully! Please verify your email.'),
+          content: Text('Account created successfully! Welcome to Signs Speak!'),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
 
-      // Sign out the user until they verify email
-      await FirebaseAuth.instance.signOut();
-
-      if (!mounted) return;
-
-      // Navigate to login screen
-      Navigator.pushReplacement(
+      // ✅ FIXED: Navigate to Home Page instead of Login
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
       );
       
     } on FirebaseAuthException catch (e) {
@@ -151,7 +139,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // Validate name
     if (name.isEmpty) {
       _showSnackBar('Please enter your full name');
       return false;
@@ -162,32 +149,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return false;
     }
 
-    // Validate email
     if (email.isEmpty) {
       _showSnackBar('Please enter your email');
       return false;
     }
 
-    // Gmail only validation
     final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
     if (!gmailRegex.hasMatch(email)) {
       _showSnackBar('Please enter a valid Gmail address (example@gmail.com)');
       return false;
     }
 
-    // Validate password
     if (password.isEmpty) {
       _showSnackBar('Please enter your password');
       return false;
     }
 
-    // Simple password validation (only check if not empty)
     if (password.length < 6) {
       _showSnackBar('Password must be at least 6 characters long');
       return false;
     }
 
-    // Validate confirm password
     if (confirmPassword.isEmpty) {
       _showSnackBar('Please confirm your password');
       return false;
@@ -198,7 +180,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return false;
     }
 
-    // Validate terms acceptance
     if (!_acceptTerms) {
       _showSnackBar('Please accept the Terms and Conditions');
       return false;
@@ -225,16 +206,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              color1,
-              color2,
-            ],
+            colors: [color1, color2],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Header with back button
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -254,12 +231,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     const Spacer(),
-                    const SizedBox(width: 48), // For balance
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
-
-              // White form container
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.all(20),
@@ -279,7 +254,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Title
                         Text(
                           'Create Account',
                           style: TextStyle(
@@ -290,18 +264,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-
-                        // Subtitle
                         Text(
                           'Sign up to get started with Signs Speak',
-                          style: TextStyle(
-                            color: lightBlue,
-                            fontSize: 14,
-                          ),
+                          style: TextStyle(color: lightBlue, fontSize: 14),
                         ),
                         const SizedBox(height: 32),
-
-                        // Full Name Field
                         _buildTextField(
                           controller: _nameController,
                           labelText: 'Full Name',
@@ -310,8 +277,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           keyboardType: TextInputType.name,
                         ),
                         const SizedBox(height: 20),
-
-                        // Email Field
                         _buildTextField(
                           controller: _emailController,
                           labelText: 'Email Address',
@@ -320,8 +285,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 20),
-
-                        // Password Field
                         _buildPasswordField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -334,8 +297,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         const SizedBox(height: 20),
-
-                        // Confirm Password Field
                         _buildPasswordField(
                           controller: _confirmPasswordController,
                           labelText: 'Confirm Password',
@@ -347,8 +308,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                         ),
-
-                        // Terms and Conditions
                         const SizedBox(height: 20),
                         Row(
                           children: [
@@ -374,10 +333,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     children: [
                                       TextSpan(
                                         text: 'I agree to the ',
-                                        style: TextStyle(
-                                          color: lightBlue,
-                                          fontSize: 12,
-                                        ),
+                                        style: TextStyle(color: lightBlue, fontSize: 12),
                                       ),
                                       TextSpan(
                                         text: 'Terms of Service',
@@ -390,10 +346,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       ),
                                       TextSpan(
                                         text: ' and ',
-                                        style: TextStyle(
-                                          color: lightBlue,
-                                          fontSize: 12,
-                                        ),
+                                        style: TextStyle(color: lightBlue, fontSize: 12),
                                       ),
                                       TextSpan(
                                         text: 'Privacy Policy',
@@ -411,8 +364,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ],
                         ),
-
-                        // Sign Up Button
                         const SizedBox(height: 30),
                         Container(
                           width: double.infinity,
@@ -443,40 +394,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
                                 : const Text(
                                     'Sign Up',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                           ),
                         ),
-
-                        // Login Link
                         const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               "Already have an account? ",
-                              style: TextStyle(
-                                color: lightBlue,
-                                fontSize: 14,
-                              ),
+                              style: TextStyle(color: lightBlue, fontSize: 14),
                             ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginScreen(),
-                                  ),
+                                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                                 );
                               },
                               child: Text(
@@ -524,58 +463,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: TextStyle(
-          color: darkBlue,
-          fontSize: 16,
-        ),
+        style: TextStyle(color: darkBlue, fontSize: 16),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(
-            color: lightBlue,
-            fontSize: 14,
-          ),
-          floatingLabelStyle: TextStyle(
-            color: darkBlue,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          labelStyle: TextStyle(color: lightBlue, fontSize: 14),
+          floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
-            fontSize: 14,
-          ),
+          hintStyle: TextStyle(color: lightBlue.withOpacity(0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: lightBlue,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: lightBlue, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.5),
-              width: 1,
-            ),
+            borderSide: BorderSide(color: lightBlue.withOpacity(0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: darkBlue,
-              width: 2,
-            ),
+            borderSide: BorderSide(color: darkBlue, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: lightBlue,
-            size: 20,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          prefixIcon: Icon(icon, color: lightBlue, size: 20),
         ),
       ),
     );
@@ -602,64 +512,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: TextStyle(
-          color: darkBlue,
-          fontSize: 16,
-        ),
+        style: TextStyle(color: darkBlue, fontSize: 16),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(
-            color: lightBlue,
-            fontSize: 14,
-          ),
-          floatingLabelStyle: TextStyle(
-            color: darkBlue,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          labelStyle: TextStyle(color: lightBlue, fontSize: 14),
+          floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
-            fontSize: 14,
-          ),
+          hintStyle: TextStyle(color: lightBlue.withOpacity(0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: lightBlue,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: lightBlue, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.5),
-              width: 1,
-            ),
+            borderSide: BorderSide(color: lightBlue.withOpacity(0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: darkBlue,
-              width: 2,
-            ),
+            borderSide: BorderSide(color: darkBlue, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          prefixIcon: Icon(
-            Icons.lock_outline,
-            color: lightBlue,
-            size: 20,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          prefixIcon: Icon(Icons.lock_outline, color: lightBlue, size: 20),
           suffixIcon: IconButton(
             onPressed: onToggleVisibility,
             icon: Icon(
-              isPassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
+              isPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
               color: lightBlue,
               size: 20,
             ),
