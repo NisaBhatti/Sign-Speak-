@@ -2,12 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
 
-// ✅ Platform-specific imports
-import 'package:tflite_flutter/tflite_flutter.dart' 
+import 'package:tflite_flutter/tflite_flutter.dart'
     if (dart.library.html) 'package:tflite_flutter/tflite_flutter_web.dart';
 
 class AlifDetectionPage extends StatefulWidget {
@@ -22,12 +19,20 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   Interpreter? _interpreter;
   bool _isModelLoaded = false;
   bool _isCameraReady = false;
-  String _prediction = 'Waiting for input...';
+  bool _isProcessing = false;        // for capture button
+  bool _isLiveDetecting = false;     // live stream toggle
+  String _prediction = 'Waiting...';
   double _confidence = 0.0;
   List<CameraDescription>? _cameras;
 
   final int _inputSize = 224;
   final int _numClasses = 10;
+
+  // Home page colors
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
 
   @override
   void initState() {
@@ -53,151 +58,111 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   Future<void> _loadModel() async {
     try {
       print('📥 Loading model...');
-      
-      // ✅ Different loading for Windows vs Mobile
-      if (Platform.isWindows) {
-        // For Windows: Load from local file
-        final dir = await getApplicationDocumentsDirectory();
-        final modelPath = '${dir.path}/alif_model.tflite';
-        
-        // Copy from assets to local storage
-        // (You'll need to pre-copy the model file)
-        _interpreter = Interpreter.fromFile(File(modelPath));
-      } else {
-        // For Mobile: Load from assets
-        _interpreter = await Interpreter.fromAsset(
-          'assets/models/alif_model.tflite',
-          options: InterpreterOptions()..threads = 4,
-        );
-      }
-      
+      _interpreter = await Interpreter.fromAsset(
+        'assets/models/alif_model.tflite',
+        options: InterpreterOptions()..threads = 4,
+      );
+      setState(() => _isModelLoaded = true);
+      print('✅ Model loaded');
+    } catch (e) {
+      print('❌ Model error: $e');
       setState(() {
         _isModelLoaded = true;
+        _prediction = 'الف (Demo)';
       });
-      print('✅ Model loaded successfully!');
-    } catch (e) {
-      print('❌ Failed to load model: $e');
-      // ✅ Use fallback prediction for Windows testing
-      if (Platform.isWindows) {
-        setState(() {
-          _isModelLoaded = true; // Allow testing UI
-          _prediction = 'Alif (Demo)';
-        });
-      }
     }
   }
 
   Future<void> _initCamera() async {
     try {
-      // ✅ Skip camera on Windows for now
-      if (Platform.isWindows) {
-        setState(() {
-          _isCameraReady = true;
-        });
-        print('✅ Windows: Camera simulation mode');
-        return;
-      }
-
       _cameras = await availableCameras();
       if (_cameras == null || _cameras!.isEmpty) {
-        throw Exception('No cameras available');
+        throw Exception('No cameras');
       }
-
       _cameraController = CameraController(
         _cameras![0],
         ResolutionPreset.medium,
         enableAudio: false,
       );
-
       await _cameraController!.initialize();
-      
-      setState(() {
-        _isCameraReady = true;
-      });
-      print('✅ Camera initialized!');
+      setState(() => _isCameraReady = true);
+      print('✅ Camera ready');
     } catch (e) {
-      print('❌ Camera initialization failed: $e');
-      // ✅ Fallback for Windows
-      if (Platform.isWindows) {
-        setState(() {
-          _isCameraReady = true;
-        });
-      }
+      print('❌ Camera error: $e');
     }
   }
 
-  // ✅ Mock prediction for Windows testing
-  Future<void> _simulatePrediction() async {
-    setState(() {
-      _prediction = 'الف';
-      _confidence = 0.92;
+  // 🔁 Toggle real‑time detection
+  void _toggleLiveDetection(bool value) async {
+    setState(() => _isLiveDetecting = value);
+    if (value) {
+      _startImageStream();
+    } else {
+      _stopImageStream();
+    }
+  }
+
+  void _startImageStream() {
+    _cameraController?.startImageStream((CameraImage image) {
+      if (!_isLiveDetecting || !_isModelLoaded) return;
+      _processFrame(image);
     });
   }
 
-  Future<void> _captureAndPredict() async {
-    if (!_isCameraReady || !_isModelLoaded) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera or model not ready!')),
-      );
-      return;
-    }
+  void _stopImageStream() {
+    _cameraController?.stopImageStream();
+  }
 
-    // ✅ Windows simulation
-    if (Platform.isWindows) {
-      await _simulatePrediction();
-      return;
-    }
+  // 🔹 Convert CameraImage (YUV420) to img.Image and predict
+  Future<void> _processFrame(CameraImage cameraImage) async {
+    // Convert YUV420 to RGB (simplified – uses first plane only, adjust for full colour)
+    final int width = cameraImage.width;
+    final int height = cameraImage.height;
+    final plane = cameraImage.planes[0];
+    final bytes = plane.bytes;
+    // Create Image from raw BGRA bytes if available, else approximate
+    // For simplicity, we use a rough conversion:
+    final img.Image? frameImg = img.Image.fromBytes(
+      width: width,
+      height: height,
+      bytes: bytes.buffer,
+      format: img.Format.uint8, // single channel
+    );
+    if (frameImg == null) return;
 
-    try {
-      final XFile imageFile = await _cameraController!.takePicture();
-      final File image = File(imageFile.path);
-      
-      final img.Image? inputImage = img.decodeImage(await image.readAsBytes());
-      if (inputImage == null) throw Exception('Failed to decode image');
+    final preprocessed = _preprocessImage(frameImg);
+    final output = await _runInference(preprocessed);
+    final (predictedClass, confidence) = _getPrediction(output);
 
-      final preprocessed = _preprocessImage(inputImage);
-      final output = await _runInference(preprocessed);
-      final (predictedClass, confidence) = _getPrediction(output);
-      
+    if (mounted) {
       setState(() {
         _prediction = _getSignLabel(predictedClass);
         _confidence = confidence;
       });
-      
-      print('🎯 Prediction: $_prediction (${(confidence * 100).toStringAsFixed(1)}%)');
-    } catch (e) {
-      print('❌ Prediction error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
     }
   }
 
-  List<List<double>> _preprocessImage(img.Image image) {
+  // 4D tensor [1][224][224][1] grayscale
+  List<List<List<List<double>>>> _preprocessImage(img.Image image) {
     final resized = img.copyResize(image, width: _inputSize, height: _inputSize);
-    
-    List<List<double>> input = List.generate(
-      _inputSize,
-      (y) => List.generate(
+    return List.generate(
+      1,
+      (b) => List.generate(
         _inputSize,
-        (x) {
-          final pixel = resized.getPixel(x, y);
-          return (pixel.r + pixel.g + pixel.b) / (3 * 255.0);
-        },
+        (y) => List.generate(
+          _inputSize,
+          (x) {
+            final pixel = resized.getPixel(x, y);
+            return [(pixel.r + pixel.g + pixel.b) / (3 * 255.0)];
+          },
+        ),
       ),
     );
-    
-    return input;
   }
 
-  Future<List<List<double>>> _runInference(List<List<double>> input) async {
-    var inputTensor = [input];
-    var outputTensor = List.generate(
-      1,
-      (i) => List.generate(_numClasses, (j) => 0.0),
-    );
-    
-    _interpreter?.run(inputTensor, outputTensor);
+  Future<List<List<double>>> _runInference(List<List<List<List<double>>>> input) async {
+    var outputTensor = List.generate(1, (_) => List.filled(_numClasses, 0.0));
+    _interpreter?.run(input, outputTensor);
     return outputTensor;
   }
 
@@ -205,55 +170,50 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     final predictions = output[0];
     int maxIndex = 0;
     double maxValue = predictions[0];
-    
     for (int i = 1; i < predictions.length; i++) {
       if (predictions[i] > maxValue) {
         maxValue = predictions[i];
         maxIndex = i;
       }
     }
-    
     return (maxIndex, maxValue);
   }
 
   String _getSignLabel(int index) {
     const labels = [
-      'الف', 'بے', 'پے', 'تے', 'ٹے', 
+      'الف', 'بے', 'پے', 'تے', 'ٹے',
       'ثے', 'جیم', 'چے', 'حے', 'خے'
     ];
-    
-    if (index < labels.length) {
-      return labels[index];
-    }
-    return 'Unknown';
+    return index < labels.length ? labels[index] : 'Unknown';
   }
 
-  Future<void> _pickImageAndPredict() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? imageFile = await picker.pickImage(source: ImageSource.gallery);
-    
-    if (imageFile == null) return;
-    
+  // Manual capture (works when live detection OFF)
+  Future<void> _captureAndPredict() async {
+    if (!_isCameraReady || !_isModelLoaded) return;
+    if (_isProcessing) return;
+    _isProcessing = true;
     try {
+      final XFile imageFile = await _cameraController!.takePicture();
       final File image = File(imageFile.path);
       final img.Image? inputImage = img.decodeImage(await image.readAsBytes());
-      if (inputImage == null) throw Exception('Failed to decode image');
-      
+      if (inputImage == null) throw Exception('Failed to decode');
       final preprocessed = _preprocessImage(inputImage);
       final output = await _runInference(preprocessed);
       final (predictedClass, confidence) = _getPrediction(output);
-      
       setState(() {
         _prediction = _getSignLabel(predictedClass);
         _confidence = confidence;
       });
     } catch (e) {
-      print('❌ Error: $e');
+      print('Capture error: $e');
+    } finally {
+      _isProcessing = false;
     }
   }
 
   @override
   void dispose() {
+    _stopImageStream();
     _cameraController?.dispose();
     _interpreter?.close();
     super.dispose();
@@ -263,172 +223,148 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alif Detection - Urdu Sign Language'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text('Alif Detection'),
+        backgroundColor: marineBlue,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 8,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color1, color2],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Camera preview
+            Expanded(
+              flex: 3,
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: marineBlue.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: _isCameraReady
+                    ? _cameraController != null && _cameraController!.value.isInitialized
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: CameraPreview(_cameraController!),
+                          )
+                        : const Center(child: CircularProgressIndicator())
+                    : const Center(child: CircularProgressIndicator()),
+              ),
+            ),
+
+            // Real‑time toggle
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Real‑time Detection', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 10),
+                  Switch(
+                    value: _isLiveDetecting,
+                    onChanged: _toggleLiveDetection,
+                    activeColor: marineBlue,
                   ),
                 ],
               ),
-              child: _isCameraReady
-                  ? _cameraController != null && _cameraController!.value.isInitialized
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: CameraPreview(_cameraController!),
-                        )
-                      : const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.camera_alt, size: 64, color: Colors.grey),
-                              SizedBox(height: 8),
-                              Text('Camera Preview', style: TextStyle(color: Colors.grey)),
-                              Text('(Windows: Simulation Mode)', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                            ],
-                          ),
-                        )
-                  : const Center(
-                      child: CircularProgressIndicator(),
-                    ),
             ),
-          ),
-          
-          Container(
-            padding: const EdgeInsets.all(20),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.deepPurple, Colors.purple[300]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+
+            // 🔵 Wider result card
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              width: double.infinity,   // full width
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [marineBlue, lightBlue],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(15),
               ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  'Detection Result',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
+              child: Column(
+                children: [
+                  const Text(
+                    'Detection Result',
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _prediction,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (_confidence > 0)
+                  const SizedBox(height: 8),
                   Text(
-                    '${(_confidence * 100).toStringAsFixed(1)}% confidence',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    _prediction,
+                    style: const TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
-              ],
+                  if (_confidence > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        '${(_confidence * 100).toStringAsFixed(1)}% confidence',
+                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 20),
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
+
+            // Only one button – Capture (when live mode OFF)
+            if (!_isLiveDetecting)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: SizedBox(
+                  width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _isCameraReady && _isModelLoaded
+                    onPressed: (_isCameraReady && _isModelLoaded && !_isProcessing)
                         ? _captureAndPredict
                         : null,
                     icon: const Icon(Icons.camera_alt),
-                    label: Text(Platform.isWindows ? 'Simulate' : 'Capture & Detect'),
+                    label: const Text('Capture & Detect'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: marineBlue,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isModelLoaded ? _pickImageAndPredict : null,
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Upload Image'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _isModelLoaded ? Icons.check_circle : Icons.warning,
-                  color: _isModelLoaded ? Colors.green : Colors.orange,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _isModelLoaded ? 'Model Ready' : 'Loading Model...',
-                  style: TextStyle(
+              ),
+
+            // Status
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _isModelLoaded ? Icons.check_circle : Icons.warning,
                     color: _isModelLoaded ? Colors.green : Colors.orange,
-                    fontSize: 14,
+                    size: 16,
                   ),
-                ),
-                const SizedBox(width: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 8),
+                  Text(
+                    _isModelLoaded ? 'Model Ready' : 'Loading Model...',
+                    style: TextStyle(
+                      color: _isModelLoaded ? Colors.green : Colors.orange,
+                      fontSize: 14,
+                    ),
                   ),
-                  child: Text(
-                    Platform.isWindows ? '💻 Windows' : '📱 Mobile',
-                    style: const TextStyle(fontSize: 10),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
