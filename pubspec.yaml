@@ -4,7 +4,6 @@ publish_to: 'none'
 
 version: 1.0.0+1
 
-# ✅ CORRECT SDK CONSTRAINT FOR YOUR VERSION
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
@@ -40,7 +39,7 @@ dependencies:
   # TFLite
   tflite_flutter: ^0.11.0
   image: ^4.1.3
-  
+
   # Windows support
   ffi: ^2.1.0
   path_provider: ^2.1.0
@@ -55,4 +54,4 @@ flutter:
   
   assets:
     - assets/images/
-    - assets/models/
+    - assets/models/   # place alif_robust.tflite here
