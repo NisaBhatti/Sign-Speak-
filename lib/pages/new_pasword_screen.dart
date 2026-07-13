@@ -7,10 +7,10 @@ class NewPasswordScreen extends StatefulWidget {
   final String oobCode;
 
   const NewPasswordScreen({
-    Key? key,
+    super.key,
     required this.email,
     required this.oobCode,
-  }) : super(key: key);
+  });
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();

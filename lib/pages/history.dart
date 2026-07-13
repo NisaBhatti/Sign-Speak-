@@ -62,7 +62,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
   static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
   static const Color color2 = Color(0xFFACD9D9);   // Light teal
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue          // Cream for contrast
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
 
   final List<TranslationItem> _translationItems = [
     TranslationItem(
@@ -110,7 +110,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
         ),
         child: Column(
           children: [
-            // App Bar
+            // App Bar - Simplified with just the arrow
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
@@ -122,35 +122,23 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
               ),
               child: Row(
                 children: [
-                  // Back button with gradient
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [lightBlue, marineBlue],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: marineBlue.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                  // Simple back button - NO CONTAINER
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      size: 24,
+                      color: marineBlue,
                     ),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.arrow_back, size: 20, color: Colors.white),
-                      padding: EdgeInsets.zero,
-                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    splashRadius: 24,
                   ),
+                  const SizedBox(width: 8),
                   // Title
-                  Expanded(
+                  const Expanded(
                     child: Text(
                       'History & Practice',
                       textAlign: TextAlign.center,
@@ -158,12 +146,10 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.015,
-                        color: marineBlue, // Dark blue
+                        color: marineBlue,
                       ),
                     ),
                   ),
-                  // Empty space for alignment
-                  const SizedBox(width: 44),
                 ],
               ),
             ),

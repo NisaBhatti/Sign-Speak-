@@ -1,25 +1,19 @@
 // lib/pages/forgot_password.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'reset_code_screen.dart'; // Fixed: correct file name
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
-
-  static const Color color1 = Color(0xFFCFE8EA);
-  static const Color color2 = Color(0xFFACD9D9);
-  static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   void dispose() {
@@ -193,7 +187,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 
                 // Reset Button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _resetPassword,
+                  onPressed: _isLoading ? null : _sendResetEmail, // Fixed: changed from _resetPassword
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(

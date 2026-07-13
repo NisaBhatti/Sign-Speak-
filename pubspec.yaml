@@ -58,6 +58,7 @@ flutter:
     - assets/images/real.png
     - assets/images/communi.png
     - assets/images/services.png
+    - assets/images/privacy.png
     
   # Optional: Add fonts if needed
   # fonts:

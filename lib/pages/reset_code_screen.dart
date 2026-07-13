@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:signspeak/pages/camera_access_screen.dart';
+import 'new_pasword_screen.dart';
 
 
 class ResetCodeScreen extends StatefulWidget {
   final String email;
-  const ResetCodeScreen({Key? key, required this.email}) : super(key: key);
+  const ResetCodeScreen({super.key, required this.email});
 
   @override
   State<ResetCodeScreen> createState() => _ResetCodeScreenState();
@@ -39,13 +39,18 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // The code should be the full OOB code from the email link
+      // For example: "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0"
       await _auth.verifyPasswordResetCode(code);
       
       if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => NewPasswordScreen(email: widget.email, oobCode: code),
+            builder: (context) => NewPasswordScreen(
+              email: widget.email, 
+              oobCode: code,  // Pass the full code
+            ),
           ),
         );
       }
@@ -53,18 +58,25 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
       String message;
       switch (e.code) {
         case 'invalid-action-code':
-          message = 'Invalid or expired code. Please request a new one.';
+          message = 'Invalid code. Please check and try again.';
           break;
         case 'expired-action-code':
           message = 'Code has expired. Please request a new one.';
           break;
         default:
-          message = e.message ?? 'Verification failed';
+          message = e.message ?? 'Verification failed. Please try again.';
       }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      // Handle any other errors
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
         );
       }
     } finally {

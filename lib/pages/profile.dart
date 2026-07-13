@@ -65,7 +65,6 @@ class ProfileSettingsPage extends StatefulWidget {
 }
 
 class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
-  // ✅ Changed: Now empty, will load from Firebase
   String _fullName = "";
   String _email = "";
   bool _isLoading = true;
@@ -82,26 +81,22 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
-  // ✅ Added: Load user data when page opens
   @override
   void initState() {
     super.initState();
     _loadUserData();
   }
 
-  // ✅ Added: Fetch logged-in user data from Firebase
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Get basic info from Firebase Auth
       setState(() {
         _email = user.email ?? "No email";
         _fullName = user.displayName ?? "User";
         _isLoading = false;
       });
 
-      // Try to get additional info from Firestore
       try {
         final doc = await FirebaseFirestore.instance
             .collection('users')
@@ -122,16 +117,13 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     }
   }
 
-  // ✅ Fixed: Now actually updates Firebase
   void _performUpdateProfile(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       try {
-        // Update display name in Firebase Auth
         await user.updateDisplayName(_fullName);
 
-        // Update in Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -319,9 +311,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
-  // ✅ Fixed: Actually signs out and navigates to login
   void _performLogout(BuildContext context) async {
-    Navigator.of(context).pop(); // Close dialog
+    Navigator.of(context).pop();
     await FirebaseAuth.instance.signOut();
     if (mounted) {
       Navigator.pushAndRemoveUntil(
@@ -334,7 +325,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Added: Show loading while fetching user data
     if (_isLoading) {
       return Scaffold(
         body: Container(
@@ -363,48 +353,34 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             return SafeArea(
               child: Column(
                 children: [
+                  // Custom AppBar - Simplified with just the arrow
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 44, height: 44,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: [lightBlue, color4]),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: marineBlue.withOpacity(0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: marineBlue,
+                            size: 24,
                           ),
-                          child: IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(Icons.arrow_back, color: Colors.white, size: 20),
-                            padding: EdgeInsets.zero,
-                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          splashRadius: 24,
                         ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              'Profile Settings',
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: marineBlue,
-                                letterSpacing: -0.015,
-                              ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Profile Settings',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: marineBlue,
+                              letterSpacing: -0.015,
                             ),
                           ),
                         ),
-                        SizedBox(width: 44, child: Container()),
                       ],
                     ),
                   ),
@@ -481,7 +457,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 border: Border.all(color: lightBlue.withOpacity(0.3)),
               ),
               child: Text(
-                _fullName,  // ✅ Now shows actual user name
+                _fullName,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -500,7 +476,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                _email,  // ✅ Now shows actual user email
+                _email,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -551,7 +527,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 ],
               ),
               child: DropdownButtonFormField<String>(
-                initialValue: _selectedLanguage,
+                value: _selectedLanguage,
                 onChanged: (String? newValue) {
                   if (newValue != null) setState(() => _selectedLanguage = newValue);
                 },
@@ -639,6 +615,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     );
   }
 
+  // ✅ UPDATED: Properly centered text and icon with simplified back button
   Widget _buildFormField({
     required String label,
     required String value,
@@ -668,18 +645,34 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             initialValue: value,
             onChanged: onChanged,
             keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: marineBlue),
+            style: TextStyle(
+              fontSize: 16, 
+              fontWeight: FontWeight.w500, 
+              color: marineBlue,
+              height: 1.2,
+            ),
+            textAlignVertical: TextAlignVertical.center,
             maxLines: 1,
             decoration: InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 0,
+                horizontal: 24,
+              ),
+              isDense: true,
               suffixIcon: Container(
-                width: 36, height: 36,
+                width: 36,
+                height: 36,
+                margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [lightBlue, color4]),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Icon(icon, color: Colors.white, size: 18),
+              ),
+              suffixIconConstraints: const BoxConstraints(
+                minWidth: 36,
+                minHeight: 36,
               ),
             ),
           ),
