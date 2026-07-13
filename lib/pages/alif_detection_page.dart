@@ -62,7 +62,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
         
         // Copy from assets to local storage
         // (You'll need to pre-copy the model file)
-        _interpreter = Interpreter.fromFile(modelPath);
+        _interpreter = Interpreter.fromFile(File(modelPath));
       } else {
         // For Mobile: Load from assets
         _interpreter = await Interpreter.fromAsset(
