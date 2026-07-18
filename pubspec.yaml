@@ -11,6 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Google ML Kit 
+  google_ml_kit: ^0.16.0
+
   cupertino_icons: ^1.0.8
   camera: ^0.10.5
   
@@ -26,10 +29,13 @@ dependencies:
   google_sign_in: ^6.2.2
   
   # UI
-  image_picker: ^1.1.2
+  image_picker: ^1.1.4
   cached_network_image: ^3.4.1
   flutter_svg: ^2.0.10+1
   
+  # For better UI
+  google_fonts: ^6.1.0
+
   # Navigation
   go_router: ^14.2.8
   
