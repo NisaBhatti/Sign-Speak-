@@ -5,7 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+ 
 class AlifDetectionPage extends StatefulWidget {
   const AlifDetectionPage({super.key});
 
