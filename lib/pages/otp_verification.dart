@@ -6,7 +6,7 @@ import 'login.dart';
 class OTPVerificationPage extends StatefulWidget {
   final String email;
   
-  const OTPVerificationPage({Key? key, required this.email}) : super(key: key);
+  const OTPVerificationPage({super.key, required this.email});
 
   @override
   State<OTPVerificationPage> createState() => _OTPVerificationPageState();
@@ -23,7 +23,6 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   void initState() {

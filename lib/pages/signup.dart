@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:signspeak/pages/login.dart';
-import 'package:signspeak/pages/homepage.dart';
+import 'login.dart';
+import 'homepage.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -87,10 +87,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       // ✅ FIXED: Navigate to Home Page instead of Login
-      Navigator.pushAndRemoveUntil(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
       );
       
     } on FirebaseAuthException catch (e) {

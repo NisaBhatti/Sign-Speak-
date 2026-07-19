@@ -1,10 +1,10 @@
-// lib/pages/terms_of_service.dart
+// lib/pages/privacy_policy.dart
 import 'package:flutter/material.dart';
 
-class TermsOfServicePage extends StatelessWidget {
-  const TermsOfServicePage({super.key});
+class PrivacyPolicyPage extends StatelessWidget {
+  const PrivacyPolicyPage({super.key});
 
-  // Match the color scheme from signup.dart
+  // Match the color scheme from terms_of_service.dart
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color darkBlue = Color.fromARGB(255, 8, 4, 84);
@@ -44,7 +44,7 @@ class TermsOfServicePage extends StatelessWidget {
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
-                        'Terms of Service',
+                        'Privacy Policy',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -63,7 +63,7 @@ class TermsOfServicePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Hero Section with image (icon removed)
+                      // Hero Section with image
                       _buildHeroSection(),
                       const SizedBox(height: 20),
                       
@@ -96,7 +96,7 @@ class TermsOfServicePage extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '. These Terms of Service ("Terms") govern your access to and use of our mobile application and related services. By using Signs Speak, you agree to be bound by these terms.',
+                                text: '. This Privacy Policy explains how we collect, use, and protect your personal information when you use our mobile application and related services. By using Signs Speak, you agree to the collection and use of information in accordance with this policy.',
                                 style: _bodyTextStyle(),
                               ),
                             ],
@@ -108,38 +108,72 @@ class TermsOfServicePage extends StatelessWidget {
                       
                       // All Sections
                       _buildSection(
-                        title: '1. Agreement to Terms',
-                        content: 'By downloading, installing, or using the Signs Speak application, you acknowledge that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If you do not agree, please do not use the app.',
-                      ),
-                      
-                      _buildSection(
-                        title: '2. User Account',
-                        content: 'To access certain features of Signs Speak, you may be required to create an account. You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account.',
-                      ),
-                      
-                      _buildSection(
-                        title: '3. Acceptable Use',
-                        content: 'You agree to use Signs Speak only for lawful purposes. Prohibited activities include but are not limited to:',
+                        title: '1. Information We Collect',
+                        content: 'We collect information to provide and improve our services. The types of information we collect include:',
                         bulletPoints: const [
-                          'Reverse engineering or attempting to extract the source code of the Signs Speak engine.',
-                          'Using the service to transmit any content that is infringing, libelous, or otherwise unlawful.',
-                          'Attempting to interfere with the proper functioning of the Signs Speak application.',
+                          'Camera data: Real-time video processing for sign language translation (processed locally on your device)',
+                          'Account information: Name, email address, and profile preferences when you create an account',
+                          'Usage data: Anonymous analytics to improve app performance and user experience',
+                          'Device information: Device model, operating system version, and app version for compatibility',
                         ],
                       ),
                       
                       _buildSection(
-                        title: '4. Intellectual Property',
-                        content: 'The Signs Speak application, including its original content, features, and functionality, are and will remain the exclusive property of Signs Speak and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.',
+                        title: '2. How We Use Your Information',
+                        content: 'We use the collected information for various purposes to provide and improve our services:',
+                        bulletPoints: const [
+                          'To provide real-time sign language translation services',
+                          'To personalize your experience and improve translation accuracy',
+                          'To maintain and enhance app performance and security',
+                          'To send important notifications about app updates or policy changes',
+                          'To analyze usage patterns and improve our features',
+                        ],
                       ),
                       
                       _buildSection(
-                        title: '5. Termination',
-                        content: 'We reserve the right to suspend or terminate your access to Signs Speak at any time, without prior notice, for conduct that we believe violates these Terms or is harmful to other users of the app, us, or third parties.',
+                        title: '3. Data Storage and Security',
+                        content: 'We take data security seriously and implement appropriate measures to protect your information:',
+                        bulletPoints: const [
+                          'Camera data is processed locally on your device and never transmitted to our servers',
+                          'Account information is encrypted and stored securely in the cloud',
+                          'We use industry-standard encryption protocols for data in transit',
+                          'Regular security audits are conducted to identify and address vulnerabilities',
+                          'We follow "Privacy by Design" principles to minimize data collection and storage',
+                        ],
                       ),
                       
                       _buildSection(
-                        title: '6. Changes to Terms',
-                        content: 'We may revise these Terms from time to time. The most current version will always be posted on this page. By continuing to access or use Signs Speak after revisions become effective, you agree to be bound by the revised Terms.',
+                        title: '4. Your Rights and Choices',
+                        content: 'You have the following rights regarding your personal information:',
+                        bulletPoints: const [
+                          'Access: You can request a copy of your personal data we hold',
+                          'Update: You can update or correct your profile information at any time',
+                          'Delete: You can request deletion of your account and associated data',
+                          'Opt-out: You can choose not to provide certain information, though this may limit some features',
+                          'Data portability: You can request your data in a structured, machine-readable format',
+                        ],
+                      ),
+                      
+                      _buildSection(
+                        title: '5. Third-Party Services',
+                        content: 'We may use third-party services to enhance our app functionality. These services have their own privacy policies:',
+                        bulletPoints: const [
+                          'Analytics providers (anonymous usage data only)',
+                          'Translation engines for improved accuracy',
+                          'Cloud storage providers for account data',
+                          'All third-party partners are contractually obligated to protect your data',
+                          'We do not share personally identifiable information with third parties without your consent',
+                        ],
+                      ),
+                      
+                      _buildSection(
+                        title: '6. Children\'s Privacy',
+                        content: 'Our services are not directed to children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.',
+                      ),
+                      
+                      _buildSection(
+                        title: '7. Changes to This Policy',
+                        content: 'We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. We encourage you to review this policy periodically for any changes.',
                       ),
                       
                       const SizedBox(height: 24),
@@ -224,7 +258,7 @@ class TermsOfServicePage extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(vertical: 14),
                                     ),
                                     child: const Text(
-                                      'Accept Terms',
+                                      'Accept',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14,
@@ -250,7 +284,7 @@ class TermsOfServicePage extends StatelessWidget {
     );
   }
 
-  // ✅ Updated: Hero section with image, NO circle icon
+  // Hero section with image (NO circle icon)
   Widget _buildHeroSection() {
     return Container(
       height: 200,
@@ -272,7 +306,7 @@ class TermsOfServicePage extends StatelessWidget {
           children: [
             // Background Image
             Image.asset(
-              'assets/images/services.png',
+              'assets/images/privacy.png',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
@@ -305,7 +339,7 @@ class TermsOfServicePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Terms of Service',
+                    'Privacy Policy',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
@@ -321,7 +355,7 @@ class TermsOfServicePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      'Last Updated: May 2026',
+                      'Last Updated: June 2026',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'termspolicyscreen.dart'; // This is now used correctly
+import 'termspolicyscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,13 +21,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.light(
-          primary: lightBlue, // Light blue as primary
-          secondary: marineBlue, // Teal as secondary
-          tertiary: marineBlue, // Dark blue as tertiary
-          surface: color1, // Light blue-green for surfaces
+          primary: lightBlue,
+          secondary: marineBlue,
+          tertiary: marineBlue,
+          surface: color1,
           onPrimary: Colors.white,
           onSecondary: Colors.white,
-          onSurface: marineBlue, // Dark blue for text
+          onSurface: marineBlue,
         ),
         fontFamily: 'Inter',
         appBarTheme: AppBarTheme(
@@ -57,17 +57,17 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.dark(
-          primary: marineBlue, // Teal for primary
-          secondary: lightBlue, // Light blue for secondary
-          tertiary: marineBlue, // Dark blue for tertiary
-          surface: const Color(0xFF1A2F3A), // Dark blue-green background
+          primary: marineBlue,
+          secondary: lightBlue,
+          tertiary: marineBlue,
+          surface: const Color(0xFF1A2F3A),
           onPrimary: Colors.white,
           onSecondary: Colors.white,
-          onSurface: color1, // Light blue-green for text
+          onSurface: color1,
         ),
         fontFamily: 'Inter',
         appBarTheme: AppBarTheme(
-          backgroundColor: const Color.fromARGB(255, 220, 230, 236), // Dark blue-green background
+          backgroundColor: const Color.fromARGB(255, 220, 230, 236),
           surfaceTintColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
@@ -75,14 +75,14 @@ class MyApp extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.015,
-            color: color1, // Light blue-green
+            color: color1,
           ),
           iconTheme: IconThemeData(
-            color: color1, // Light blue-green
+            color: color1,
           ),
         ),
         cardTheme: CardThemeData(
-          color: const Color(0xFF2A4045), // Darker blue-green
+          color: const Color(0xFF2A4045),
           surfaceTintColor: const Color(0xFF2A4045),
           elevation: 2,
           shape: RoundedRectangleBorder(
@@ -116,151 +116,94 @@ class _SettingsPageState extends State<SettingsPage> {
     {
       'title': 'Terms & Policies',
       'icon': Icons.description_outlined,
-      'color': lightBlue, // Changed to lightBlue
     },
   ];
 
   // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color color4 = Color(0xFF6CC2C0);   // Teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color color4 = Color(0xFF6CC2C0);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   Widget build(BuildContext context) {
-    final isLightMode = Theme.of(context).brightness == Brightness.light;
-
     return Scaffold(
-      backgroundColor: color1, // Changed to color1
-      appBar: AppBar(
-        backgroundColor: color1, // Changed to color1
-        title: Text(
-          'Settings',
-          style: TextStyle(
-            color: lightBlue, // Changed to lightBlue
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: isLightMode
-                ? marineBlue.withOpacity(0.2) // Changed to marineBlue
-                : color1.withOpacity(0.2), // Changed to color1
-          ),
-        ),
-      ),
+      backgroundColor: Colors.transparent,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [color1, color2], // Added gradient background
+            colors: [color1, color2],
           ),
         ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Target Sign Language Section
-                _buildSectionHeader('Target Sign Language'),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.white, color1.withOpacity(0.3)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom AppBar - Simplified with just the arrow
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Row(
+                  children: [
+                    // Simple back button - NO CONTAINER
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        size: 24,
+                        color: marineBlue,
                       ),
-                      borderRadius: BorderRadius.circular(20),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 24,
                     ),
-                    child: Column(
-                      children: signLanguages.map((language) {
-                        return _buildLanguageOption(
-                          language['name']!,
-                          language['value']!,
-                        );
-                      }).toList(),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Settings',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: marineBlue,
+                          letterSpacing: -0.015,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 24),
+              ),
+              // Body
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Target Sign Language Section
+                      _buildSectionHeader('Target Sign Language'),
+                      const SizedBox(height: 8),
+                      _buildLanguageCard(),
+                      const SizedBox(height: 24),
 
-                // Audio Section
-                _buildSectionHeader('Audio'),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.white, color1.withOpacity(0.3)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Play Translated Text Aloud',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: marineBlue, // Changed to marineBlue
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          Switch.adaptive(
-                            value: _playAudio,
-                            onChanged: (value) {
-                              setState(() {
-                                _playAudio = value;
-                              });
-                            },
-                            activeColor: lightBlue, // Changed to lightBlue
-                            activeTrackColor: lightBlue.withOpacity(0.5),
-                            inactiveThumbColor: marineBlue, // Changed to marineBlue
-                            inactiveTrackColor: marineBlue.withOpacity(0.2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                      // Audio Section
+                      _buildSectionHeader('Audio'),
+                      const SizedBox(height: 8),
+                      _buildAudioCard(),
+                      const SizedBox(height: 24),
 
-                // Information Section
-                _buildSectionHeader('Information'),
-                const SizedBox(height: 8),
-                Column(
-                  children: helpItems.map((item) {
-                    return _buildHelpItem(
-                      context,
-                      item['title'] as String,
-                      item['icon'] as IconData,
-                      item['color'] as Color,
-                    );
-                  }).toList(),
+                      // Information Section
+                      _buildSectionHeader('Information'),
+                      const SizedBox(height: 8),
+                      _buildHelpItems(),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -269,20 +212,46 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          letterSpacing: -0.015,
-          color: marineBlue, // Changed to marineBlue
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: marineBlue.withOpacity(0.8),
         ),
       ),
     );
   }
 
-  Widget _buildLanguageOption(String name, String value) {
+  Widget _buildLanguageCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: marineBlue.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: signLanguages.asMap().entries.map((entry) {
+          final index = entry.key;
+          final language = entry.value;
+          return _buildLanguageOption(
+            language['name']!,
+            language['value']!,
+            isLast: index == signLanguages.length - 1,
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(String name, String value, {bool isLast = false}) {
     final isLightMode = Theme.of(context).brightness == Brightness.light;
 
     return InkWell(
@@ -291,44 +260,52 @@ class _SettingsPageState extends State<SettingsPage> {
           _selectedLanguage = value;
         });
       },
-      borderRadius: BorderRadius.circular(20),
-      splashColor: lightBlue.withOpacity(0.1), // Changed to lightBlue
-      highlightColor: lightBlue.withOpacity(0.05), // Changed to lightBlue
+      borderRadius: BorderRadius.circular(16),
+      splashColor: lightBlue.withOpacity(0.1),
+      highlightColor: lightBlue.withOpacity(0.05),
       child: Container(
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isLightMode
-                  ? marineBlue.withOpacity(0.1) // Changed to marineBlue
-                  : color1.withOpacity(0.1), // Changed to color1
-            ),
-          ),
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(
+                    color: isLightMode
+                        ? marineBlue.withOpacity(0.08)
+                        : color1.withOpacity(0.08),
+                  ),
+                ),
+          borderRadius: isLast
+              ? const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                )
+              : null,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   name,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: marineBlue, // Changed to marineBlue
+                    color: marineBlue,
                   ),
                 ),
               ),
               Container(
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: _selectedLanguage == value
-                        ? lightBlue // Changed to lightBlue
+                        ? lightBlue
                         : isLightMode
-                            ? marineBlue.withOpacity(0.3) // Changed to marineBlue
-                            : color1.withOpacity(0.3), // Changed to color1
+                            ? marineBlue.withOpacity(0.3)
+                            : color1.withOpacity(0.3),
                     width: 2,
                   ),
                 ),
@@ -337,7 +314,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         margin: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: lightBlue, // Changed to lightBlue
+                          color: lightBlue,
                         ),
                       )
                     : null,
@@ -349,93 +326,137 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildHelpItem(
-      BuildContext context, String title, IconData icon, Color color) {
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, color1.withOpacity(0.3)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  Widget _buildAudioCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: marineBlue.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: InkWell(
-          onTap: () {
-            // Handle item tap based on title
-            if (title == 'Terms & Policies') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TermsPoliciesScreen(),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Play Translated Text Aloud',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: marineBlue,
+                  fontWeight: FontWeight.w500,
                 ),
-              );
-            }
-          },
-          borderRadius: BorderRadius.circular(20),
-          splashColor: lightBlue.withOpacity(0.1), // Changed to lightBlue
-          highlightColor: lightBlue.withOpacity(0.05), // Changed to lightBlue
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [lightBlue, color4], // Added gradient
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: marineBlue.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white, // Changed to white
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: marineBlue, // Changed to marineBlue
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: lightBlue.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.chevron_right,
-                    color: marineBlue, // Changed to marineBlue
-                    size: 18,
-                  ),
-                ),
-              ],
+              ),
             ),
+            Switch.adaptive(
+              value: _playAudio,
+              onChanged: (value) {
+                setState(() {
+                  _playAudio = value;
+                });
+              },
+              activeColor: lightBlue,
+              activeTrackColor: lightBlue.withOpacity(0.5),
+              inactiveThumbColor: marineBlue,
+              inactiveTrackColor: marineBlue.withOpacity(0.2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHelpItems() {
+    return Column(
+      children: helpItems.map((item) {
+        return _buildHelpItem(
+          context,
+          item['title'] as String,
+          item['icon'] as IconData,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildHelpItem(
+      BuildContext context, String title, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: marineBlue.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          if (title == 'Terms & Policies') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TermsPoliciesScreen(),
+              ),
+            );
+          }
+        },
+        borderRadius: BorderRadius.circular(16),
+        splashColor: lightBlue.withOpacity(0.1),
+        highlightColor: lightBlue.withOpacity(0.05),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [lightBlue, color4],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: marineBlue.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: marineBlue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: marineBlue.withOpacity(0.5),
+                size: 22,
+              ),
+            ],
           ),
         ),
       ),
