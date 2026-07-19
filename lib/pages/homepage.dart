@@ -4,6 +4,8 @@ import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'alif_detection_page.dart';
 import 'drawer_page.dart';
+import 'package:signspeak/pages/alif_detection_page.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
