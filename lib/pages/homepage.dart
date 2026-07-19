@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
+import 'alif_detection_page.dart';
 import 'drawer_page.dart';
 import 'package:signspeak/pages/alif_detection_page.dart';
 
@@ -100,26 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const CameraAccessScreen()),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // 2. Sign Book
-                      _buildFeatureCard(
-                        title: 'Sign Book',
-                        subtitle: 'Browse 500+ signs',
-                        description: 'Search the complete dictionary.',
-                        icon: Icons.menu_book_outlined,
-                        gradient: LinearGradient(
-                          colors: [lightBlue, marineBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const DictionaryPage()),
+                            MaterialPageRoute(
+                            builder: (context) => CameraAccessScreen(),
+                            ),
                           );
                         },
                       ),
