@@ -1,44 +1,17 @@
-plugins {
-    id("com.android.application")
-    id("com.google.gms.google-services")
-    id("kotlin-android")
-    id("dev.flutter.flutter-gradle-plugin")
-}
-
 android {
-    namespace = "com.example.signspeak"
-    compileSdk = 36
-    ndkVersion = flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
     defaultConfig {
-        applicationId = "com.example.signspeak"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-        multiDexEnabled = true
+        minSdkVersion 21  // Minimum SDK for ML Kit
+        targetSdkVersion 33
     }
-
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("debug")
-        }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-}
-
-flutter {
-    source = "../.."
 }
 
 dependencies {
-    implementation("androidx.multidex:multidex:2.0.1")
+    implementation 'com.google.mlkit:pose-detection:17.0.0'
+    implementation 'com.google.mlkit:pose-detection-accurate:17.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 }
