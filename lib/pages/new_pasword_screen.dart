@@ -6,6 +6,7 @@ class NewPasswordScreen extends StatefulWidget {
   final String email;
   final String oobCode;
 
+
   const NewPasswordScreen({
     Key? key,
     required this.email,
