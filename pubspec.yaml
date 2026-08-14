@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
 
   # ===== GOOGLE ML KIT (Use the full package) =====
-  google_ml_kit: ^0.16.3
   
   # ===== CAMERA =====
   camera: ^0.10.6
