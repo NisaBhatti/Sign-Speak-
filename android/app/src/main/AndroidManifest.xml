@@ -89,9 +89,10 @@
         <!-- ============================================ -->
         <!-- 🔥 FIREBASE CONFIGURATION                   -->
         <!-- ============================================ -->
-        <meta-data
+        <!-- REMOVE THIS LINE - It's causing the error -->
+        <!-- <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id" />
+            android:value="@string/default_notification_channel_id" /> -->
             
         <!-- ============================================ -->
         <!-- 🖼️ FILE PROVIDER (for camera images)        -->
