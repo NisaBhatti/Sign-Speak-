@@ -1,8 +1,7 @@
-// lib/pages/alif_detection_page.dart
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import '../services/hand_detector_service.dart';
-import '../services/alif_detector.dart';
 
 class AlifDetectionPage extends StatefulWidget {
   const AlifDetectionPage({super.key});
@@ -14,250 +13,146 @@ class AlifDetectionPage extends StatefulWidget {
 class _AlifDetectionPageState extends State<AlifDetectionPage> {
   CameraController? _cameraController;
   HandDetectorService? _handDetector;
-  AlifDetector? _alifDetector;
-  bool _isCameraReady = false;
-  bool _isDetecting = false;
-  bool _isMediaPipeLoading = true;
-  bool _useFallback = false;
-  
-  String _prediction = 'Waiting...';
-  double _confidence = 0.0;
-  
+  List<Offset> _landmarks = [];
+  bool _isProcessing = false;
+
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    _initializeCamera();
+    _initializeHandDetector();
   }
-  
-  Future<void> _initializeApp() async {
-    // Initialize services with fallback
+
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    _cameraController = CameraController(
+      cameras.first,
+      ResolutionPreset.medium,
+      enableAudio: false,
+    );
+    await _cameraController!.initialize();
+    setState(() {});
+  }
+
+  Future<void> _initializeHandDetector() async {
     _handDetector = HandDetectorService();
-    _alifDetector = AlifDetector();
-    await _alifDetector!.initialize();
-    
-    // Check if MediaPipe loaded
-    _isMediaPipeLoading = false;
-    
-    // If MediaPipe not available, use fallback
-    _useFallback = true;
-    
-    await _initCamera();
+    await _handDetector!.initialize();
   }
-  
-  Future<void> _initCamera() async {
+
+  // Helper method to convert CameraImage to InputImage
+  Future<InputImage> _convertToInputImage(CameraImage image) async {
+    // For now, use a simple conversion
+    // You might need to implement proper image conversion based on your needs
+    return InputImage.fromBytes(
+      bytes: image.planes.first.bytes,
+      metadata: InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        format: InputImageFormat.nv21,
+        rotation: InputImageRotation.rotation0deg,
+      ),
+    );
+  }
+
+  Future<void> _processFrame(CameraImage cameraImage) async {
+    if (_isProcessing || _handDetector == null) return;
+    
+    _isProcessing = true;
     try {
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) return;
+      final inputImage = await _convertToInputImage(cameraImage);
+      final landmarks = await _handDetector!.detectHandLandmarks(inputImage);
       
-      _cameraController = CameraController(
-        cameras[0],
-        ResolutionPreset.medium,
-        enableAudio: false,
-      );
-      
-      await _cameraController!.initialize();
-      setState(() => _isCameraReady = true);
-      
-      // Start detection loop
-      _startDetectionLoop();
+      setState(() {
+        _landmarks = landmarks;
+      });
       
     } catch (e) {
-      print('❌ Camera error: $e');
-    }
-  }
-  
-  void _startDetectionLoop() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted && _isCameraReady) {
-        _processFrame();
-      }
-    });
-  }
-  
-  Future<void> _processFrame() async {
-    if (_isDetecting || !_isCameraReady || _cameraController == null) {
-      _startDetectionLoop();
-      return;
-    }
-    
-    _isDetecting = true;
-    
-    try {
-      // Take picture
-      final image = await _cameraController!.takePicture();
-      
-      // For now, use simulated landmarks (since MediaPipe is not working)
-      // Get landmarks from hand detector (will use simulation if MediaPipe fails)
-      final landmarks = await _handDetector!.detectHandLandmarks(
-        await _cameraController!.takePicture() as CameraImage
-      );
-      
-      if (landmarks != null && landmarks.length == 21) {
-        final isAlif = await _alifDetector!.isAlif(landmarks);
-        final confidence = await _alifDetector!.getAlifConfidence(landmarks);
-        
-        setState(() {
-          _prediction = isAlif ? 'الف' : 'Not Alif';
-          _confidence = confidence;
-        });
-      }
-      
-    } catch (e) {
-      print('Processing error: $e');
+      print('Error processing frame: $e');
     } finally {
-      _isDetecting = false;
-      _startDetectionLoop();
+      _isProcessing = false;
     }
   }
-  
+
+  Future<void> _reloadMediaPipe() async {
+    if (_handDetector != null) {
+      final success = await _handDetector!.forceReloadMediaPipe();
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('MediaPipe reloaded successfully')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alif Detection ${_useFallback ? "(Demo Mode)" : ""}'),
-        backgroundColor: const Color.fromARGB(255, 8, 4, 84),
-        foregroundColor: Colors.white,
+        title: const Text('Alif Detection'),
         actions: [
-          if (_useFallback)
-            Container(
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'DEMO',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _reloadMediaPipe,
+          ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              const Color(0xFFCFE8EA),
-              const Color(0xFFACD9D9),
-            ],
-          ),
-        ),
-        child: Column(
-          children: [
+      body: Column(
+        children: [
+          if (_cameraController != null && _cameraController!.value.isInitialized)
             Expanded(
-              flex: 3,
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: _isCameraReady && _cameraController != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: CameraPreview(_cameraController!),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color.fromARGB(255, 8, 4, 84),
-                    const Color.fromARGB(255, 0, 109, 176),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
+              child: Stack(
                 children: [
-                  const Text(
-                    'Detection Result',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
-                    ),
+                  CameraPreview(_cameraController!),
+                  // Draw landmarks on the camera preview
+                  CustomPaint(
+                    painter: LandmarkPainter(_landmarks),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _prediction,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (_confidence > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        '${(_confidence * 100).toStringAsFixed(1)}% confidence',
-                        style: const TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                    ),
-                  if (_useFallback)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: Text(
-                        '⚠️ Using demo mode (MediaPipe unavailable)',
-                        style: TextStyle(color: Colors.orange, fontSize: 12),
-                      ),
-                    ),
                 ],
               ),
             ),
-            // Retry button
-            if (_useFallback)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton(
-                  onPressed: _retryMediaPipe,
-                  child: const Text('Retry MediaPipe Loading'),
-                ),
-              ),
-          ],
-        ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Landmarks detected: ${_landmarks.length}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
       ),
     );
   }
-  
-  Future<void> _retryMediaPipe() async {
-    setState(() => _isMediaPipeLoading = true);
-    
-    final success = await _handDetector!.forceReloadMediaPipe();
-    
-    setState(() {
-      _isMediaPipeLoading = false;
-      _useFallback = !success;
-    });
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('MediaPipe loaded successfully!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('MediaPipe still unavailable. Using demo mode.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    }
-  }
-  
+
   @override
   void dispose() {
     _cameraController?.dispose();
     _handDetector?.dispose();
     super.dispose();
+  }
+}
+
+// Custom painter for drawing landmarks
+class LandmarkPainter extends CustomPainter {
+  final List<Offset> landmarks;
+
+  LandmarkPainter(this.landmarks);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.green
+      ..strokeWidth = 4.0
+      ..style = PaintingStyle.fill;
+
+    for (var landmark in landmarks) {
+      canvas.drawCircle(
+        Offset(landmark.dx * size.width, landmark.dy * size.height),
+        6,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }

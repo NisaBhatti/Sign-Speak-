@@ -6,9 +6,9 @@ plugins {
 
 android {
     namespace 'com.example.signspeak'
-    compileSdk 34
+    compileSdk 36  // Updated to 36
 
-    ndkVersion '25.1.8937393'
+    ndkVersion "28.2.13676358"  // Updated NDK version
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId 'com.example.signspeak'
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 36  // Updated to 36
         versionCode 1
         versionName '1.0'
         
@@ -34,8 +34,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled true  // Changed to true for resource shrinking
-            shrinkResources true // Changed to true for resource shrinking
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
