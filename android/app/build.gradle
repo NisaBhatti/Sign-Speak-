@@ -5,20 +5,11 @@ plugins {
 }
 
 android {
-<<<<<<< HEAD
-    compileSdkVersion 33
-    defaultConfig {
-        minSdkVersion 21  // Minimum SDK for ML Kit
-        targetSdkVersion 33
-    }
-    
-=======
     namespace 'com.example.signspeak'
     compileSdk 36
 
     ndkVersion "28.2.13676358"
 
->>>>>>> e26f5f854aa8bd8b01123444ec9e1619ed3f348b
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
