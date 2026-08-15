@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   'What would you like to do today?',
                   style: TextStyle(
-                    color: marineBlue.withOpacity(0.7),
+                    color: marineBlue.withValues(alpha: 0.7),
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: 'Recognise signs instantly with your camera.',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: 'Quick access to favourite signs.',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.15),
+              color: marineBlue.withValues(alpha: 0.15),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: Colors.white, size: 28),
@@ -209,10 +209,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(subtitle,
-                        style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12)),
                     const SizedBox(height: 2),
                     Text(description,
-                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
                   ],
                 ),
               ),
@@ -220,10 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.8), size: 18),
+                child: Icon(Icons.arrow_forward, color: Colors.white.withValues(alpha: 0.8), size: 18),
               ),
             ],
           ),

@@ -1,36 +1,33 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:image/image.dart' as img;
-import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
- 
-class AlifDetectionPage extends StatefulWidget {
-  const AlifDetectionPage({super.key});
+import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:image/image.dart' as img;
+
+class HandLandmarkDetectionPage extends StatefulWidget {
+  const HandLandmarkDetectionPage({super.key});
 
   @override
-  State<AlifDetectionPage> createState() => _AlifDetectionPageState();
+  State<HandLandmarkDetectionPage> createState() => _HandLandmarkDetectionPageState();
 }
 
-class _AlifDetectionPageState extends State<AlifDetectionPage> {
+class _HandLandmarkDetectionPageState extends State<HandLandmarkDetectionPage> {
   CameraController? _cameraController;
   Interpreter? _interpreter;
-  bool _isModelLoaded = false;
+  
   bool _isCameraReady = false;
-  bool _isLiveDetecting = false;
-  Timer? _liveTimer;
-
-  String _prediction = 'Waiting...';
-  double _confidence = 0.0;
-
-  final int _inputSize = 224;
-  final int _numClasses = 10;
-
+  bool _isModelLoaded = false;
+  bool _isProcessing = false;
+  Timer? _detectionTimer;
+  
+  List<dynamic>? _landmarks;
+  String _gesture = 'No hand detected';
+  bool _showLandmarks = true;
+  
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
-  static const Color color1 = Color(0xFFCFE8EA);
-  static const Color color2 = Color(0xFFACD9D9);
 
   @override
   void initState() {
@@ -46,38 +43,44 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
 
   Future<void> _requestPermissions() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      await [Permission.camera].request();
+      final status = await Permission.camera.request();
+      print('Camera permission status: $status');
     }
   }
 
   Future<void> _loadModel() async {
     try {
+      // Load TFLite model
       _interpreter = await Interpreter.fromAsset(
-        'assets/models/alif_model.tflite',   // use your image classifier model
+        'assets/hand_landmark.tflite',
         options: InterpreterOptions()..threads = 4,
       );
+      
       setState(() => _isModelLoaded = true);
-      print('✅ Model loaded');
+      print('✅ Model loaded successfully');
     } catch (e) {
-      print('❌ Model error: $e');
-      // Fallback for demo
-      setState(() {
-        _isModelLoaded = true;
-        _prediction = 'الف (Demo)';
-      });
+      print('❌ Model loading error: $e');
+      setState(() => _isModelLoaded = false);
     }
   }
 
   Future<void> _initCamera() async {
     try {
       final cameras = await availableCameras();
-      if (cameras.isEmpty) return;
+      if (cameras.isEmpty) {
+        print('No cameras available');
+        return;
+      }
+      
       _cameraController = CameraController(
         cameras[0],
         ResolutionPreset.medium,
         enableAudio: false,
       );
+      
       await _cameraController!.initialize();
+      _startContinuousDetection();
+      
       setState(() => _isCameraReady = true);
       print('✅ Camera ready');
     } catch (e) {
@@ -85,96 +88,157 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     }
   }
 
-  void _toggleLiveDetection(bool value) {
-    setState(() => _isLiveDetecting = value);
-    if (value) {
-      _startLiveDetection();
-    } else {
-      _stopLiveDetection();
-    }
-  }
-
-  void _startLiveDetection() {
-    _liveTimer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
-      _captureAndPredict();
+  void _startContinuousDetection() {
+    _detectionTimer?.cancel();
+    _detectionTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (_isCameraReady && !_isProcessing && _isModelLoaded) {
+        _detectHands();
+      }
     });
   }
 
-  void _stopLiveDetection() {
-    _liveTimer?.cancel();
-  }
-
-  // Capture a single photo, run inference
-  Future<void> _captureAndPredict() async {
-    if (!_isCameraReady || !_isModelLoaded) return;
-    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
-
+  Future<void> _detectHands() async {
+    if (_isProcessing || _cameraController == null) return;
+    
+    _isProcessing = true;
+    
     try {
       final XFile imageFile = await _cameraController!.takePicture();
       final File image = File(imageFile.path);
-      final img.Image? inputImage = img.decodeImage(await image.readAsBytes());
-      if (inputImage == null) throw Exception('Failed to decode image');
-
+      final bytes = await image.readAsBytes();
+      final img.Image? inputImage = img.decodeImage(bytes);
+      
+      if (inputImage == null) return;
+      
+      // Preprocess image for model
       final preprocessed = _preprocessImage(inputImage);
+      
+      // Run inference
       final output = await _runInference(preprocessed);
-      final (predictedClass, confidence) = _getPrediction(output);
-
-      setState(() {
-        _prediction = _getSignLabel(predictedClass);
-        _confidence = confidence;
-      });
-      print('🎯 Prediction: $_prediction (${(confidence*100).toStringAsFixed(1)}%)');
+      
+      // Process output to get landmarks
+      final landmarks = _processOutput(output);
+      
+      if (mounted) {
+        setState(() {
+          _landmarks = landmarks;
+          if (landmarks != null && landmarks.isNotEmpty) {
+            _analyzeGesture(landmarks);
+          } else {
+            _gesture = 'No hand detected';
+          }
+        });
+      }
+      
     } catch (e) {
-      print('❌ Prediction error: $e');
+      print('Detection error: $e');
+    } finally {
+      _isProcessing = false;
     }
   }
 
   List<List<List<List<double>>>> _preprocessImage(img.Image image) {
-    final resized = img.copyResize(image, width: _inputSize, height: _inputSize);
-    return List.generate(
+    // Resize to 224x224
+    final resized = img.copyResize(image, width: 224, height: 224);
+    
+    // Convert to normalized float array
+    List<List<List<List<double>>>> input = List.generate(
       1,
       (b) => List.generate(
-        _inputSize,
+        224,
         (y) => List.generate(
-          _inputSize,
+          224,
           (x) {
             final pixel = resized.getPixel(x, y);
-            return [(pixel.r + pixel.g + pixel.b) / (3 * 255.0)];
+            // Normalize to [0,1]
+            return [(pixel.r / 255.0), (pixel.g / 255.0), (pixel.b / 255.0)];
           },
         ),
       ),
     );
+    
+    return input;
   }
 
-  Future<List<List<double>>> _runInference(List<List<List<List<double>>>> input) async {
-    var outputTensor = List.generate(1, (_) => List.filled(_numClasses, 0.0));
-    _interpreter!.run(input, outputTensor);
-    return outputTensor;
+  Future<List<dynamic>> _runInference(List<List<List<List<double>>>> input) async {
+    // Output shape depends on the model
+    var output = List.filled(1, List.filled(21 * 3, 0.0));
+    _interpreter!.run(input, output);
+    return output;
   }
 
-  (int, double) _getPrediction(List<List<double>> output) {
-    final predictions = output[0];
-    int maxIndex = 0;
-    double maxValue = predictions[0];
-    for (int i = 1; i < predictions.length; i++) {
-      if (predictions[i] > maxValue) {
-        maxValue = predictions[i];
-        maxIndex = i;
+  List<dynamic>? _processOutput(List<dynamic> output) {
+    try {
+      final flatOutput = output[0] as List<dynamic>;
+      
+      // Extract 21 landmarks (x, y, z)
+      List<dynamic> landmarks = [];
+      for (int i = 0; i < 21; i++) {
+        final x = flatOutput[i * 3];
+        final y = flatOutput[i * 3 + 1];
+        final z = flatOutput[i * 3 + 2];
+        landmarks.add({'x': x, 'y': y, 'z': z});
       }
+      
+      return landmarks;
+    } catch (e) {
+      print('Output processing error: $e');
+      return null;
     }
-    return (maxIndex, maxValue);
   }
 
-  String _getSignLabel(int index) {
-    const labels = ['الف', 'بے', 'پے', 'تے', 'ٹے', 'ثے', 'جیم', 'چے', 'حے', 'خے'];
-    return index < labels.length ? labels[index] : 'Unknown';
+  void _analyzeGesture(List<dynamic> landmarks) {
+    if (landmarks.length < 21) {
+      _gesture = 'Insufficient landmarks';
+      return;
+    }
+    
+    try {
+      // Get key landmarks
+      final wrist = landmarks[0];
+      final thumbTip = landmarks[4];
+      final indexTip = landmarks[8];
+      final middleTip = landmarks[12];
+      final ringTip = landmarks[16];
+      final pinkyTip = landmarks[20];
+      
+      // Check finger extensions
+      bool thumbExtended = thumbTip['y'] < wrist['y'] - 0.05;
+      bool indexExtended = indexTip['y'] < landmarks[6]['y'] - 0.02;
+      bool middleExtended = middleTip['y'] < landmarks[10]['y'] - 0.02;
+      bool ringExtended = ringTip['y'] < landmarks[14]['y'] - 0.02;
+      bool pinkyExtended = pinkyTip['y'] < landmarks[18]['y'] - 0.02;
+      
+      int extendedCount = [
+        thumbExtended, indexExtended, middleExtended, ringExtended, pinkyExtended
+      ].where((e) => e).length;
+      
+      // Detect gestures
+      if (extendedCount == 5) {
+        _gesture = '🖐️ Open Hand';
+      } else if (extendedCount == 0) {
+        _gesture = '✊ Fist';
+      } else if (indexExtended && !middleExtended && !ringExtended && !pinkyExtended) {
+        _gesture = '☝️ Pointing';
+      } else if (indexExtended && middleExtended && !ringExtended && !pinkyExtended) {
+        _gesture = '✌️ Victory';
+      } else if (thumbExtended && !indexExtended && !middleExtended && !ringExtended && !pinkyExtended) {
+        _gesture = '👍 Thumbs Up';
+      } else {
+        _gesture = '🤚 Custom Gesture';
+      }
+      
+    } catch (e) {
+      print('Gesture analysis error: $e');
+      _gesture = 'Analysis error';
+    }
   }
 
   @override
   void dispose() {
-    _stopLiveDetection();
-    _cameraController?.dispose();
+    _detectionTimer?.cancel();
     _interpreter?.close();
+    _cameraController?.dispose();
     super.dispose();
   }
 
@@ -182,132 +246,71 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alif Detection'),
+        title: const Text('Hand Landmark Detection'),
         backgroundColor: marineBlue,
         foregroundColor: Colors.white,
         elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [color1, color2],
+        actions: [
+          IconButton(
+            icon: Icon(_showLandmarks ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => _showLandmarks = !_showLandmarks),
+            tooltip: 'Toggle Landmarks',
           ),
+        ],
+      ),
+      body: _isCameraReady && _cameraController != null
+          ? Stack(
+              children: [
+                CameraPreview(_cameraController!),
+                if (_showLandmarks && _landmarks != null && _landmarks!.isNotEmpty)
+                  CustomPaint(
+                    painter: LandmarkPainter(
+                      landmarks: _landmarks!,
+                    ),
+                    size: Size.infinite,
+                  ),
+                _buildInfoOverlay(),
+                _buildStatusIndicator(),
+              ],
+            )
+          : const Center(
+              child: CircularProgressIndicator(),
+            ),
+    );
+  }
+
+  Widget _buildInfoOverlay() {
+    return Positioned(
+      top: 20,
+      left: 20,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: marineBlue.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: _isCameraReady && _cameraController != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: CameraPreview(_cameraController!),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
+            Text(
+              _gesture,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Real‑time Detection',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 10),
-                  Switch(
-                    value: _isLiveDetecting,
-                    onChanged: _toggleLiveDetection,
-                    activeColor: marineBlue,
-                  ),
-                ],
+            if (_landmarks != null && _landmarks!.isNotEmpty)
+              Text(
+                '${_landmarks!.length} landmarks',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [marineBlue, lightBlue],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                children: [
-                  const Text('Detection Result',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300)),
-                  const SizedBox(height: 8),
-                  Text(
-                    _prediction,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (_confidence > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        '${(_confidence * 100).toStringAsFixed(1)}% confidence',
-                        style: const TextStyle(color: Colors.white70, fontSize: 16),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            if (!_isLiveDetecting)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: (_isCameraReady && _isModelLoaded) ? _captureAndPredict : null,
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Capture & Detect'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: marineBlue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ),
-              ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _isModelLoaded ? Icons.check_circle : Icons.warning,
-                    color: _isModelLoaded ? Colors.green : Colors.orange,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _isModelLoaded ? 'Model Ready' : 'Loading Model...',
-                    style: TextStyle(
-                      color: _isModelLoaded ? Colors.green : Colors.orange,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 4),
+            Text(
+              _isProcessing ? '⏳ Processing...' : '✅ Ready',
+              style: TextStyle(
+                color: _isProcessing ? Colors.orange : Colors.green,
+                fontSize: 12,
               ),
             ),
           ],
@@ -315,4 +318,101 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
       ),
     );
   }
+
+  Widget _buildStatusIndicator() {
+    return Positioned(
+      bottom: 20,
+      left: 20,
+      right: 20,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: _isModelLoaded ? Colors.green : Colors.orange,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _isModelLoaded ? Icons.check_circle : Icons.warning,
+              color: Colors.white,
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _isModelLoaded 
+                  ? '✅ Model Ready - Detecting hands' 
+                  : '⏳ Loading model...',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Custom Painter for Landmarks
+class LandmarkPainter extends CustomPainter {
+  final List<dynamic> landmarks;
+  
+  LandmarkPainter({required this.landmarks});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (landmarks.isEmpty) return;
+    
+    final connectionPaint = Paint()
+      ..color = Colors.greenAccent.withValues(alpha: 0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    
+    // Hand connections
+    final connections = [
+      [0, 1], [1, 2], [2, 3], [3, 4],
+      [0, 5], [5, 6], [6, 7], [7, 8],
+      [0, 9], [9, 10], [10, 11], [11, 12],
+      [0, 13], [13, 14], [14, 15], [15, 16],
+      [0, 17], [17, 18], [18, 19], [19, 20],
+      [5, 9], [9, 13], [13, 17],
+    ];
+    
+    // Draw connections
+    for (var connection in connections) {
+      if (connection[0] < landmarks.length && connection[1] < landmarks.length) {
+        final p1 = landmarks[connection[0]];
+        final p2 = landmarks[connection[1]];
+        canvas.drawLine(
+          Offset(p1['x'] * size.width, p1['y'] * size.height),
+          Offset(p2['x'] * size.width, p2['y'] * size.height),
+          connectionPaint,
+        );
+      }
+    }
+    
+    // Draw landmarks
+    for (int i = 0; i < landmarks.length; i++) {
+      final landmark = landmarks[i];
+      final dx = landmark['x'] * size.width;
+      final dy = landmark['y'] * size.height;
+      
+      Paint paint;
+      if ([4, 8, 12, 16, 20].contains(i)) {
+        paint = Paint()..color = Colors.yellow..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(dx, dy), 8, paint);
+      } else if ([0].contains(i)) {
+        paint = Paint()..color = Colors.red..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(dx, dy), 6, paint);
+      } else if ([2, 6, 10, 14, 18].contains(i)) {
+        paint = Paint()..color = Colors.orange..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(dx, dy), 5, paint);
+      } else {
+        paint = Paint()..color = Colors.green..style = PaintingStyle.fill;
+        canvas.drawCircle(Offset(dx, dy), 4, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

@@ -165,7 +165,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.white, color1.withOpacity(0.3)],
+                colors: [Colors.white, color1.withValues(alpha: 0.3)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -188,7 +188,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 const SizedBox(height: 8),
                 Text('Are you sure you want to update your profile?',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: marineBlue.withOpacity(0.7))),
+                    style: TextStyle(fontSize: 16, color: marineBlue.withValues(alpha: 0.7))),
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -245,7 +245,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.white, color1.withOpacity(0.3)],
+                colors: [Colors.white, color1.withValues(alpha: 0.3)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -268,7 +268,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                 const SizedBox(height: 8),
                 Text('Are you sure you want to logout?',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: marineBlue.withOpacity(0.7))),
+                    style: TextStyle(fontSize: 16, color: marineBlue.withValues(alpha: 0.7))),
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -423,7 +423,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             border: Border.all(color: Colors.white, width: 3),
             boxShadow: [
               BoxShadow(
-                color: marineBlue.withOpacity(0.2),
+                color: marineBlue.withValues(alpha: 0.2),
                 blurRadius: 15,
                 offset: const Offset(0, 4),
               ),
@@ -452,9 +452,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               width: 250,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: lightBlue.withOpacity(0.3)),
+                border: Border.all(color: lightBlue.withValues(alpha: 0.3)),
               ),
               child: Text(
                 _fullName,
@@ -472,7 +472,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               width: 250,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -519,15 +519,15 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             Container(
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: lightBlue.withOpacity(0.5), width: 1),
+                border: Border.all(color: lightBlue.withValues(alpha: 0.5), width: 1),
                 boxShadow: [
-                  BoxShadow(color: marineBlue.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2)),
+                  BoxShadow(color: marineBlue.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2)),
                 ],
               ),
               child: DropdownButtonFormField<String>(
-                value: _selectedLanguage,
+                initialValue: _selectedLanguage,
                 onChanged: (String? newValue) {
                   if (newValue != null) setState(() => _selectedLanguage = newValue);
                 },
@@ -566,7 +566,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   gradient: LinearGradient(colors: [marineBlue, lightBlue]),
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: [
-                    BoxShadow(color: marineBlue.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+                    BoxShadow(color: marineBlue.withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8)),
                   ],
                 ),
                 child: ElevatedButton(
@@ -586,9 +586,9 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
             Container(
               width: double.infinity, height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: marineBlue.withOpacity(0.3), width: 2),
+                border: Border.all(color: marineBlue.withValues(alpha: 0.3), width: 2),
               ),
               child: TextButton(
                 onPressed: () => _showLogoutDialog(context),
@@ -634,11 +634,11 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
         Container(
           height: 56,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: lightBlue.withOpacity(0.5), width: 1),
+            border: Border.all(color: lightBlue.withValues(alpha: 0.5), width: 1),
             boxShadow: [
-              BoxShadow(color: marineBlue.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(color: marineBlue.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2)),
             ],
           ),
           child: TextFormField(

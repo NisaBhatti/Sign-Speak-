@@ -1,4 +1,5 @@
 android {
+    compileSdkVersion 33
     defaultConfig {
         minSdkVersion 21  // Minimum SDK for ML Kit
         targetSdkVersion 33

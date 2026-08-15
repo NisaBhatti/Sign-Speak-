@@ -126,7 +126,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: darkBlue.withOpacity(0.1),
+                      color: darkBlue.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -143,13 +143,13 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     hintText: 'Search signs...',
                     prefixIcon: Icon(
                       Icons.search,
-                      color: darkBlue.withOpacity(0.6),
+                      color: darkBlue.withValues(alpha: 0.6),
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: Icon(
                               Icons.clear,
-                              color: darkBlue.withOpacity(0.6),
+                              color: darkBlue.withValues(alpha: 0.6),
                             ),
                             onPressed: () {
                               _searchController.clear();
@@ -175,7 +175,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     '${_filteredCards.length} signs found',
                     style: TextStyle(
                       fontSize: 14,
-                      color: darkBlue.withOpacity(0.7),
+                      color: darkBlue.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -195,14 +195,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                             Icon(
                               Icons.search_off,
                               size: 64,
-                              color: darkBlue.withOpacity(0.3),
+                              color: darkBlue.withValues(alpha: 0.3),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No signs found',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: darkBlue.withOpacity(0.5),
+                                color: darkBlue.withValues(alpha: 0.5),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -211,7 +211,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                               'Try searching with different keywords',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: darkBlue.withOpacity(0.3),
+                                color: darkBlue.withValues(alpha: 0.3),
                               ),
                             ),
                           ],
@@ -243,11 +243,11 @@ class _DictionaryPageState extends State<DictionaryPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: darkBlue.withOpacity(0.1),
+          color: darkBlue.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: darkBlue.withOpacity(0.05),
+            color: darkBlue.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -261,7 +261,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
             child: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: darkBlue.withOpacity(0.05),
+                color: darkBlue.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
                   image: NetworkImage(card['imageUrl']!),

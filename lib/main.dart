@@ -175,10 +175,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 400,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: MyApp.color2.withOpacity(0.2),
+                    color: MyApp.color2.withValues(alpha: 0.2),
                     boxShadow: [
                       BoxShadow(
-                        color: MyApp.color2.withOpacity(0.3),
+                        color: MyApp.color2.withValues(alpha: 0.3),
                         blurRadius: 100,
                         spreadRadius: 20,
                       ),
@@ -215,7 +215,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontFamily: 'Inter',
                       shadows: [
                         Shadow(
-                          color: MyApp.color2.withOpacity(0.6),
+                          color: MyApp.color2.withValues(alpha: 0.6),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -237,8 +237,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          MyApp.color4.withOpacity(0.8),
-                          MyApp.color2.withOpacity(0.8),
+                          MyApp.color4.withValues(alpha: 0.8),
+                          MyApp.color2.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(1),
@@ -315,7 +315,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Text(
                       'Skip',
                       style: TextStyle(
-                        color: MyApp.darkBlue.withOpacity(0.8),
+                        color: MyApp.darkBlue.withValues(alpha: 0.8),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -357,7 +357,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             shape: BoxShape.circle,
                             color: _currentPage == index
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.5),
+                                : Colors.white.withValues(alpha: 0.5),
                           ),
                         );
                       }),
@@ -448,13 +448,13 @@ class OnboardingPageWidget extends StatelessWidget {
                   Icon(
                     Icons.image_not_supported,
                     size: 60,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Image Not Found',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -480,7 +480,7 @@ class OnboardingPageWidget extends StatelessWidget {
             child: Text(
               page.description,
               style: TextStyle(
-                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.9),
+                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.9),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
@@ -629,7 +629,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -640,7 +640,7 @@ class WelcomeScreen extends StatelessWidget {
                                   TextSpan(
                                     text: 'Already have an account? ',
                                     style: TextStyle(
-                                      color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.9),
+                                      color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.9),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -668,7 +668,7 @@ class WelcomeScreen extends StatelessWidget {
                         Container(
                           width: 100,
                           height: 1,
-                          color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                          color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                           margin: const EdgeInsets.only(bottom: 16),
                         ),
                         GestureDetector(
@@ -683,7 +683,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
