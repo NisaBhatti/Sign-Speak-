@@ -685,21 +685,12 @@ class WelcomeScreen extends StatelessWidget {
                               label: 'Hand Detection',
                               route: '/alif-detection',
                             ),
-<<<<<<< HEAD
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-=======
                             const SizedBox(width: 12),
                             _buildQuickAccessButton(
                               context,
                               icon: Icons.home,
                               label: 'Home (Test)',
                               route: '/home',
->>>>>>> e26f5f854aa8bd8b01123444ec9e1619ed3f348b
                             ),
                           ],
                         ),
