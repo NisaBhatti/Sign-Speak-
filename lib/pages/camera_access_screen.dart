@@ -67,7 +67,7 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
                     borderRadius: BorderRadius.circular(60), // CIRCULAR
                     boxShadow: [
                       BoxShadow(
-                        color: darkBlue.withOpacity(0.3), // Dark Blue shadow
+                        color: darkBlue.withValues(alpha: 0.3), // Dark Blue shadow
                         blurRadius: 20,
                         offset: Offset(0, 10),
                       ),
@@ -126,13 +126,13 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: darkBlue.withOpacity(0.4), // Dark Blue shadow
+                            color: darkBlue.withValues(alpha: 0.4), // Dark Blue shadow
                             blurRadius: 15,
                             offset: Offset(0, 8),
                           ),
                         ],
                         border: Border.all(
-                          color: darkBlue.withOpacity(0.3), // Subtle border
+                          color: darkBlue.withValues(alpha: 0.3), // Subtle border
                           width: 1.5,
                         ),
                       ),
@@ -166,7 +166,7 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
                         color: const Color.fromARGB(255, 8, 4, 84), // White background
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: darkBlue.withOpacity(0.5), // Dark Blue border
+                          color: darkBlue.withValues(alpha: 0.5), // Dark Blue border
                           width: 2,
                         ),
                       ),

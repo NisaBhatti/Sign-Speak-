@@ -89,7 +89,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   const SizedBox(height: 24),
                   const Text('New Password', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: darkBlue)),
                   const SizedBox(height: 8),
-                  Text('Set password for ${widget.email}', style: TextStyle(color: darkBlue.withOpacity(0.7))),
+                  Text('Set password for ${widget.email}', style: TextStyle(color: darkBlue.withValues(alpha: 0.7))),
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _passwordController,

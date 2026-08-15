@@ -76,7 +76,7 @@ class WelcomeScreen extends StatelessWidget {
             colors: [
               color1, // #CFE8EA - lightest at top
               color2, // #ACD9D9
-              color4.withOpacity(0.5), // #6CC2C0 with opacity
+              color4.withValues(alpha: 0.5), // #6CC2C0 with opacity
             ],
             stops: [0.0, 0.5, 1.0],
           ),
@@ -114,7 +114,7 @@ class WelcomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(60),
                             boxShadow: [
                               BoxShadow(
-                                color: marineBlue.withOpacity(0.3),
+                                color: marineBlue.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -132,7 +132,7 @@ class WelcomeScreen extends StatelessWidget {
                                 return Container(
                                   width: 120,
                                   height: 120,
-                                  color: lightBlue.withOpacity(0.2),
+                                  color: lightBlue.withValues(alpha: 0.2),
                                   child: Icon(
                                     Icons.broken_image,
                                     size: 48,
@@ -212,7 +212,7 @@ class WelcomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: marineBlue.withOpacity(0.3),
+                                color: marineBlue.withValues(alpha: 0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -254,7 +254,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: marineBlue.withOpacity(0.5), // Marine blue border
+                                color: marineBlue.withValues(alpha: 0.5), // Marine blue border
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(20),
@@ -265,7 +265,7 @@ class WelcomeScreen extends StatelessWidget {
                                   TextSpan(
                                     text: 'Already have an account? ',
                                     style: TextStyle(
-                                      color: marineBlue.withOpacity(0.8), // Marine blue text
+                                      color: marineBlue.withValues(alpha: 0.8), // Marine blue text
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -295,7 +295,7 @@ class WelcomeScreen extends StatelessWidget {
                         Container(
                           width: 100,
                           height: 1,
-                          color: marineBlue.withOpacity(0.3), // Marine blue line
+                          color: marineBlue.withValues(alpha: 0.3), // Marine blue line
                           margin: const EdgeInsets.only(bottom: 16),
                         ),
                         GestureDetector(
@@ -309,7 +309,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: marineBlue.withOpacity(0.3), // Marine blue border
+                                color: marineBlue.withValues(alpha: 0.3), // Marine blue border
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(20),

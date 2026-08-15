@@ -8,7 +8,10 @@ list(APPEND FLUTTER_PLUGIN_LIST
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   jni
+<<<<<<< HEAD
   tflite_flutter
+=======
+>>>>>>> e26f5f854aa8bd8b01123444ec9e1619ed3f348b
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

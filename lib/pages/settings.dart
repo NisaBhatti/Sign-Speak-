@@ -218,7 +218,7 @@ class _SettingsPageState extends State<SettingsPage> {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: marineBlue.withOpacity(0.8),
+          color: marineBlue.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -231,7 +231,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.08),
+            color: marineBlue.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -261,8 +261,8 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       },
       borderRadius: BorderRadius.circular(16),
-      splashColor: lightBlue.withOpacity(0.1),
-      highlightColor: lightBlue.withOpacity(0.05),
+      splashColor: lightBlue.withValues(alpha: 0.1),
+      highlightColor: lightBlue.withValues(alpha: 0.05),
       child: Container(
         decoration: BoxDecoration(
           border: isLast
@@ -270,8 +270,8 @@ class _SettingsPageState extends State<SettingsPage> {
               : Border(
                   bottom: BorderSide(
                     color: isLightMode
-                        ? marineBlue.withOpacity(0.08)
-                        : color1.withOpacity(0.08),
+                        ? marineBlue.withValues(alpha: 0.08)
+                        : color1.withValues(alpha: 0.08),
                   ),
                 ),
           borderRadius: isLast
@@ -304,8 +304,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: _selectedLanguage == value
                         ? lightBlue
                         : isLightMode
-                            ? marineBlue.withOpacity(0.3)
-                            : color1.withOpacity(0.3),
+                            ? marineBlue.withValues(alpha: 0.3)
+                            : color1.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -333,7 +333,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.08),
+            color: marineBlue.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -361,9 +361,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
               activeColor: lightBlue,
-              activeTrackColor: lightBlue.withOpacity(0.5),
+              activeTrackColor: lightBlue.withValues(alpha: 0.5),
               inactiveThumbColor: marineBlue,
-              inactiveTrackColor: marineBlue.withOpacity(0.2),
+              inactiveTrackColor: marineBlue.withValues(alpha: 0.2),
             ),
           ],
         ),
@@ -392,7 +392,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.08),
+            color: marineBlue.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -410,8 +410,8 @@ class _SettingsPageState extends State<SettingsPage> {
           }
         },
         borderRadius: BorderRadius.circular(16),
-        splashColor: lightBlue.withOpacity(0.1),
-        highlightColor: lightBlue.withOpacity(0.05),
+        splashColor: lightBlue.withValues(alpha: 0.1),
+        highlightColor: lightBlue.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -428,7 +428,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: marineBlue.withOpacity(0.2),
+                      color: marineBlue.withValues(alpha: 0.2),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -453,7 +453,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Icon(
                 Icons.chevron_right,
-                color: marineBlue.withOpacity(0.5),
+                color: marineBlue.withValues(alpha: 0.5),
                 size: 22,
               ),
             ],

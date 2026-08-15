@@ -149,7 +149,7 @@ class AppIntroDocument extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.3),
+            color: marineBlue.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -177,7 +177,7 @@ class AppIntroDocument extends StatelessWidget {
             'Real-Time Sign Language Translation',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
             textAlign: TextAlign.center,
           ),
@@ -192,7 +192,7 @@ class AppIntroDocument extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.1),
+            color: marineBlue.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -212,20 +212,20 @@ class AppIntroDocument extends StatelessWidget {
                 return Container(
                   width: double.infinity,
                   height: 200,
-                  color: color1.withOpacity(0.3),
+                  color: color1.withValues(alpha: 0.3),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.image,
                         size: 50,
-                        color: marineBlue.withOpacity(0.5),
+                        color: marineBlue.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         caption,
                         style: TextStyle(
-                          color: marineBlue.withOpacity(0.7),
+                          color: marineBlue.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -241,7 +241,7 @@ class AppIntroDocument extends StatelessWidget {
             caption,
             style: TextStyle(
               fontSize: 14,
-              color: marineBlue.withOpacity(0.7),
+              color: marineBlue.withValues(alpha: 0.7),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -265,7 +265,7 @@ class AppIntroDocument extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.1),
+            color: marineBlue.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -288,7 +288,7 @@ class AppIntroDocument extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: iconColor.withOpacity(0.3),
+                      color: iconColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -357,7 +357,7 @@ class AppIntroDocument extends StatelessWidget {
                 Expanded(
                   child: _parseBoldText(
                     line.substring(1).trim(),
-                    textColor.withOpacity(0.8),
+                    textColor.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -396,7 +396,7 @@ class AppIntroDocument extends StatelessWidget {
                 Expanded(
                   child: _parseBoldText(
                     line.substring(line.indexOf('.') + 1).trim(),
-                    textColor.withOpacity(0.8),
+                    textColor.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -405,7 +405,7 @@ class AppIntroDocument extends StatelessWidget {
         } else {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _parseBoldText(line, textColor.withOpacity(0.8)),
+            child: _parseBoldText(line, textColor.withValues(alpha: 0.8)),
           );
         }
       }).toList(),
@@ -436,13 +436,13 @@ class AppIntroDocument extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color1.withOpacity(0.5), color2.withOpacity(0.3)],
+          colors: [color1.withValues(alpha: 0.5), color2.withValues(alpha: 0.3)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: lightBlue.withOpacity(0.3),
+          color: lightBlue.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -518,7 +518,7 @@ class AppIntroDocument extends StatelessWidget {
                 Text(
                   description,
                   style: TextStyle(
-                    color: marineBlue.withOpacity(0.7),
+                    color: marineBlue.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -532,7 +532,7 @@ class AppIntroDocument extends StatelessWidget {
   Widget _buildFooterSection(BuildContext context) {
     return Column(
       children: [
-        Divider(color: lightBlue.withOpacity(0.3)),
+        Divider(color: lightBlue.withValues(alpha: 0.3)),
         const SizedBox(height: 20),
         Text(
           'By using this app, you agree to our:',

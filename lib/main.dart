@@ -7,7 +7,12 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
-import 'pages/alif_detection_page.dart';  // ADD THIS IMPORT
+import 'pages/alif_detection_page.dart';
+
+// Firebase imports
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,7 +104,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionPage(),  // ADD THIS ROUTE
+        '/alif-detection': (context) => const AlifDetectionPage(),
       },
     );
   }
@@ -175,10 +180,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 400,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: MyApp.color2.withOpacity(0.2),
+                    color: MyApp.color2.withValues(alpha: 0.2),
                     boxShadow: [
                       BoxShadow(
-                        color: MyApp.color2.withOpacity(0.3),
+                        color: MyApp.color2.withValues(alpha: 0.3),
                         blurRadius: 100,
                         spreadRadius: 20,
                       ),
@@ -215,7 +220,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontFamily: 'Inter',
                       shadows: [
                         Shadow(
-                          color: MyApp.color2.withOpacity(0.6),
+                          color: MyApp.color2.withValues(alpha: 0.6),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -237,8 +242,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          MyApp.color4.withOpacity(0.8),
-                          MyApp.color2.withOpacity(0.8),
+                          MyApp.color4.withValues(alpha: 0.8),
+                          MyApp.color2.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(1),
@@ -315,7 +320,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Text(
                       'Skip',
                       style: TextStyle(
-                        color: MyApp.darkBlue.withOpacity(0.8),
+                        color: MyApp.darkBlue.withValues(alpha: 0.8),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -357,7 +362,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             shape: BoxShape.circle,
                             color: _currentPage == index
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.5),
+                                : Colors.white.withValues(alpha: 0.5),
                           ),
                         );
                       }),
@@ -448,13 +453,13 @@ class OnboardingPageWidget extends StatelessWidget {
                   Icon(
                     Icons.image_not_supported,
                     size: 60,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Image Not Found',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 16,
                     ),
                   ),
@@ -480,7 +485,7 @@ class OnboardingPageWidget extends StatelessWidget {
             child: Text(
               page.description,
               style: TextStyle(
-                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.9),
+                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.9),
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
@@ -629,7 +634,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -640,7 +645,7 @@ class WelcomeScreen extends StatelessWidget {
                                   TextSpan(
                                     text: 'Already have an account? ',
                                     style: TextStyle(
-                                      color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.9),
+                                      color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.9),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -668,36 +673,35 @@ class WelcomeScreen extends StatelessWidget {
                         Container(
                           width: 100,
                           height: 1,
-                          color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                          color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                           margin: const EdgeInsets.only(bottom: 16),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to Alif Detection for now
-                            Navigator.pushReplacementNamed(context, '/alif-detection');
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 8,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildQuickAccessButton(
+                              context,
+                              icon: Icons.back_hand,
+                              label: 'Hand Detection',
+                              route: '/alif-detection',
                             ),
+<<<<<<< HEAD
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: const Color.fromARGB(255, 0, 109, 176).withOpacity(0.5),
+                                color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
+=======
+                            const SizedBox(width: 12),
+                            _buildQuickAccessButton(
+                              context,
+                              icon: Icons.home,
+                              label: 'Home (Test)',
+                              route: '/home',
+>>>>>>> e26f5f854aa8bd8b01123444ec9e1619ed3f348b
                             ),
-                            child: const Text(
-                              'Try Alif Detection (Demo)',
-                              style: TextStyle(
-                                color: MyApp.darkBlue,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -706,6 +710,52 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessButton(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String route,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushReplacementNamed(context, route);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: MyApp.darkBlue.withOpacity(0.3),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white.withOpacity(0.3),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: MyApp.darkBlue,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: MyApp.darkBlue,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
