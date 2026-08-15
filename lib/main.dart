@@ -7,7 +7,12 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
-import 'pages/alif_detection_page.dart';  // ADD THIS IMPORT
+import 'pages/alif_detection_page.dart';
+
+// Firebase imports
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,7 +104,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionPage(),  // ADD THIS ROUTE
+        '/alif-detection': (context) => const AlifDetectionPage(),
       },
     );
   }
@@ -671,33 +676,32 @@ class WelcomeScreen extends StatelessWidget {
                           color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                           margin: const EdgeInsets.only(bottom: 16),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            // Navigate to Alif Detection for now
-                            Navigator.pushReplacementNamed(context, '/alif-detection');
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 8,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildQuickAccessButton(
+                              context,
+                              icon: Icons.back_hand,
+                              label: 'Hand Detection',
+                              route: '/alif-detection',
                             ),
+<<<<<<< HEAD
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: const Color.fromARGB(255, 0, 109, 176).withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
+=======
+                            const SizedBox(width: 12),
+                            _buildQuickAccessButton(
+                              context,
+                              icon: Icons.home,
+                              label: 'Home (Test)',
+                              route: '/home',
+>>>>>>> e26f5f854aa8bd8b01123444ec9e1619ed3f348b
                             ),
-                            child: const Text(
-                              'Try Alif Detection (Demo)',
-                              style: TextStyle(
-                                color: MyApp.darkBlue,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -706,6 +710,52 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessButton(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String route,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushReplacementNamed(context, route);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: MyApp.darkBlue.withOpacity(0.3),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white.withOpacity(0.3),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: MyApp.darkBlue,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: MyApp.darkBlue,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
