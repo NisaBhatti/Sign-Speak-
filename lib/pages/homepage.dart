@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       // 1. Real-Time Translation
                       _buildFeatureCard(
-                        title: 'Real-Time Translation',
+                        title: 'Real Translation',
                         subtitle: 'Live camera detection',
                         description: 'Recognise signs instantly with your camera.',
                         icon: Icons.videocam_outlined,
@@ -108,9 +108,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       // 2. Dictionary
                       _buildFeatureCard(
-                        title: 'Dictionary',
-                        subtitle: 'Sign Language Dictionary',
-                        description: 'Browse and search signs in the dictionary.',
+                        title: 'Sign Book',
+                        subtitle: 'Browse 500+ signs',
+                        description: 'Search the complete dictionary.',
                         icon: Icons.book,
                         gradient: LinearGradient(
                           colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
@@ -125,9 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 3. Fav Signs
+                      // 3. Favourite Signs
                       _buildFeatureCard(
-                        title: 'Fav Signs',
+                        title: 'Favourite Signs',
                         subtitle: 'Your saved signs',
                         description: 'Quick access to favourite signs.',
                         icon: Icons.favorite_border,
