@@ -107,12 +107,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     children: [
                       const SizedBox(height: 10),
                       
-                      // 1. Alphabets Button
+                      // 1. Words Button (Changed from Alphabets)
                       _buildFeatureCard(
-                        title: 'Alphabets',
-                        subtitle: 'Learn A to Z',
-                        description: 'Explore English sign language alphabets.',
-                        icon: Icons.abc,
+                        title: 'Words',
+                        subtitle: 'Learn Common Words',
+                        description: 'Explore common sign language words.',
+                        icon: Icons.menu_book, // Changed icon to book
                         gradient: LinearGradient(
                           colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
@@ -121,7 +121,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Alphabets feature coming soon!'),
+                              content: Text('Words feature coming soon!'),
                               backgroundColor: Color.fromARGB(255, 0, 109, 176),
                             ),
                           );
@@ -135,7 +135,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         title: 'A to Z / الف تا یئ',
                         subtitle: 'English & Urdu Signs',
                         description: 'Learn signs from A to Z and الف to یئ.',
-                        icon: Icons.sort_by_alpha,
+                        icon: Icons.abc,
                         gradient: LinearGradient(
                           colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
@@ -153,14 +153,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 3. Videos Button (Now with same theme colors)
+                      // 3. Videos Button
                       _buildFeatureCard(
                         title: 'Videos',
                         subtitle: 'Video Tutorials',
                         description: 'Watch sign language video tutorials.',
                         icon: Icons.video_library,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue], // Changed to match theme
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -168,7 +168,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Videos feature coming soon!'),
-                              backgroundColor: Color.fromARGB(255, 0, 109, 176), // Changed to match theme
+                              backgroundColor: Color.fromARGB(255, 0, 109, 176),
                             ),
                           );
                         },
