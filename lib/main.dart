@@ -691,7 +691,7 @@ class WelcomeScreen extends StatelessWidget {
                               icon: Icons.home,
                               label: 'Home (Test)',
                               route: '/home',
-                            ),
+                           ),
                           ],
                         ),
                       ],
