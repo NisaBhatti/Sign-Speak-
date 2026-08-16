@@ -723,11 +723,11 @@ class WelcomeScreen extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(
-            color: MyApp.darkBlue.withOpacity(0.3),
+            color: MyApp.darkBlue.withValues(alpha: 0.3),
             width: 1,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
