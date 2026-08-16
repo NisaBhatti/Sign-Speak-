@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'alif_detection_page.dart';
 import 'drawer_page.dart';
+import 'dictionary.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,13 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Signs Speak',
                       style: TextStyle(color: lightBlue, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 48), // symmetry
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
               // Welcome text
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12), // Reduced bottom padding
                 child: Text(
                   'What would you like to do today?',
                   style: TextStyle(
@@ -78,13 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Feature cards – now scrollable
+              // Feature cards
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20), // Removed vertical padding
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
                       // 1. Real-Time Translation
                       _buildFeatureCard(
                         title: 'Real-Time Translation',
@@ -102,6 +102,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(
                             builder: (context) => CameraAccessScreen(),
                             ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // 2. Dictionary
+                      _buildFeatureCard(
+                        title: 'Dictionary',
+                        subtitle: 'Sign Language Dictionary',
+                        description: 'Browse and search signs in the dictionary.',
+                        icon: Icons.book,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const DictionaryPage()),
                           );
                         },
                       ),
@@ -130,26 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
-                      // 4. Alif Detection Screen
-                      _buildFeatureCard(
-                        title: 'Alif Detection',
-                        subtitle: 'Urdu Sign Detection',
-                        description: 'Detect Alif and other signs with your model.',
-                        icon: Icons.auto_awesome,  // or Icons.accessibility_new
-                        gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Colors.purpleAccent],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AlifDetectionPage()),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 20),
+                      // Removed the extra SizedBox at the bottom
                     ],
                   ),
                 ),
