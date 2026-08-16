@@ -130,11 +130,11 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 2. A to Z Button
+                      // 2. A to Z & الف تا یئ (Combined Button)
                       _buildFeatureCard(
-                        title: 'A to Z',
-                        subtitle: 'English Signs',
-                        description: 'Learn signs from A to Z with examples.',
+                        title: 'A to Z / الف تا یئ',
+                        subtitle: 'English & Urdu Signs',
+                        description: 'Learn signs from A to Z and الف to یئ.',
                         icon: Icons.sort_by_alpha,
                         gradient: LinearGradient(
                           colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
@@ -144,7 +144,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('A to Z feature coming soon!'),
+                              content: Text('A to Z & Urdu signs feature coming soon!'),
                               backgroundColor: Color.fromARGB(255, 0, 109, 176),
                             ),
                           );
@@ -153,37 +153,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 3. الف تا یئ (Alif Ta Yay) - Urdu
-                      _buildFeatureCard(
-                        title: 'الف تا یئ',
-                        subtitle: 'Urdu Signs',
-                        description: 'Learn Urdu sign language from الف to یئ.',
-                        icon: Icons.translate,
-                        gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Urdu signs feature coming soon!'),
-                              backgroundColor: Color.fromARGB(255, 0, 109, 176),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // 4. Videos Button
+                      // 3. Videos Button (Now with same theme colors)
                       _buildFeatureCard(
                         title: 'Videos',
                         subtitle: 'Video Tutorials',
                         description: 'Watch sign language video tutorials.',
                         icon: Icons.video_library,
                         gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Colors.purpleAccent],
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue], // Changed to match theme
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -191,7 +168,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Videos feature coming soon!'),
-                              backgroundColor: Colors.deepPurple,
+                              backgroundColor: Color.fromARGB(255, 0, 109, 176), // Changed to match theme
                             ),
                           );
                         },
