@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'words_page.dart';  
+import 'word_page.dart'; 
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -99,7 +99,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const WordPage(),
+                              builder: (context) => const WordsPage(), // Navigate to WordPage
                             ),
                           );
                         },
