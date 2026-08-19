@@ -99,7 +99,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const WordPage(),
+                              builder: (context) => const WordsPage(),
                             ),
                           );
                         },
