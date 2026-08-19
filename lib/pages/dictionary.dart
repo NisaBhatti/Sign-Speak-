@@ -1,29 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sign Dictionary',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Lexend',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 25, 19, 132), // darkBlue
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: const DictionaryPage(),
-    );
-  }
-}
+import 'words_page.dart';  
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -63,7 +39,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withValues(alpha: 0.1),
+                        color: marineBlue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -92,7 +68,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 child: Text(
                   'Learn Sign Language',
                   style: TextStyle(
-                    color: marineBlue.withValues(alpha: 0.7),
+                    color: marineBlue.withOpacity(0.7),
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -107,22 +83,23 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     children: [
                       const SizedBox(height: 10),
                       
-                      // 1. Words Button (Changed from Alphabets)
+                      // 1. Words Button - UPDATED WITH NAVIGATION
                       _buildFeatureCard(
                         title: 'Words',
                         subtitle: 'Learn Common Words',
                         description: 'Explore common sign language words.',
-                        icon: Icons.menu_book, // Changed icon to book
+                        icon: Icons.menu_book,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Words feature coming soon!'),
-                              backgroundColor: Color.fromARGB(255, 0, 109, 176),
+                          // 👇 YEH LINE UPDATE HUI HAI - AB WORDS PAGE OPEN HOGA
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WordPage(),
                             ),
                           );
                         },
@@ -137,7 +114,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         description: 'Learn signs from A to Z and الف to یئ.',
                         icon: Icons.abc,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -160,7 +137,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         description: 'Watch sign language video tutorials.',
                         icon: Icons.video_library,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -203,7 +180,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withValues(alpha: 0.15),
+              color: marineBlue.withOpacity(0.15),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -217,7 +194,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: Colors.white, size: 28),
@@ -240,7 +217,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -248,7 +225,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     Text(
                       description,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 10,
                       ),
                     ),
@@ -259,12 +236,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: Colors.white.withOpacity(0.8),
                   size: 18,
                 ),
               ),
