@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'words_page.dart';  // 👈 YEH IMPORT ADD KIYA HAI (NAYA)
+import 'words_page.dart';  
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
