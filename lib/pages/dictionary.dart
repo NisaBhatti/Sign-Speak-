@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'words_page.dart';  
+import 'words_page.dart';
+import 'alphabets_page.dart';
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -83,7 +84,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     children: [
                       const SizedBox(height: 10),
                       
-                      // 1. Words Button - UPDATED WITH NAVIGATION
+                      // 1. Words Button - Navigates to WordsPage
                       _buildFeatureCard(
                         title: 'Words',
                         subtitle: 'Learn Common Words',
@@ -95,7 +96,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          // 👇 YEH LINE UPDATE HUI HAI - AB WORDS PAGE OPEN HOGA
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -107,7 +107,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 2. A to Z & الف تا یئ (Combined Button)
+                      // 2. A to Z / الف تا یئ Button - Navigates to AlphabetsPage
                       _buildFeatureCard(
                         title: 'A to Z / الف تا یئ',
                         subtitle: 'English & Urdu Signs',
@@ -119,10 +119,10 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('A to Z & Urdu signs feature coming soon!'),
-                              backgroundColor: Color.fromARGB(255, 0, 109, 176),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AlphabetsPage(),
                             ),
                           );
                         },
@@ -130,7 +130,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 3. Videos Button
+                      // 3. Videos Button - Coming Soon
                       _buildFeatureCard(
                         title: 'Videos',
                         subtitle: 'Video Tutorials',
