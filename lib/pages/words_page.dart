@@ -67,6 +67,66 @@ class _WordsPageState extends State<WordsPage> {
       'category': 'Basic',
       'description': 'Rub your chest in a circular motion',
     },
+    {
+      'name': 'Good Morning',
+      'image': 'assets/images/sign_goodmorning.png',
+      'category': 'Greetings',
+      'description': 'Place hand on chest and move outward',
+    },
+    {
+      'name': 'Good Night',
+      'image': 'assets/images/sign_goodnight.png',
+      'category': 'Greetings',
+      'description': 'Place hand on chin and move downward',
+    },
+    {
+      'name': 'Friend',
+      'image': 'assets/images/sign_friend.png',
+      'category': 'Relationships',
+      'description': 'Interlock index fingers and twist',
+    },
+    {
+      'name': 'Family',
+      'image': 'assets/images/sign_family.png',
+      'category': 'Relationships',
+      'description': 'Circle both hands in front of chest',
+    },
+    {
+      'name': 'Eat',
+      'image': 'assets/images/sign_eat.png',
+      'category': 'Basic',
+      'description': 'Tap fingers to mouth',
+    },
+    {
+      'name': 'Drink',
+      'image': 'assets/images/sign_drink.png',
+      'category': 'Basic',
+      'description': 'Make C shape and tilt toward mouth',
+    },
+    {
+      'name': 'School',
+      'image': 'assets/images/sign_school.png',
+      'category': 'Education',
+      'description': 'Clap hands together and separate',
+    },
+    {
+      'name': 'Teacher',
+      'image': 'assets/images/sign_teacher.png',
+      'category': 'Education',
+      'description': 'Touch forehead with fingertips and move outward',
+    },
+    {
+      'name': 'Happy',
+      'image': 'assets/images/sign_happy.png',
+      'category': 'Emotions',
+      'description': 'Pat chest with flat hand',
+    },
+    {
+      'name': 'Sad',
+      'image': 'assets/images/sign_sad.png',
+      'category': 'Emotions',
+      'description': 'Draw a tear down your cheek',
+    },
   ];
 
   // Get unique categories for filter
@@ -303,9 +363,9 @@ class _WordsPageState extends State<WordsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sign Image - Size Controlled
+            // ✅ Sign Image - Size Controlled with SizedBox
             SizedBox(
-              height: 120,  // ✅ IMAGE HEIGHT FIXED
+              height: 110,  // 👈 IMAGE HEIGHT FIXED (kam kiya)
               width: double.infinity,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
@@ -358,7 +418,7 @@ class _WordsPageState extends State<WordsPage> {
   Widget _buildImage(String imagePath) {
     return Image.asset(
       imagePath,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya taake puri image dikhe
       width: double.infinity,
       errorBuilder: (context, error, stackTrace) {
         return Container(
@@ -409,17 +469,17 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Detail Image - Size Controlled
+              // ✅ Detail Image - Size Controlled
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   sign['image'],
-                  height: 180,  // ✅ DETAIL IMAGE SIZE
+                  height: 160,  // 👈 DETAIL IMAGE SIZE (kam kiya)
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      height: 180,
+                      height: 160,
                       color: Colors.grey.shade200,
                       child: const Icon(
                         Icons.image_not_supported,
