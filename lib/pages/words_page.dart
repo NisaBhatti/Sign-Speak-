@@ -17,7 +17,7 @@ class _WordsPageState extends State<WordsPage> {
   // Search query
   String _searchQuery = '';
 
-  // ✅ COMMON SIGNS LIST - YAHAN APNI SIGNS ADD KAREIN
+  // ✅ COMMON SIGNS LIST
   final List<Map<String, dynamic>> _signs = [
     {
       'name': 'Hello',
@@ -66,66 +66,6 @@ class _WordsPageState extends State<WordsPage> {
       'image': 'assets/images/sign_please.png',
       'category': 'Basic',
       'description': 'Rub your chest in a circular motion',
-    },
-    {
-      'name': 'Good Morning',
-      'image': 'assets/images/sign_goodmorning.png',
-      'category': 'Greetings',
-      'description': 'Place hand on chest and move outward',
-    },
-    {
-      'name': 'Good Night',
-      'image': 'assets/images/sign_goodnight.png',
-      'category': 'Greetings',
-      'description': 'Place hand on chin and move downward',
-    },
-    {
-      'name': 'Friend',
-      'image': 'assets/images/sign_friend.png',
-      'category': 'Relationships',
-      'description': 'Interlock index fingers and twist',
-    },
-    {
-      'name': 'Family',
-      'image': 'assets/images/sign_family.png',
-      'category': 'Relationships',
-      'description': 'Circle both hands in front of chest',
-    },
-    {
-      'name': 'Eat',
-      'image': 'assets/images/sign_eat.png',
-      'category': 'Basic',
-      'description': 'Tap fingers to mouth',
-    },
-    {
-      'name': 'Drink',
-      'image': 'assets/images/sign_drink.png',
-      'category': 'Basic',
-      'description': 'Make C shape and tilt toward mouth',
-    },
-    {
-      'name': 'School',
-      'image': 'assets/images/sign_school.png',
-      'category': 'Education',
-      'description': 'Clap hands together and separate',
-    },
-    {
-      'name': 'Teacher',
-      'image': 'assets/images/sign_teacher.png',
-      'category': 'Education',
-      'description': 'Touch forehead with fingertips and move outward',
-    },
-    {
-      'name': 'Happy',
-      'image': 'assets/images/sign_happy.png',
-      'category': 'Emotions',
-      'description': 'Pat chest with flat hand',
-    },
-    {
-      'name': 'Sad',
-      'image': 'assets/images/sign_sad.png',
-      'category': 'Emotions',
-      'description': 'Draw a tear down your cheek',
     },
   ];
 
@@ -363,9 +303,10 @@ class _WordsPageState extends State<WordsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sign Image
-            Expanded(
-              flex: 3,
+            // Sign Image - Size Controlled
+            SizedBox(
+              height: 120,  // ✅ IMAGE HEIGHT FIXED
+              width: double.infinity,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
@@ -420,7 +361,6 @@ class _WordsPageState extends State<WordsPage> {
       fit: BoxFit.cover,
       width: double.infinity,
       errorBuilder: (context, error, stackTrace) {
-        // Agar image load na ho toh placeholder
         return Container(
           color: Colors.grey.shade100,
           child: Column(
@@ -428,15 +368,15 @@ class _WordsPageState extends State<WordsPage> {
             children: [
               Icon(
                 Icons.image_not_supported,
-                size: 40,
+                size: 30,
                 color: Colors.grey.shade400,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 'No Image',
                 style: TextStyle(
                   color: Colors.grey.shade500,
-                  fontSize: 12,
+                  fontSize: 10,
                 ),
               ),
             ],
@@ -459,7 +399,6 @@ class _WordsPageState extends State<WordsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Handle bar
               Container(
                 width: 40,
                 height: 4,
@@ -470,17 +409,17 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Sign Image
+              // Detail Image - Size Controlled
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   sign['image'],
-                  height: 150,
+                  height: 180,  // ✅ DETAIL IMAGE SIZE
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      height: 150,
+                      height: 180,
                       color: Colors.grey.shade200,
                       child: const Icon(
                         Icons.image_not_supported,
@@ -493,7 +432,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Sign Name
               Text(
                 sign['name'],
                 style: TextStyle(
@@ -504,7 +442,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 8),
               
-              // Category
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
@@ -522,7 +459,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Description
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -540,7 +476,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Close Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
