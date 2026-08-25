@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'word_page.dart'; 
+import 'words_page.dart'; 
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -72,7 +72,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
+                  ),
               ),
               
               // Feature cards
