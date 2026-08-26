@@ -56,12 +56,6 @@ class _WordsPageState extends State<WordsPage> {
       'description': 'Place one hand on top of the other and lift up',
     },
     {
-      'name': 'Love',
-      'image': 'assets/images/sign_love.png',
-      'category': 'Emotions',
-      'description': 'Cross arms over your chest',
-    },
-    {
       'name': 'Please',
       'image': 'assets/images/sign_please.png',
       'category': 'Basic',
@@ -102,18 +96,6 @@ class _WordsPageState extends State<WordsPage> {
       'image': 'assets/images/sign_drink.png',
       'category': 'Basic',
       'description': 'Make C shape and tilt toward mouth',
-    },
-    {
-      'name': 'School',
-      'image': 'assets/images/sign_school.png',
-      'category': 'Education',
-      'description': 'Clap hands together and separate',
-    },
-    {
-      'name': 'Teacher',
-      'image': 'assets/images/sign_teacher.png',
-      'category': 'Education',
-      'description': 'Touch forehead with fingertips and move outward',
     },
     {
       'name': 'Happy',
