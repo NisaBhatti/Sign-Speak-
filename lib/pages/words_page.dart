@@ -17,7 +17,7 @@ class _WordsPageState extends State<WordsPage> {
   // Search query
   String _searchQuery = '';
 
-  // ✅ COMMON SIGNS LIST - YAHAN APNI SIGNS ADD KAREIN
+  // ✅ COMMON SIGNS LIST
   final List<Map<String, dynamic>> _signs = [
     {
       'name': 'Hello',
@@ -54,12 +54,6 @@ class _WordsPageState extends State<WordsPage> {
       'image': 'assets/images/sign_help.png',
       'category': 'Emergency',
       'description': 'Place one hand on top of the other and lift up',
-    },
-    {
-      'name': 'Love',
-      'image': 'assets/images/sign_love.png',
-      'category': 'Emotions',
-      'description': 'Cross arms over your chest',
     },
     {
       'name': 'Please',
@@ -102,18 +96,6 @@ class _WordsPageState extends State<WordsPage> {
       'image': 'assets/images/sign_drink.png',
       'category': 'Basic',
       'description': 'Make C shape and tilt toward mouth',
-    },
-    {
-      'name': 'School',
-      'image': 'assets/images/sign_school.png',
-      'category': 'Education',
-      'description': 'Clap hands together and separate',
-    },
-    {
-      'name': 'Teacher',
-      'image': 'assets/images/sign_teacher.png',
-      'category': 'Education',
-      'description': 'Touch forehead with fingertips and move outward',
     },
     {
       'name': 'Happy',
@@ -363,9 +345,10 @@ class _WordsPageState extends State<WordsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sign Image
-            Expanded(
-              flex: 3,
+            // ✅ Sign Image - Size Controlled with SizedBox
+            SizedBox(
+              height: 110,  // 👈 IMAGE HEIGHT FIXED (kam kiya)
+              width: double.infinity,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
@@ -417,10 +400,9 @@ class _WordsPageState extends State<WordsPage> {
   Widget _buildImage(String imagePath) {
     return Image.asset(
       imagePath,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya taake puri image dikhe
       width: double.infinity,
       errorBuilder: (context, error, stackTrace) {
-        // Agar image load na ho toh placeholder
         return Container(
           color: Colors.grey.shade100,
           child: Column(
@@ -428,15 +410,15 @@ class _WordsPageState extends State<WordsPage> {
             children: [
               Icon(
                 Icons.image_not_supported,
-                size: 40,
+                size: 30,
                 color: Colors.grey.shade400,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 'No Image',
                 style: TextStyle(
                   color: Colors.grey.shade500,
-                  fontSize: 12,
+                  fontSize: 10,
                 ),
               ),
             ],
@@ -459,7 +441,6 @@ class _WordsPageState extends State<WordsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Handle bar
               Container(
                 width: 40,
                 height: 4,
@@ -470,17 +451,17 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Sign Image
+              // ✅ Detail Image - Size Controlled
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   sign['image'],
-                  height: 150,
+                  height: 160,  // 👈 DETAIL IMAGE SIZE (kam kiya)
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      height: 150,
+                      height: 160,
                       color: Colors.grey.shade200,
                       child: const Icon(
                         Icons.image_not_supported,
@@ -493,7 +474,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Sign Name
               Text(
                 sign['name'],
                 style: TextStyle(
@@ -504,7 +484,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 8),
               
-              // Category
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
@@ -522,7 +501,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Description
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -540,7 +518,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Close Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
