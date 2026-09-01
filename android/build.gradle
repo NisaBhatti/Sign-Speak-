@@ -17,7 +17,6 @@ allprojects {
     }
 }
 
-// Custom build directory
 def newBuildDir = rootProject.layout.buildDirectory.dir('../../build').get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 

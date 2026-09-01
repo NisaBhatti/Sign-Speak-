@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.google.mediapipe.framework.AndroidAssetUtil
-import com.google.mediapipe.framework.PacketGetter
-import com.google.mediapipe.solutions.hands.HandLandmark
-import com.google.mediapipe.solutions.hands.Hands
-import com.google.mediapipe.solutions.hands.HandsOptions
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.pose.Pose
+import com.google.mlkit.vision.pose.PoseDetection
+import com.google.mlkit.vision.pose.PoseDetectorOptionsBase
+import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
-    private var hands: Hands? = null
     private var tflite: Interpreter? = null
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     private val isProcessing = AtomicBoolean(false)
@@ -40,35 +39,15 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(this)
         context = binding.applicationContext
         
-        // Initialize MediaPipe
-        AndroidAssetUtil.initializeNativeAssetManager(context)
-        initMediaPipe()
-        
         // Load TFLite Model
         loadTFLiteModel()
-    }
-
-    private fun initMediaPipe() {
-        try {
-            hands = Hands.create(
-                HandsOptions.builder()
-                    .setStaticImageMode(false)
-                    .setMaxNumHands(1)
-                    .setMinDetectionConfidence(0.5)
-                    .setMinTrackingConfidence(0.5)
-                    .build()
-            )
-            Log.d(TAG, "✅ MediaPipe Hands initialized successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to initialize MediaPipe: ${e.message}")
-        }
     }
 
     private fun loadTFLiteModel() {
         try {
             val modelBuffer = loadModelFile()
             tflite = Interpreter(modelBuffer)
-            Log.d(TAG, "✅ TFLite model loaded successfully from: $MODEL_PATH")
+            Log.d(TAG, "✅ TFLite model loaded successfully")
         } catch (e: Exception) {
             Log.e(TAG, "❌ Failed to load TFLite model: ${e.message}")
         }
@@ -127,7 +106,6 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
                     return@execute
                 }
 
-                // Detect hand landmarks using MediaPipe
                 val landmarks = detectHandLandmarks(bitmap)
                 
                 if (landmarks.isEmpty()) {
@@ -136,10 +114,7 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
                     return@execute
                 }
 
-                // Convert landmarks to 42 features (21 landmarks * 2)
                 val features = landmarksToFeatures(landmarks)
-                
-                // Run TFLite inference
                 val prediction = runInference(features)
                 
                 result.success(createResponse(prediction > 0.5f, prediction.toDouble(), true, landmarks))
@@ -169,26 +144,28 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
         val result = mutableListOf<List<Float>>()
         
         try {
-            // Convert bitmap to MediaPipe Image
-            val mpImage = convertBitmapToMPImage(bitmap)
+            val inputImage = InputImage.fromBitmap(bitmap, 0)
+            val options = PoseDetectorOptions.Builder()
+                .setDetectorMode(PoseDetectorOptions.STREAM_MODE)
+                .build()
+            val detector = PoseDetection.getClient(options)
             
-            hands?.let { handsInstance ->
-                val packet = handsInstance.process(mpImage)
-                val output = packet.get(0)
-                
-                // Extract landmarks
-                val landmarks = PacketGetter.getHandLandmarks(output)
-                
-                if (landmarks != null && landmarks.isNotEmpty()) {
-                    for (landmark in landmarks[0]) {
-                        result.add(listOf(landmark.x(), landmark.y()))
+            detector.process(inputImage)
+                .addOnSuccessListener { pose ->
+                    if (pose.allPoseLandmarks.isNotEmpty()) {
+                        val landmarks = pose.allPoseLandmarks
+                        for (landmark in landmarks) {
+                            result.add(listOf(
+                                landmark.position.x,
+                                landmark.position.y
+                            ))
+                        }
                     }
                 }
-                
-                packet.release()
-            }
-            
-            mpImage.release()
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Pose detection failed: ${e.message}")
+                }
+                .await()
             
         } catch (e: Exception) {
             Log.e(TAG, "Error detecting hand: ${e.message}")
@@ -197,18 +174,14 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
         return result
     }
 
-    private fun convertBitmapToMPImage(bitmap: Bitmap): com.google.mediapipe.framework.Image {
-        return com.google.mediapipe.framework.Image.fromBitmap(bitmap)
-    }
-
     private fun landmarksToFeatures(landmarks: List<List<Float>>): FloatArray {
-        val features = FloatArray(42) // 21 landmarks * 2 (x, y)
+        val features = FloatArray(42)
         
         for (i in 0 until minOf(21, landmarks.size)) {
             val landmark = landmarks[i]
             if (landmark.size >= 2) {
-                features[i * 2] = landmark[0] // x
-                features[i * 2 + 1] = landmark[1] // y
+                features[i * 2] = landmark[0]
+                features[i * 2 + 1] = landmark[1]
             }
         }
         
@@ -246,7 +219,6 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
-        hands?.close()
         tflite?.close()
         executor.shutdown()
     }

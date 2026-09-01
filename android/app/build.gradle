@@ -6,13 +6,13 @@ plugins {
 
 android {
     namespace 'com.example.signspeak'
-    compileSdk 36  // Must be 36 for your plugins
+    compileSdk 36
 
     ndkVersion "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
@@ -58,15 +58,15 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     
     // ============================================
-    // 📱 MEDIAPIPE FOR HAND DETECTION
+    // 📱 MEDIAPIPE FOR HAND DETECTION (USE SPECIFIC VERSION)
     // ============================================
-    implementation 'com.google.mediapipe:solution-core:latest.release'
-    implementation 'com.google.mediapipe:hands:latest.release'
+    implementation 'com.google.mediapipe:solution-core:0.10.14'
+    implementation 'com.google.mediapipe:hands:0.10.14'
     
     // ============================================
-    // 📱 TENSORFLOW LITE
+    // 📱 TENSORFLOW LITE - USE SAME VERSION AS MEDIAPIPE
     // ============================================
-    implementation 'org.tensorflow:tensorflow-lite:2.17.0'
+    implementation 'org.tensorflow:tensorflow-lite:2.13.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
     
     // ============================================
@@ -75,5 +75,14 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-    implementation 'com.google.guava:guava:33.3.0-android'
+}
+
+// ============================================
+// 🔥 FIX DUPLICATE CLASSES
+// ============================================
+configurations {
+    all {
+        exclude group: 'com.google.ai.edge.litert', module: 'litert-api'
+        exclude group: 'org.tensorflow', module: 'tensorflow-lite-api'
+    }
 }
