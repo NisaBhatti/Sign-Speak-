@@ -104,7 +104,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionPage(),
+        '/alif-detection': (context) => const AlifDetectionScreen(),
       },
     );
   }

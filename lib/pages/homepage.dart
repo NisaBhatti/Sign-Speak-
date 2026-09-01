@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const AlifDetectionPage()),
+                            MaterialPageRoute(builder: (_) => const AlifDetectionScreen()),
                           );
                         },
                       ),

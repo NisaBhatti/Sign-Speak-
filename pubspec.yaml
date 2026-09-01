@@ -50,3 +50,4 @@ flutter:
   
   assets:
     - assets/images/
+    - assets/models/alif_robust.tflite
