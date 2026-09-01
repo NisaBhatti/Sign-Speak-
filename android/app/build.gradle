@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace 'com.example.signspeak'
-    
-    // 🔥 FIX: Use compileSdk 34 instead of 36 for better compatibility
-    compileSdk 34
+    compileSdk 36  // Must be 36 for your plugins
 
     ndkVersion "28.2.13676358"
 
@@ -18,17 +16,15 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'  // 🔥 FIX: Use 1.8 instead of 17 for Java 8 compatibility
+        jvmTarget = '17'
     }
 
     defaultConfig {
         applicationId 'com.example.signspeak'
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 1
         versionName '1.0'
-        
-        // 🔥 ADD: For better performance
         multiDexEnabled true
     }
 
@@ -54,38 +50,30 @@ dependencies {
     // ============================================
     // 📱 EXISTING DEPENDENCIES
     // ============================================
-    implementation 'androidx.camera:camera-core:1.3.0'
-    implementation 'androidx.camera:camera-camera2:1.3.0'
-    implementation 'androidx.camera:camera-lifecycle:1.3.0'
-    implementation 'androidx.camera:camera-view:1.3.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.camera:camera-core:1.4.1'
+    implementation 'androidx.camera:camera-camera2:1.4.1'
+    implementation 'androidx.camera:camera-lifecycle:1.4.1'
+    implementation 'androidx.camera:camera-view:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
     
     // ============================================
-    // 📱 HAND DETECTION DEPENDENCIES
+    // 📱 MEDIAPIPE FOR HAND DETECTION
     // ============================================
+    implementation 'com.google.mediapipe:solution-core:latest.release'
+    implementation 'com.google.mediapipe:hands:latest.release'
     
-    // 🔥 OPTION 1: Google ML Kit (Recommended - More Stable)
-    implementation 'com.google.mlkit:hand-pose-detection:16.0.0-beta1'
-    implementation 'com.google.mlkit:vision-common:17.3.0'
-    
-    // 🔥 OPTION 2: MediaPipe (Alternative if ML Kit fails)
-    // implementation 'com.google.mediapipe:solution-core:latest.release'
-    // implementation 'com.google.mediapipe:hands:latest.release'
-    
-    // TensorFlow Lite
-    implementation 'org.tensorflow:tensorflow-lite:2.14.0'
+    // ============================================
+    // 📱 TENSORFLOW LITE
+    // ============================================
+    implementation 'org.tensorflow:tensorflow-lite:2.17.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
     
-    // AndroidX Core KTX
-    implementation 'androidx.core:core-ktx:1.12.0'
-    
-    // Guava for ListenableFuture (Required for ML Kit)
-    implementation 'com.google.guava:guava:31.1-android'
-    
-    // 🔥 ADD: MultiDex support
+    // ============================================
+    // 📱 ANDROIDX
+    // ============================================
+    implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.multidex:multidex:2.0.1'
-    
-    // 🔥 ADD: Kotlin coroutines for async operations
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'com.google.guava:guava:33.3.0-android'
 }
