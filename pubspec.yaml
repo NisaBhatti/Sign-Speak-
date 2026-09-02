@@ -10,11 +10,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # ===== GOOGLE ML KIT (Use the full package) =====
   
   # ===== CAMERA =====
   camera: ^0.10.6
+
+  # ============================================
+  # ✅ TENSORFLOW LITE (UPDATED VERSION)
+  # ============================================
+  tflite_flutter: ^0.11.0
+  
+  # ============================================
+  # ✅ IMAGE PROCESSING (UPDATED VERSION)
+  # ============================================
+  image: ^4.2.0
+  
+  # ============================================
+  # ✅ HTTP (UPDATED VERSION)
+  # ============================================
+  http: ^1.3.0
   
   # ===== PERMISSIONS =====
   permission_handler: ^11.3.1

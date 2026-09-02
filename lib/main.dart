@@ -8,6 +8,7 @@ import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
 import 'pages/alif_detection_page.dart';
+import 'pages/tflite_test_page.dart'; // ✅ ADDED
 
 // Firebase imports
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -104,7 +105,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionScreen(),
+        '/alif-detection': (context) => const AlifDetectionPage(),
+        '/tflite-test': (context) => const TFLiteTestPage(), // ✅ ADDED
       },
     );
   }
@@ -682,14 +684,21 @@ class WelcomeScreen extends StatelessWidget {
                             _buildQuickAccessButton(
                               context,
                               icon: Icons.back_hand,
-                              label: 'Hand Detection',
+                              label: 'Alif Detection',
                               route: '/alif-detection',
                             ),
                             const SizedBox(width: 12),
                             _buildQuickAccessButton(
                               context,
+                              icon: Icons.science,
+                              label: 'TFLite Test',
+                              route: '/tflite-test', // ✅ ADDED
+                            ),
+                            const SizedBox(width: 12),
+                            _buildQuickAccessButton(
+                              context,
                               icon: Icons.home,
-                              label: 'Home (Test)',
+                              label: 'Home',
                               route: '/home',
                             ),
                           ],
@@ -714,7 +723,7 @@ class WelcomeScreen extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushReplacementNamed(context, route);
+        Navigator.pushNamed(context, route);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(

@@ -1,14 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'package:camera/camera.dart';
 
 class HandDetectionService {
   static const MethodChannel _channel = MethodChannel('hand_detection');
   
-  // Process image bytes
+  // Method 1: Detect hand from image bytes
   static Future<DetectionResult> processImage(Uint8List imageBytes) async {
     try {
-      final result = await _channel.invokeMethod('processFrame', {
+      final result = await _channel.invokeMethod('detectHand', {
         'imageBytes': imageBytes,
       });
       
@@ -16,55 +15,44 @@ class HandDetectionService {
         return DetectionResult.fromMap(result as Map<dynamic, dynamic>);
       }
     } on PlatformException catch (e) {
-      print('Failed to process image: ${e.message}');
+      print('❌ Failed to detect hand: ${e.message}');
     } catch (e) {
-      print('Error: $e');
+      print('❌ Error: $e');
     }
     
     return DetectionResult.empty();
   }
   
-  // Get landmarks only
-  static Future<List<List<double>>> detectLandmarks(Uint8List imageBytes) async {
+  // Method 2: Simple ping to test connection
+  static Future<bool> ping() async {
     try {
-      final result = await _channel.invokeMethod('detectLandmarks', {
-        'imageBytes': imageBytes,
-      });
-      
-      if (result != null && result is List) {
-        return result.map((list) => 
-          (list as List).map((e) => (e as num).toDouble()).toList()
-        ).toList();
-      }
-    } on PlatformException catch (e) {
-      print('Failed to detect landmarks: ${e.message}');
+      final result = await _channel.invokeMethod('ping');
+      return result == 'pong';
     } catch (e) {
-      print('Error: $e');
+      return false;
     }
-    
-    return [];
   }
 }
 
 class DetectionResult {
+  final bool hasHand;
   final bool isAlif;
   final double confidence;
-  final bool hasHand;
   final List<List<double>> landmarks;
   
   DetectionResult({
+    required this.hasHand,
     required this.isAlif,
     required this.confidence,
-    required this.hasHand,
-    required this.landmarks,
+    this.landmarks = const [],
   });
   
   factory DetectionResult.fromMap(Map<dynamic, dynamic> map) {
     return DetectionResult(
+      hasHand: map['hasHand'] ?? false,
       isAlif: map['isAlif'] ?? false,
       confidence: (map['confidence'] ?? 0.0).toDouble(),
-      hasHand: map['hasHand'] ?? false,
-      landmarks: (map['landmarks'] as List?)?.map((e) => 
+      landmarks: (map['landmarks'] as List?)?.map((e) =>
         (e as List).map((v) => (v as num).toDouble()).toList()
       ).toList() ?? [],
     );
@@ -72,10 +60,9 @@ class DetectionResult {
   
   factory DetectionResult.empty() {
     return DetectionResult(
+      hasHand: false,
       isAlif: false,
       confidence: 0.0,
-      hasHand: false,
-      landmarks: [],
     );
   }
 }

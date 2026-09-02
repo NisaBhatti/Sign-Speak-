@@ -7,7 +7,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
-        // Register the hand detection plugin
-        flutterEngine.plugins.add(HandDetectionPlugin())
+        // ❌ COMMENT OUT OR REMOVE THIS LINE
+        // flutterEngine.plugins.add(HandDetectionPlugin())
     }
 }
