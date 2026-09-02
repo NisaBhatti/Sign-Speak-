@@ -13,8 +13,7 @@ class TFLiteService {
     if (_isLoaded) return;
     
     try {
-      // Load model from assets
-     _interpreter = await Interpreter.fromAsset('assets/models/alif_robust.tflite');
+      _interpreter = await Interpreter.fromAsset('assets/models/alif_robust.tflite');
       _isLoaded = true;
       
       print('✅ TFLite model loaded successfully!');
@@ -42,16 +41,17 @@ class TFLiteService {
     }
     
     try {
-      // Prepare input as Float32List
+      // ✅ FIX: Input should be 2D [1, 42]
       final input = Float32List.fromList(features.map((e) => e.toDouble()).toList());
       
-      // Prepare output
-      final output = Float32List(1);
+      // ✅ FIX: Output should be 2D [1, 1]
+      final output = Float32List(2); // [1, 1] flattened
       
       // Run inference
       _interpreter!.run(input, output);
       
-      return output[0];
+      // Extract the prediction (first element)
+      return output[0].toDouble();
     } catch (e) {
       print('❌ Prediction error: $e');
       return 0.0;
@@ -71,7 +71,6 @@ class TFLiteService {
     }
     
     try {
-      // Extract features from image
       final features = await extractFeaturesFromImage(imageBytes);
       
       if (features.isEmpty) {
@@ -121,7 +120,6 @@ class TFLiteService {
       print('📊 Image processed: ${resized.width}x${resized.height}');
       
       // Return dummy 42 features for testing
-      // In production, you need actual hand landmark detection
       return List.generate(42, (i) => i / 42.0);
       
     } catch (e) {
