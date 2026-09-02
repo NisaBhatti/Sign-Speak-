@@ -58,15 +58,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     
     // ============================================
-    // 📱 MEDIAPIPE FOR HAND DETECTION (USE SPECIFIC VERSION)
+    // 📱 TENSORFLOW LITE ONLY (NO CONFLICTS)
     // ============================================
-    implementation 'com.google.mediapipe:solution-core:0.10.14'
-    implementation 'com.google.mediapipe:hands:0.10.14'
-    
-    // ============================================
-    // 📱 TENSORFLOW LITE - USE SAME VERSION AS MEDIAPIPE
-    // ============================================
-    implementation 'org.tensorflow:tensorflow-lite:2.13.0'
+    implementation 'org.tensorflow:tensorflow-lite:2.14.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
     
     // ============================================
@@ -75,14 +69,4 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-}
-
-// ============================================
-// 🔥 FIX DUPLICATE CLASSES
-// ============================================
-configurations {
-    all {
-        exclude group: 'com.google.ai.edge.litert', module: 'litert-api'
-        exclude group: 'org.tensorflow', module: 'tensorflow-lite-api'
-    }
 }

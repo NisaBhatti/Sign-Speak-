@@ -4,11 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.pose.Pose
-import com.google.mlkit.vision.pose.PoseDetection
-import com.google.mlkit.vision.pose.PoseDetectorOptionsBase
-import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -77,10 +72,18 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
                     result.error("INVALID_ARGUMENT", "Image bytes are null", null)
                 }
             }
-            "detectLandmarks" -> {
+            "predict" -> {
+                val features = call.argument<DoubleArray>("features")
+                if (features != null) {
+                    predict(features, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "Features are null", null)
+                }
+            }
+            "getLandmarks" -> {
                 val imageBytes = call.argument<ByteArray>("imageBytes")
                 if (imageBytes != null) {
-                    detectLandmarksOnly(imageBytes, result)
+                    getLandmarks(imageBytes, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Image bytes are null", null)
                 }
@@ -106,18 +109,15 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
                     return@execute
                 }
 
-                val landmarks = detectHandLandmarks(bitmap)
+                // Here you would extract features from the image
+                // For now, we'll return a placeholder result
+                // You can implement hand detection using OpenCV or a custom model
                 
-                if (landmarks.isEmpty()) {
-                    result.success(createResponse(false, 0.0, false, emptyList()))
-                    isProcessing.set(false)
-                    return@execute
-                }
-
-                val features = landmarksToFeatures(landmarks)
+                // Simulated response - replace with actual detection
+                val features = getDummyFeatures()
                 val prediction = runInference(features)
                 
-                result.success(createResponse(prediction > 0.5f, prediction.toDouble(), true, landmarks))
+                result.success(createResponse(prediction > 0.5f, prediction.toDouble(), true))
                 
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing frame: ${e.message}")
@@ -128,64 +128,36 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun detectLandmarksOnly(imageBytes: ByteArray, result: Result) {
+    private fun predict(features: DoubleArray, result: Result) {
+        executor.execute {
+            try {
+                val floatFeatures = features.map { it.toFloat() }.toFloatArray()
+                val prediction = runInference(floatFeatures)
+                result.success(prediction.toDouble())
+            } catch (e: Exception) {
+                result.error("PREDICTION_ERROR", e.message, null)
+            }
+        }
+    }
+
+    private fun getLandmarks(imageBytes: ByteArray, result: Result) {
         executor.execute {
             try {
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                val landmarks = detectHandLandmarks(bitmap)
+                if (bitmap == null) {
+                    result.error("DECODE_ERROR", "Failed to decode image", null)
+                    return@execute
+                }
+
+                // Placeholder - return dummy landmarks
+                // In a real implementation, you'd use a hand detection model
+                val landmarks = getDummyLandmarks()
                 result.success(landmarks)
+                
             } catch (e: Exception) {
                 result.error("DETECTION_ERROR", e.message, null)
             }
         }
-    }
-
-    private fun detectHandLandmarks(bitmap: Bitmap): List<List<Float>> {
-        val result = mutableListOf<List<Float>>()
-        
-        try {
-            val inputImage = InputImage.fromBitmap(bitmap, 0)
-            val options = PoseDetectorOptions.Builder()
-                .setDetectorMode(PoseDetectorOptions.STREAM_MODE)
-                .build()
-            val detector = PoseDetection.getClient(options)
-            
-            detector.process(inputImage)
-                .addOnSuccessListener { pose ->
-                    if (pose.allPoseLandmarks.isNotEmpty()) {
-                        val landmarks = pose.allPoseLandmarks
-                        for (landmark in landmarks) {
-                            result.add(listOf(
-                                landmark.position.x,
-                                landmark.position.y
-                            ))
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Pose detection failed: ${e.message}")
-                }
-                .await()
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Error detecting hand: ${e.message}")
-        }
-        
-        return result
-    }
-
-    private fun landmarksToFeatures(landmarks: List<List<Float>>): FloatArray {
-        val features = FloatArray(42)
-        
-        for (i in 0 until minOf(21, landmarks.size)) {
-            val landmark = landmarks[i]
-            if (landmark.size >= 2) {
-                features[i * 2] = landmark[0]
-                features[i * 2 + 1] = landmark[1]
-            }
-        }
-        
-        return features
     }
 
     private fun runInference(features: FloatArray): Float {
@@ -203,17 +175,33 @@ class HandDetectionPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    private fun getDummyFeatures(): FloatArray {
+        // Return dummy 42 features (21 landmarks * 2)
+        val features = FloatArray(42)
+        for (i in features.indices) {
+            features[i] = (i / 42.0f)
+        }
+        return features
+    }
+
+    private fun getDummyLandmarks(): List<List<Float>> {
+        // Return dummy 21 landmarks
+        val landmarks = mutableListOf<List<Float>>()
+        for (i in 0 until 21) {
+            landmarks.add(listOf(i / 21.0f, i / 21.0f))
+        }
+        return landmarks
+    }
+
     private fun createResponse(
         isAlif: Boolean,
         confidence: Double,
-        hasHand: Boolean,
-        landmarks: List<List<Float>>
+        hasHand: Boolean
     ): Map<String, Any> {
         return mapOf(
             "isAlif" to isAlif,
             "confidence" to confidence,
-            "hasHand" to hasHand,
-            "landmarks" to landmarks
+            "hasHand" to hasHand
         )
     }
 

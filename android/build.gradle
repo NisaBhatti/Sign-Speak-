@@ -1,34 +1,93 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+
+class HandDetectionService {
+  static const MethodChannel _channel = MethodChannel('hand_detection');
+  
+  // Process image and get prediction
+  static Future<DetectionResult> processImage(Uint8List imageBytes) async {
+    try {
+      final result = await _channel.invokeMethod('processFrame', {
+        'imageBytes': imageBytes,
+      });
+      
+      if (result != null) {
+        return DetectionResult.fromMap(result as Map<dynamic, dynamic>);
+      }
+    } on PlatformException catch (e) {
+      print('Failed to process image: ${e.message}');
+    } catch (e) {
+      print('Error: $e');
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.9.1'
-        classpath 'com.google.gms:google-services:4.4.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
+    
+    return DetectionResult.empty();
+  }
+  
+  // Predict from features directly
+  static Future<double> predict(List<double> features) async {
+    try {
+      final result = await _channel.invokeMethod('predict', {
+        'features': features,
+      });
+      
+      if (result != null) {
+        return (result as num).toDouble();
+      }
+    } on PlatformException catch (e) {
+      print('Failed to predict: ${e.message}');
+    } catch (e) {
+      print('Error: $e');
     }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+    
+    return 0.0;
+  }
+  
+  // Get landmarks from image
+  static Future<List<List<double>>> getLandmarks(Uint8List imageBytes) async {
+    try {
+      final result = await _channel.invokeMethod('getLandmarks', {
+        'imageBytes': imageBytes,
+      });
+      
+      if (result != null && result is List) {
+        return result.map((list) => 
+          (list as List).map((e) => (e as num).toDouble()).toList()
+        ).toList();
+      }
+    } on PlatformException catch (e) {
+      print('Failed to get landmarks: ${e.message}');
+    } catch (e) {
+      print('Error: $e');
     }
+    
+    return [];
+  }
 }
 
-def newBuildDir = rootProject.layout.buildDirectory.dir('../../build').get()
-rootProject.layout.buildDirectory.value(newBuildDir)
-
-subprojects {
-    def newSubprojectBuildDir = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-
-subprojects {
-    project.evaluationDependsOn(':app')
-}
-
-tasks.register('clean', Delete) {
-    delete rootProject.layout.buildDirectory
+class DetectionResult {
+  final bool isAlif;
+  final double confidence;
+  final bool hasHand;
+  
+  DetectionResult({
+    required this.isAlif,
+    required this.confidence,
+    required this.hasHand,
+  });
+  
+  factory DetectionResult.fromMap(Map<dynamic, dynamic> map) {
+    return DetectionResult(
+      isAlif: map['isAlif'] ?? false,
+      confidence: (map['confidence'] ?? 0.0).toDouble(),
+      hasHand: map['hasHand'] ?? false,
+    );
+  }
+  
+  factory DetectionResult.empty() {
+    return DetectionResult(
+      isAlif: false,
+      confidence: 0.0,
+      hasHand: false,
+    );
+  }
 }
