@@ -40,8 +40,6 @@ dependencies:
   google_fonts: ^6.3.3
 
 
-  google_ml_kit: ^0.16.0
-  google_mlkit_pose_detection: ^0.10.0
   
   # ===== STATE MANAGEMENT =====
   provider: ^6.1.2
@@ -68,3 +66,4 @@ flutter:
   assets:
     - assets/images/
     - assets/models/alif_robust.tflite
+    - assets/models/hand_landmarker.tflite  

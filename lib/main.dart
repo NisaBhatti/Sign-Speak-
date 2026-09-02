@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
         '/alif-detection': (context) => const AlifDetectionPage(),
-        '/tflite-test': (context) => const TFLiteTestPage(), // ✅ ADDED
+        '/tflite-test': (context) => const RealtimeDetectionPage(), // ✅ ADDED
       },
     );
   }

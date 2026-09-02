@@ -1,20 +1,25 @@
-import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
+import 'package:image/image.dart' as img;
 import '../services/tflite_service.dart';
 
-class TFLiteTestPage extends StatefulWidget {
-  const TFLiteTestPage({Key? key}) : super(key: key);
+class RealtimeDetectionPage extends StatefulWidget {
+  const RealtimeDetectionPage({Key? key}) : super(key: key);
 
   @override
-  State<TFLiteTestPage> createState() => _TFLiteTestPageState();
+  State<RealtimeDetectionPage> createState() => _RealtimeDetectionPageState();
 }
 
-class _TFLiteTestPageState extends State<TFLiteTestPage> {
+class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
+  CameraController? _controller;
   DetectionResult _result = DetectionResult.empty();
-  bool _isLoading = false;
+  bool _isProcessing = false;
   bool _isModelLoaded = false;
+  int _frameCount = 0;
+  double _fps = 0.0;
+  DateTime _lastFpsUpdate = DateTime.now();
 
   @override
   void initState() {
@@ -22,65 +27,157 @@ class _TFLiteTestPageState extends State<TFLiteTestPage> {
     _initialize();
   }
 
-  @override
-  void dispose() {
-    TFLiteService.close();
-    super.dispose();
+  Future<void> _initialize() async {
+    await TFLiteService.loadModels();
+    _isModelLoaded = true;
+    setState(() {});
+    await _initializeCamera();
   }
 
-  Future<void> _initialize() async {
-    setState(() => _isLoading = true);
+  Future<void> _initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      final frontCamera = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras[0],
+      );
+      
+      _controller = CameraController(
+        frontCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      
+      await _controller!.initialize();
+      
+      if (mounted) {
+        setState(() {});
+        _controller!.startImageStream(_processCameraImage);
+      }
+    } catch (e) {
+      print('Error initializing camera: $e');
+    }
+  }
+
+  // ============================================
+  // 🔥 FIXED: Convert CameraImage to JPEG bytes
+  // ============================================
+  Future<Uint8List?> _convertCameraImageToBytes(CameraImage image) async {
+    try {
+      // Get image dimensions
+      final width = image.width;
+      final height = image.height;
+      
+      // Create a buffer for RGB image
+      Uint8List rgbBytes = Uint8List(width * height * 3);
+      
+      if (image.format.group == ImageFormatGroup.yuv420) {
+        // YUV420 format - most common
+        final yPlane = image.planes[0];
+        final uPlane = image.planes[1];
+        final vPlane = image.planes[2];
+        
+        int rgbIndex = 0;
+        
+        for (int y = 0; y < height; y++) {
+          for (int x = 0; x < width; x++) {
+            // Y value
+            final yValue = yPlane.bytes[y * yPlane.bytesPerRow + x] & 0xFF;
+            
+            // UV values (4:2:0 subsampling)
+            final uvX = x ~/ 2;
+            final uvY = y ~/ 2;
+            final uValue = uPlane.bytes[uvY * uPlane.bytesPerRow + uvX] & 0xFF;
+            final vValue = vPlane.bytes[uvY * vPlane.bytesPerRow + uvX] & 0xFF;
+            
+            // Convert YUV to RGB
+            int r = (yValue + 1.402 * (vValue - 128)).round();
+            int g = (yValue - 0.344 * (uValue - 128) - 0.714 * (vValue - 128)).round();
+            int b = (yValue + 1.772 * (uValue - 128)).round();
+            
+            // Clamp RGB values
+            rgbBytes[rgbIndex++] = r.clamp(0, 255).toInt();
+            rgbBytes[rgbIndex++] = g.clamp(0, 255).toInt();
+            rgbBytes[rgbIndex++] = b.clamp(0, 255).toInt();
+          }
+        }
+        
+        // Convert RGB bytes to Image
+        final imgImage = img.Image.fromBytes(
+          width: width,
+          height: height,
+          bytes: rgbBytes.buffer,
+          numChannels: 3,
+        );
+        
+        // Encode to JPEG
+        final jpegBytes = img.encodeJpg(imgImage);
+        return Uint8List.fromList(jpegBytes);
+        
+      } else {
+        print('⚠️ Unsupported format: ${image.format.group}');
+        return null;
+      }
+      
+    } catch (e) {
+      print('❌ Image conversion error: $e');
+      return null;
+    }
+  }
+
+  void _processCameraImage(CameraImage image) {
+    if (_isProcessing || !_isModelLoaded) return;
+    _isProcessing = true;
     
-    await TFLiteService.loadModel();
-    _isModelLoaded = true;
+    // Calculate FPS
+    _frameCount++;
+    final now = DateTime.now();
+    if (now.difference(_lastFpsUpdate) > const Duration(seconds: 1)) {
+      _fps = _frameCount.toDouble();
+      _frameCount = 0;
+      _lastFpsUpdate = now;
+      if (mounted) setState(() {});
+    }
     
-    final result = await TFLiteService.testWithDummy();
-    
-    setState(() {
-      _result = result;
-      _isLoading = false;
+    // Convert camera image to JPEG bytes
+    _convertCameraImageToBytes(image).then((jpegBytes) {
+      if (jpegBytes != null && mounted) {
+        print('📷 Image converted: ${jpegBytes.length} bytes');
+        
+        // Send to TFLite
+        TFLiteService.predictFromImage(jpegBytes).then((result) {
+          if (mounted) {
+            setState(() {
+              _result = result;
+            });
+          }
+          _isProcessing = false;
+        }).catchError((e) {
+          print('❌ Prediction error: $e');
+          _isProcessing = false;
+        });
+      } else {
+        _isProcessing = false;
+      }
+    }).catchError((e) {
+      print('❌ Conversion error: $e');
+      _isProcessing = false;
     });
   }
 
-  Future<void> _pickImage() async {
-    try {
-      final picker = ImagePicker();
-      final image = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 640,
-        maxHeight: 480,
-      );
-      
-      if (image != null) {
-        setState(() => _isLoading = true);
-        
-        final bytes = await image.readAsBytes();
-        final prediction = await TFLiteService.predictFromImage(bytes);
-        
-        setState(() {
-          _result = DetectionResult(
-            hasHand: true,
-            isAlif: prediction > 0.5,
-            confidence: prediction,
-            featuresCount: 42,
-            message: 'Prediction from image',
-          );
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _result = DetectionResult.error('Error: $e');
-        _isLoading = false;
-      });
-    }
+  @override
+  void dispose() {
+    _controller?.stopImageStream();
+    _controller?.dispose();
+    TFLiteService.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TFLite Test'),
+        title: const Text('Real-Time Alif Detection'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         actions: [
@@ -90,151 +187,88 @@ class _TFLiteTestPageState extends State<TFLiteTestPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Model Status
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _isModelLoaded ? Colors.green.shade100 : Colors.red.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _isModelLoaded ? Icons.check_circle : Icons.error,
-                    color: _isModelLoaded ? Colors.green : Colors.red,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    _isModelLoaded ? '✅ Model Loaded' : '❌ Model Not Loaded',
-                    style: TextStyle(
-                      color: _isModelLoaded ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          if (_controller != null && _controller!.value.isInitialized)
+            CameraPreview(_controller!),
+          
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _result.hasHand 
+                        ? (_result.isAlif ? Icons.check_circle : Icons.cancel)
+                        : Icons.handshake,
+                      color: _result.hasHand 
+                        ? (_result.isAlif ? Colors.green : Colors.red)
+                        : Colors.grey,
+                      size: 30,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 30),
-            
-            // Result
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: _result.hasHand
-                  ? (_result.isAlif ? Colors.green.shade50 : Colors.red.shade50)
-                  : Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: _result.hasHand
-                    ? (_result.isAlif ? Colors.green : Colors.red)
-                    : Colors.grey,
-                  width: 2,
+                    const SizedBox(width: 15),
+                    Text(
+                      _result.hasHand
+                        ? (_result.isAlif 
+                          ? '✅ ALIF ${(_result.confidence * 100).toStringAsFixed(0)}%'
+                          : '❌ Not Alif ${(_result.confidence * 100).toStringAsFixed(0)}%')
+                        : '👋 Show your hand',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: _isLoading
-                ? const CircularProgressIndicator()
-                : Column(
-                    children: [
-                      Icon(
-                        _result.hasHand
-                          ? (_result.isAlif ? Icons.check_circle : Icons.cancel)
-                          : Icons.handshake,
-                        size: 60,
-                        color: _result.hasHand
-                          ? (_result.isAlif ? Colors.green : Colors.red)
-                          : Colors.grey,
+              
+              Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      _result.message.isNotEmpty ? _result.message : 'Processing...',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 10),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'FPS: ${_fps.toStringAsFixed(1)} | Features: ${_result.featuresCount}',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                      ),
+                    ),
+                    if (_result.error.isNotEmpty)
                       Text(
-                        _result.isSuccess
-                          ? (_result.hasHand
-                              ? (_result.isAlif ? '✅ ALIF' : '❌ Not Alif')
-                              : '🤚 No Hand')
-                          : '⚠️ ${_result.error}',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: _result.hasHand
-                            ? (_result.isAlif ? Colors.green : Colors.red)
-                            : Colors.grey,
+                        'Error: ${_result.error}',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 10,
                         ),
                       ),
-                      if (_result.hasHand)
-                        Text(
-                          'Confidence: ${(_result.confidence * 100).toStringAsFixed(0)}%',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      if (_result.featuresCount > 0)
-                        Text(
-                          'Features: ${_result.featuresCount}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      if (_result.message.isNotEmpty)
-                        Text(
-                          _result.message,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                    ],
-                  ),
-            ),
-            
-            const SizedBox(height: 40),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isLoading ? null : _pickImage,
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('Test with Image'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      backgroundColor: Colors.blueAccent,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            
-            const SizedBox(height: 10),
-            
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    'Using tflite_flutter package',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Model: alif_robust.tflite',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
