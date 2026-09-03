@@ -4,11 +4,16 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 
 class TFLiteService {
-  static Interpreter? _handLandmarker;
-  static Interpreter? _alifClassifier;
+  static Interpreter? _handDetector;      // Your trained hand detection model
+  static Interpreter? _alifClassifier;    // Your Alif classification model
   static bool _isLoaded = false;
   static bool _handModelLoaded = false;
   static bool _alifModelLoaded = false;
+  
+  // Model input/output dimensions
+  static const int INPUT_SIZE = 224;       // Your model's input size
+  static const int NUM_LANDMARKS = 21;     // 21 hand landmarks
+  static const int NUM_KEYPOINTS = 42;     // 21 * 2 (x, y)
   
   // ============================================
   // LOAD MODELS
@@ -21,7 +26,27 @@ class TFLiteService {
     print('=' * 60);
     
     // ============================================
-    // LOAD ALIF MODEL (THIS WORKS)
+    // LOAD HAND DETECTION MODEL (YOUR TRAINED MODEL)
+    // ============================================
+    try {
+      print('🔄 Loading hand detection model...');
+      _handDetector = await Interpreter.fromAsset('assets/models/hand_detection.tflite');
+      _handModelLoaded = true;
+      print('✅ Hand detection model loaded successfully!');
+      
+      if (_handDetector != null) {
+        print('📊 Input shape: ${_handDetector!.getInputTensor(0).shape}');
+        print('📊 Output shape: ${_handDetector!.getOutputTensor(0).shape}');
+        print('📊 Input type: ${_handDetector!.getInputTensor(0).type}');
+      }
+    } catch (e) {
+      print('❌ Hand detection model error: $e');
+      print('   Expected: assets/models/hand_detection.tflite');
+      _handModelLoaded = false;
+    }
+    
+    // ============================================
+    // LOAD ALIF CLASSIFIER
     // ============================================
     try {
       print('🔄 Loading Alif classifier...');
@@ -35,132 +60,91 @@ class TFLiteService {
       }
     } catch (e) {
       print('❌ Alif classifier error: $e');
+      print('   Expected: assets/models/alif_robust.tflite');
       _alifModelLoaded = false;
     }
     
-    // ============================================
-    // LOAD HAND LANDMARKER (MAY FAIL)
-    // ============================================
-    try {
-      print('🔄 Loading hand landmarker...');
-      _handLandmarker = await Interpreter.fromAsset('assets/models/hand_landmarker.tflite');
-      _handModelLoaded = true;
-      print('✅ Hand landmarker loaded successfully!');
-      
-      if (_handLandmarker != null) {
-        print('📊 Input shape: ${_handLandmarker!.getInputTensor(0).shape}');
-        print('📊 Output shape: ${_handLandmarker!.getOutputTensor(0).shape}');
-      }
-    } catch (e) {
-      print('⚠️ Hand landmarker failed: $e');
-      print('📌 Using MOVING dummy landmarks as fallback');
-      _handModelLoaded = false;
-    }
-    
     print('=' * 60);
-    print('📊 STATUS:');
-    print('   Hand Model: ${_handModelLoaded ? "✅ LOADED" : "❌ USING MOVING DUMMY"}');
-    print('   Alif Model: ${_alifModelLoaded ? "✅ LOADED" : "❌ NOT LOADED"}');
+    print('📊 MODEL STATUS:');
+    print('   Hand Detection: ${_handModelLoaded ? "✅ LOADED" : "❌ NOT LOADED (Using Dummy)"}');
+    print('   Alif Classifier: ${_alifModelLoaded ? "✅ LOADED" : "❌ NOT LOADED"}');
     print('=' * 60);
     
     _isLoaded = true;
   }
   
   // ============================================
-  // DETECT HAND LANDMARKS (WITH MOVING DUMMY)
+  // DETECT HAND LANDMARKS USING YOUR TRAINED MODEL
   // ============================================
   static Future<List<List<double>>> detectHandLandmarks(Uint8List imageBytes) async {
-    // If hand landmarker not loaded, use MOVING dummy landmarks
-    if (!_handModelLoaded || _handLandmarker == null) {
-      return _generateMovingDummyLandmarks(imageBytes);
+    // If hand model not loaded, use dummy
+    if (!_handModelLoaded || _handDetector == null) {
+      print('🔄 Using dummy landmarks (hand model not loaded)');
+      return _generateDummyLandmarks();
     }
     
-    // If loaded, try real detection
     try {
+      print('📷 Processing image: ${imageBytes.length} bytes');
+      
+      // Decode image
       final image = img.decodeImage(imageBytes);
       if (image == null) {
-        return _generateMovingDummyLandmarks(imageBytes);
+        print('❌ Failed to decode image');
+        return _generateDummyLandmarks();
       }
       
-      final resized = img.copyResize(image, width: 224, height: 224);
+      print('📷 Original image: ${image.width}x${image.height}');
+      
+      // Resize to model input size
+      final resized = img.copyResize(image, width: INPUT_SIZE, height: INPUT_SIZE);
+      print('📷 Resized: ${resized.width}x${resized.height}');
+      
+      // Convert to float array [1, INPUT_SIZE, INPUT_SIZE, 3]
       final input = _imageToFloatArray(resized);
       
-      final output = List.generate(1, (_) => List.filled(21 * 3, 0.0));
-      _handLandmarker!.run(input, output);
+      // Get output shape from model
+      final outputShape = _handDetector!.getOutputTensor(0).shape;
+      print('📊 Output shape: $outputShape');
       
+      // Create output based on model output shape
+      // Your model should output 42 values (21 landmarks * 2)
+      final output = List.generate(1, (_) => List.filled(NUM_KEYPOINTS, 0.0));
+      
+      // Run inference
+      print('🔄 Running inference on hand detection model...');
+      final stopwatch = Stopwatch()..start();
+      _handDetector!.run(input, output);
+      stopwatch.stop();
+      print('⏱️ Inference time: ${stopwatch.elapsedMilliseconds}ms');
+      
+      // Extract landmarks from output
       final landmarks = <List<double>>[];
       final raw = output[0] as List<dynamic>;
       
-      for (int i = 0; i < 21 && i * 3 + 1 < raw.length; i++) {
-        final x = (raw[i * 3] as num).toDouble();
-        final y = (raw[i * 3 + 1] as num).toDouble();
+      print('📊 Raw output length: ${raw.length}');
+      
+      for (int i = 0; i < NUM_LANDMARKS && i * 2 + 1 < raw.length; i++) {
+        final x = (raw[i * 2] as num).toDouble();
+        final y = (raw[i * 2 + 1] as num).toDouble();
         landmarks.add([x, y]);
       }
       
-      if (landmarks.isNotEmpty && landmarks.any((l) => l[0] != 0 || l[1] != 0)) {
-        return landmarks;
+      // Check if we got valid landmarks (not all zeros)
+      bool hasValidLandmarks = landmarks.any((l) => l[0] != 0 || l[1] != 0);
+      
+      if (!hasValidLandmarks) {
+        print('⚠️ No valid landmarks detected');
+        return _generateDummyLandmarks();
       }
       
-      return _generateMovingDummyLandmarks(imageBytes);
+      print('✅ Detected ${landmarks.length} valid landmarks');
+      return landmarks;
       
     } catch (e) {
-      return _generateMovingDummyLandmarks(imageBytes);
+      print('❌ Hand detection error: $e');
+      print('🔄 Falling back to dummy landmarks');
+      return _generateDummyLandmarks();
     }
-  }
-  
-  // ============================================
-  // 🔥 MOVING DUMMY LANDMARKS (Follows Image Center)
-  // ============================================
-  static List<List<double>> _generateMovingDummyLandmarks(Uint8List imageBytes) {
-    // Try to find hand-like shape using simple image processing
-    // Or use a moving pattern based on image content
-    
-    final landmarks = <List<double>>[];
-    
-    // Create a hand pattern that shifts based on the image
-    // This simulates hand movement
-    final random = DateTime.now().millisecondsSinceEpoch % 1000 / 1000;
-    
-    for (int i = 0; i < 21; i++) {
-      double x, y;
-      
-      // Create a hand shape with slight movement
-      if (i == 0) {
-        // Wrist (center-ish)
-        x = 0.4 + 0.2 * (i / 20) + (random * 0.1 - 0.05);
-        y = 0.6 + 0.1 * (i / 20) + (random * 0.1 - 0.05);
-      } else if (i <= 4) {
-        // Thumb (spread out)
-        final t = (i - 1) / 3;
-        x = 0.15 + 0.35 * t + (random * 0.1 - 0.05);
-        y = 0.3 + 0.2 * t + (random * 0.1 - 0.05);
-      } else if (i <= 8) {
-        // Index finger (pointing up)
-        final t = (i - 5) / 3;
-        x = 0.35 + 0.05 * t + (random * 0.1 - 0.05);
-        y = 0.2 + 0.15 * t + (random * 0.1 - 0.05);
-      } else if (i <= 12) {
-        // Middle finger (tallest)
-        final t = (i - 9) / 3;
-        x = 0.5 + 0.05 * t + (random * 0.1 - 0.05);
-        y = 0.15 + 0.15 * t + (random * 0.1 - 0.05);
-      } else if (i <= 16) {
-        // Ring finger
-        final t = (i - 13) / 3;
-        x = 0.6 + 0.05 * t + (random * 0.1 - 0.05);
-        y = 0.25 + 0.15 * t + (random * 0.1 - 0.05);
-      } else {
-        // Pinky finger
-        final t = (i - 17) / 3;
-        x = 0.7 + 0.05 * t + (random * 0.1 - 0.05);
-        y = 0.35 + 0.15 * t + (random * 0.1 - 0.05);
-      }
-      
-      // Clamp values to 0-1 range
-      landmarks.add([x.clamp(0.05, 0.95), y.clamp(0.05, 0.95)]);
-    }
-    
-    return landmarks;
   }
   
   // ============================================
@@ -170,17 +154,18 @@ class TFLiteService {
     final input = List.generate(
       1,
       (_) => List.generate(
-        224,
+        INPUT_SIZE,
         (_) => List.generate(
-          224,
+          INPUT_SIZE,
           (_) => List.filled(3, 0.0),
         ),
       ),
     );
     
-    for (int y = 0; y < 224; y++) {
-      for (int x = 0; x < 224; x++) {
+    for (int y = 0; y < INPUT_SIZE; y++) {
+      for (int x = 0; x < INPUT_SIZE; x++) {
         final pixel = image.getPixel(x, y);
+        // Normalize pixel values to [0, 1]
         input[0][y][x][0] = pixel.r / 255.0;
         input[0][y][x][1] = pixel.g / 255.0;
         input[0][y][x][2] = pixel.b / 255.0;
@@ -191,13 +176,58 @@ class TFLiteService {
   }
   
   // ============================================
-  // CONVERT LANDMARKS TO FEATURES
+  // GENERATE DUMMY LANDMARKS (Fallback)
+  // ============================================
+  static List<List<double>> _generateDummyLandmarks() {
+    final landmarks = <List<double>>[];
+    
+    // Generate hand-like pattern
+    for (int i = 0; i < 21; i++) {
+      double x, y;
+      if (i == 0) {
+        // Wrist
+        x = 0.4 + 0.2 * (i / 20);
+        y = 0.7 + 0.1 * (i / 20);
+      } else if (i <= 4) {
+        // Thumb
+        final t = (i - 1) / 3;
+        x = 0.15 + 0.35 * t;
+        y = 0.3 + 0.2 * t;
+      } else if (i <= 8) {
+        // Index
+        final t = (i - 5) / 3;
+        x = 0.35 + 0.05 * t;
+        y = 0.2 + 0.15 * t;
+      } else if (i <= 12) {
+        // Middle
+        final t = (i - 9) / 3;
+        x = 0.5 + 0.05 * t;
+        y = 0.15 + 0.15 * t;
+      } else if (i <= 16) {
+        // Ring
+        final t = (i - 13) / 3;
+        x = 0.6 + 0.05 * t;
+        y = 0.25 + 0.15 * t;
+      } else {
+        // Pinky
+        final t = (i - 17) / 3;
+        x = 0.7 + 0.05 * t;
+        y = 0.35 + 0.15 * t;
+      }
+      landmarks.add([x.clamp(0, 1), y.clamp(0, 1)]);
+    }
+    
+    return landmarks;
+  }
+  
+  // ============================================
+  // CONVERT LANDMARKS TO 42 FEATURES
   // ============================================
   static List<double> landmarksToFeatures(List<List<double>> landmarks) {
     final features = <double>[];
     for (int i = 0; i < 21 && i < landmarks.length; i++) {
-      features.add(landmarks[i][0]);
-      features.add(landmarks[i][1]);
+      features.add(landmarks[i][0]); // x
+      features.add(landmarks[i][1]); // y
     }
     while (features.length < 42) features.add(0.0);
     return features;
@@ -219,7 +249,7 @@ class TFLiteService {
       _alifClassifier!.run(input, output);
       return output[0][0];
     } catch (e) {
-      print('❌ Alif error: $e');
+      print('❌ Alif classification error: $e');
       return 0.0;
     }
   }
@@ -230,6 +260,12 @@ class TFLiteService {
   static Future<DetectionResult> predictFromImage(Uint8List imageBytes) async {
     if (!_isLoaded) await loadModels();
     
+    print('=' * 50);
+    print('🔍 Processing image...');
+    print('   Hand Model: ${_handModelLoaded ? "✅" : "❌ (Dummy)"}');
+    print('   Alif Model: ${_alifModelLoaded ? "✅" : "❌"}');
+    
+    // Detect hand landmarks
     final landmarks = await detectHandLandmarks(imageBytes);
     
     if (landmarks.isEmpty) {
@@ -242,36 +278,41 @@ class TFLiteService {
       );
     }
     
+    // Convert to features
     final features = landmarksToFeatures(landmarks);
+    
+    // Classify Alif
     final prediction = await classifyAlif(features);
+    
+    print('📊 Final: isAlif=${prediction > 0.5}, confidence=${prediction.toStringAsFixed(3)}');
+    print('=' * 50);
     
     return DetectionResult(
       hasHand: true,
       isAlif: prediction > 0.5,
       confidence: prediction,
-      message: _handModelLoaded ? 'Real hand' : 'Moving dummy',
+      message: _handModelLoaded ? 'Hand detected' : 'Dummy landmarks',
       featuresCount: features.length,
       landmarks: landmarks,
     );
   }
   
   // ============================================
-  // TEST WITH DUMMY
+  // TEST WITH DUMMY DATA
   // ============================================
   static Future<DetectionResult> testWithDummy() async {
     await loadModels();
     
     final features = List.generate(42, (i) => i / 42.0);
     final prediction = await classifyAlif(features);
-    final landmarks = _generateMovingDummyLandmarks(Uint8List(0));
     
     return DetectionResult(
       hasHand: true,
       isAlif: prediction > 0.5,
       confidence: prediction,
-      message: 'Test',
+      message: 'Dummy test',
       featuresCount: features.length,
-      landmarks: landmarks,
+      landmarks: _generateDummyLandmarks(),
     );
   }
   
@@ -287,14 +328,15 @@ class TFLiteService {
   }
   
   // ============================================
-  // CLOSE
+  // CLOSE MODELS
   // ============================================
   static void close() {
-    _handLandmarker?.close();
+    _handDetector?.close();
     _alifClassifier?.close();
     _isLoaded = false;
     _handModelLoaded = false;
     _alifModelLoaded = false;
+    print('✅ Models closed');
   }
 }
 
