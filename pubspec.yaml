@@ -67,3 +67,4 @@ flutter:
     - assets/images/
     - assets/models/alif_robust.tflite
     - assets/models/hand_landmarker.tflite  
+    - assets/models/hand_detection.tflite
