@@ -7,8 +7,7 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
-import 'pages/alif_detection_page.dart';
-import 'pages/tflite_test_page.dart'; // ✅ ADDED
+import 'pages/hand_detection_screen.dart'; // ✅ NEW: Real-time hand detection
 
 // Firebase imports
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -105,8 +104,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionPage(),
-        '/tflite-test': (context) => const RealtimeDetectionPage(), // ✅ ADDED
+        '/hand-detection': (context) => const HandDetectionScreen(), // ✅ NEW ROUTE
       },
     );
   }
@@ -685,14 +683,7 @@ class WelcomeScreen extends StatelessWidget {
                               context,
                               icon: Icons.back_hand,
                               label: 'Alif Detection',
-                              route: '/alif-detection',
-                            ),
-                            const SizedBox(width: 12),
-                            _buildQuickAccessButton(
-                              context,
-                              icon: Icons.science,
-                              label: 'TFLite Test',
-                              route: '/tflite-test', // ✅ ADDED
+                              route: '/hand-detection', // ✅ UPDATED
                             ),
                             const SizedBox(width: 12),
                             _buildQuickAccessButton(

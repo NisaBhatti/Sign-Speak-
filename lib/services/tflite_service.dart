@@ -4,20 +4,16 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 
 class TFLiteService {
-  static Interpreter? _handDetector;      // Your trained hand detection model
-  static Interpreter? _alifClassifier;    // Your Alif classification model
+  static Interpreter? _handDetector;
+  static Interpreter? _alifClassifier;
   static bool _isLoaded = false;
   static bool _handModelLoaded = false;
   static bool _alifModelLoaded = false;
   
-  // Model input/output dimensions
-  static const int INPUT_SIZE = 224;       // Your model's input size
-  static const int NUM_LANDMARKS = 21;     // 21 hand landmarks
-  static const int NUM_KEYPOINTS = 42;     // 21 * 2 (x, y)
+  static const int INPUT_SIZE = 224;
+  static const int NUM_LANDMARKS = 21;
+  static const int NUM_KEYPOINTS = 42;
   
-  // ============================================
-  // LOAD MODELS
-  // ============================================
   static Future<void> loadModels() async {
     if (_isLoaded) return;
     
@@ -26,7 +22,7 @@ class TFLiteService {
     print('=' * 60);
     
     // ============================================
-    // LOAD HAND DETECTION MODEL (YOUR TRAINED MODEL)
+    // LOAD HAND DETECTION MODEL
     // ============================================
     try {
       print('🔄 Loading hand detection model...');
@@ -37,7 +33,6 @@ class TFLiteService {
       if (_handDetector != null) {
         print('📊 Input shape: ${_handDetector!.getInputTensor(0).shape}');
         print('📊 Output shape: ${_handDetector!.getOutputTensor(0).shape}');
-        print('📊 Input type: ${_handDetector!.getInputTensor(0).type}');
       }
     } catch (e) {
       print('❌ Hand detection model error: $e');
@@ -60,7 +55,6 @@ class TFLiteService {
       }
     } catch (e) {
       print('❌ Alif classifier error: $e');
-      print('   Expected: assets/models/alif_robust.tflite');
       _alifModelLoaded = false;
     }
     
@@ -73,11 +67,7 @@ class TFLiteService {
     _isLoaded = true;
   }
   
-  // ============================================
-  // DETECT HAND LANDMARKS USING YOUR TRAINED MODEL
-  // ============================================
   static Future<List<List<double>>> detectHandLandmarks(Uint8List imageBytes) async {
-    // If hand model not loaded, use dummy
     if (!_handModelLoaded || _handDetector == null) {
       print('🔄 Using dummy landmarks (hand model not loaded)');
       return _generateDummyLandmarks();
@@ -86,7 +76,6 @@ class TFLiteService {
     try {
       print('📷 Processing image: ${imageBytes.length} bytes');
       
-      // Decode image
       final image = img.decodeImage(imageBytes);
       if (image == null) {
         print('❌ Failed to decode image');
@@ -107,7 +96,6 @@ class TFLiteService {
       print('📊 Output shape: $outputShape');
       
       // Create output based on model output shape
-      // Your model should output 42 values (21 landmarks * 2)
       final output = List.generate(1, (_) => List.filled(NUM_KEYPOINTS, 0.0));
       
       // Run inference
@@ -147,9 +135,6 @@ class TFLiteService {
     }
   }
   
-  // ============================================
-  // CONVERT IMAGE TO FLOAT ARRAY
-  // ============================================
   static List<List<List<List<double>>>> _imageToFloatArray(img.Image image) {
     final input = List.generate(
       1,
@@ -165,7 +150,6 @@ class TFLiteService {
     for (int y = 0; y < INPUT_SIZE; y++) {
       for (int x = 0; x < INPUT_SIZE; x++) {
         final pixel = image.getPixel(x, y);
-        // Normalize pixel values to [0, 1]
         input[0][y][x][0] = pixel.r / 255.0;
         input[0][y][x][1] = pixel.g / 255.0;
         input[0][y][x][2] = pixel.b / 255.0;
@@ -175,41 +159,31 @@ class TFLiteService {
     return input;
   }
   
-  // ============================================
-  // GENERATE DUMMY LANDMARKS (Fallback)
-  // ============================================
   static List<List<double>> _generateDummyLandmarks() {
     final landmarks = <List<double>>[];
     
-    // Generate hand-like pattern
     for (int i = 0; i < 21; i++) {
       double x, y;
       if (i == 0) {
-        // Wrist
         x = 0.4 + 0.2 * (i / 20);
         y = 0.7 + 0.1 * (i / 20);
       } else if (i <= 4) {
-        // Thumb
         final t = (i - 1) / 3;
         x = 0.15 + 0.35 * t;
         y = 0.3 + 0.2 * t;
       } else if (i <= 8) {
-        // Index
         final t = (i - 5) / 3;
         x = 0.35 + 0.05 * t;
         y = 0.2 + 0.15 * t;
       } else if (i <= 12) {
-        // Middle
         final t = (i - 9) / 3;
         x = 0.5 + 0.05 * t;
         y = 0.15 + 0.15 * t;
       } else if (i <= 16) {
-        // Ring
         final t = (i - 13) / 3;
         x = 0.6 + 0.05 * t;
         y = 0.25 + 0.15 * t;
       } else {
-        // Pinky
         final t = (i - 17) / 3;
         x = 0.7 + 0.05 * t;
         y = 0.35 + 0.15 * t;
@@ -220,22 +194,16 @@ class TFLiteService {
     return landmarks;
   }
   
-  // ============================================
-  // CONVERT LANDMARKS TO 42 FEATURES
-  // ============================================
   static List<double> landmarksToFeatures(List<List<double>> landmarks) {
     final features = <double>[];
     for (int i = 0; i < 21 && i < landmarks.length; i++) {
-      features.add(landmarks[i][0]); // x
-      features.add(landmarks[i][1]); // y
+      features.add(landmarks[i][0]);
+      features.add(landmarks[i][1]);
     }
     while (features.length < 42) features.add(0.0);
     return features;
   }
   
-  // ============================================
-  // CLASSIFY ALIF
-  // ============================================
   static Future<double> classifyAlif(List<double> features) async {
     if (!_alifModelLoaded || _alifClassifier == null) {
       await loadModels();
@@ -254,9 +222,6 @@ class TFLiteService {
     }
   }
   
-  // ============================================
-  // PREDICT FROM IMAGE
-  // ============================================
   static Future<DetectionResult> predictFromImage(Uint8List imageBytes) async {
     if (!_isLoaded) await loadModels();
     
@@ -265,7 +230,6 @@ class TFLiteService {
     print('   Hand Model: ${_handModelLoaded ? "✅" : "❌ (Dummy)"}');
     print('   Alif Model: ${_alifModelLoaded ? "✅" : "❌"}');
     
-    // Detect hand landmarks
     final landmarks = await detectHandLandmarks(imageBytes);
     
     if (landmarks.isEmpty) {
@@ -278,10 +242,7 @@ class TFLiteService {
       );
     }
     
-    // Convert to features
     final features = landmarksToFeatures(landmarks);
-    
-    // Classify Alif
     final prediction = await classifyAlif(features);
     
     print('📊 Final: isAlif=${prediction > 0.5}, confidence=${prediction.toStringAsFixed(3)}');
@@ -291,18 +252,14 @@ class TFLiteService {
       hasHand: true,
       isAlif: prediction > 0.5,
       confidence: prediction,
-      message: _handModelLoaded ? 'Hand detected' : 'Dummy landmarks',
+      message: _handModelLoaded ? 'Real hand detected' : 'Dummy landmarks',
       featuresCount: features.length,
       landmarks: landmarks,
     );
   }
   
-  // ============================================
-  // TEST WITH DUMMY DATA
-  // ============================================
   static Future<DetectionResult> testWithDummy() async {
     await loadModels();
-    
     final features = List.generate(42, (i) => i / 42.0);
     final prediction = await classifyAlif(features);
     
@@ -316,9 +273,6 @@ class TFLiteService {
     );
   }
   
-  // ============================================
-  // GET MODEL STATUS
-  // ============================================
   static Map<String, bool> getModelStatus() {
     return {
       'handModelLoaded': _handModelLoaded,
@@ -327,9 +281,6 @@ class TFLiteService {
     };
   }
   
-  // ============================================
-  // CLOSE MODELS
-  // ============================================
   static void close() {
     _handDetector?.close();
     _alifClassifier?.close();
@@ -340,9 +291,6 @@ class TFLiteService {
   }
 }
 
-// ============================================
-// DETECTION RESULT
-// ============================================
 class DetectionResult {
   final bool hasHand;
   final bool isAlif;

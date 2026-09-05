@@ -21,8 +21,6 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
   double _fps = 0.0;
   DateTime _lastFpsUpdate = DateTime.now();
   List<List<double>> _landmarks = [];
-  
-  // Model status
   bool _handModelLoaded = false;
   bool _alifModelLoaded = false;
 
@@ -33,14 +31,15 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
   }
 
   Future<void> _initialize() async {
-    // Load models
     await TFLiteService.loadModels();
     
-    // Get model status
     final status = TFLiteService.getModelStatus();
     _handModelLoaded = status['handModelLoaded'] ?? false;
     _alifModelLoaded = status['alifModelLoaded'] ?? false;
     _isModelLoaded = true;
+    
+    print('📊 Hand Model: ${_handModelLoaded ? "✅ LOADED" : "❌ NOT LOADED"}');
+    print('📊 Alif Model: ${_alifModelLoaded ? "✅ LOADED" : "❌ NOT LOADED"}');
     
     setState(() {});
     await _initializeCamera();
@@ -67,13 +66,10 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
         _controller!.startImageStream(_processCameraImage);
       }
     } catch (e) {
-      print('Error initializing camera: $e');
+      print('❌ Error initializing camera: $e');
     }
   }
 
-  // ============================================
-  // CONVERT CAMERA IMAGE TO BYTES
-  // ============================================
   Future<Uint8List?> _convertCameraImageToBytes(CameraImage image) async {
     try {
       final width = image.width;
@@ -125,14 +121,10 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
     }
   }
 
-  // ============================================
-  // PROCESS CAMERA IMAGE
-  // ============================================
   void _processCameraImage(CameraImage image) {
     if (_isProcessing || !_isModelLoaded) return;
     _isProcessing = true;
     
-    // Calculate FPS
     _frameCount++;
     final now = DateTime.now();
     if (now.difference(_lastFpsUpdate) > const Duration(seconds: 1)) {
@@ -166,16 +158,19 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
   }
 
   // ============================================
-  // DRAW LANDMARK OVERLAY
+  // ✅ DRAW RECTANGLE AROUND HAND (NO DUMMY)
   // ============================================
-  Widget _buildLandmarkOverlay() {
-    if (_landmarks.isEmpty || !_result.hasHand) {
+  Widget _buildHandOverlay() {
+    // Only show if hand is detected AND we have real landmarks
+    if (!_result.hasHand || _landmarks.isEmpty || !_handModelLoaded) {
       return Container();
     }
     
     return CustomPaint(
-      painter: LandmarkPainter(
+      painter: HandRectanglePainter(
         landmarks: _landmarks,
+        isAlif: _result.isAlif,
+        confidence: _result.confidence,
         viewWidth: MediaQuery.of(context).size.width,
         viewHeight: MediaQuery.of(context).size.height,
       ),
@@ -183,12 +178,9 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
     );
   }
 
-  // ============================================
-  // MODEL STATUS INDICATOR
-  // ============================================
   Widget _buildModelStatus() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: (_handModelLoaded && _alifModelLoaded) ? Colors.green : Colors.orange,
         borderRadius: BorderRadius.circular(12),
@@ -199,16 +191,16 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
           Icon(
             (_handModelLoaded && _alifModelLoaded) ? Icons.check_circle : Icons.warning,
             color: Colors.white,
-            size: 16,
+            size: 14,
           ),
           const SizedBox(width: 4),
           Text(
-            _handModelLoaded ? '✅ Hand' : '📌 Dummy',
+            _handModelLoaded ? 'Hand✅' : 'Hand❌',
             style: const TextStyle(color: Colors.white, fontSize: 10),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 2),
           Text(
-            _alifModelLoaded ? '✅ Alif' : '❌ Alif',
+            _alifModelLoaded ? 'Alif✅' : 'Alif❌',
             style: const TextStyle(color: Colors.white, fontSize: 10),
           ),
         ],
@@ -226,11 +218,9 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alif Detection'),
+        title: const Text('Real-Time Alif Detection'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         actions: [
@@ -243,8 +233,8 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
           if (_controller != null && _controller!.value.isInitialized)
             CameraPreview(_controller!),
           
-          // Landmark Overlay
-          _buildLandmarkOverlay(),
+          // ✅ Hand Rectangle Overlay (NO DUMMY)
+          _buildHandOverlay(),
           
           // Status Bar (Top)
           Positioned(
@@ -301,9 +291,11 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
               child: Column(
                 children: [
                   Text(
-                    _result.message.isNotEmpty ? _result.message : 'Processing...',
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    _result.hasHand 
+                        ? '✅ Hand Detected (${_landmarks.length} landmarks)' 
+                        : '👋 No hand detected',
+                    style: TextStyle(
+                      color: _result.hasHand ? Colors.green : Colors.white70,
                       fontSize: 12,
                     ),
                   ),
@@ -315,18 +307,9 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
                       fontSize: 10,
                     ),
                   ),
-                  if (_landmarks.isNotEmpty)
+                  if (!_handModelLoaded && _result.hasHand)
                     const Text(
-                      '✅ Hand tracking active!',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  if (!_handModelLoaded && _landmarks.isNotEmpty)
-                    const Text(
-                      '📌 Using dummy landmarks (model not loaded)',
+                      '⚠️ Using dummy landmarks - train model for real detection',
                       style: TextStyle(
                         color: Colors.orange,
                         fontSize: 10,
@@ -343,15 +326,19 @@ class _RealtimeDetectionPageState extends State<RealtimeDetectionPage> {
 }
 
 // ============================================
-// LANDMARK PAINTER
+// ✅ CUSTOM PAINTER: RECTANGLE AROUND HAND
 // ============================================
-class LandmarkPainter extends CustomPainter {
+class HandRectanglePainter extends CustomPainter {
   final List<List<double>> landmarks;
+  final bool isAlif;
+  final double confidence;
   final double viewWidth;
   final double viewHeight;
 
-  LandmarkPainter({
+  HandRectanglePainter({
     required this.landmarks,
+    required this.isAlif,
+    required this.confidence,
     required this.viewWidth,
     required this.viewHeight,
   });
@@ -360,126 +347,194 @@ class LandmarkPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (landmarks.isEmpty) return;
 
-    final paintLines = Paint()
-      ..color = Colors.yellow
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    final paintPoints = Paint()
-      ..color = Colors.green
-      ..style = PaintingStyle.fill;
-
-    final paintWrist = Paint()
-      ..color = Colors.red
-      ..style = PaintingStyle.fill;
-
-    // Hand connections (same as MediaPipe)
-    final connections = [
-      // Thumb
-      [0, 1], [1, 2], [2, 3], [3, 4],
-      // Index
-      [0, 5], [5, 6], [6, 7], [7, 8],
-      // Middle
-      [0, 9], [9, 10], [10, 11], [11, 12],
-      // Ring
-      [0, 13], [13, 14], [14, 15], [15, 16],
-      // Pinky
-      [0, 17], [17, 18], [18, 19], [19, 20],
-    ];
-
-    // Draw connections
-    for (var connection in connections) {
-      if (connection[0] < landmarks.length && connection[1] < landmarks.length) {
-        final p1 = landmarks[connection[0]];
-        final p2 = landmarks[connection[1]];
-        
-        if (p1.length >= 2 && p2.length >= 2) {
-          final x1 = p1[0] * viewWidth;
-          final y1 = p1[1] * viewHeight;
-          final x2 = p2[0] * viewWidth;
-          final y2 = p2[1] * viewHeight;
-          
-          canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paintLines);
-        }
-      }
-    }
-
-    // Draw points
-    for (int i = 0; i < landmarks.length && i < 21; i++) {
-      final landmark = landmarks[i];
+    // ============================================
+    // CALCULATE BOUNDING BOX FROM LANDMARKS
+    // ============================================
+    double minX = 1.0, minY = 1.0, maxX = 0.0, maxY = 0.0;
+    
+    for (var landmark in landmarks) {
       if (landmark.length >= 2) {
-        final x = landmark[0] * viewWidth;
-        final y = landmark[1] * viewHeight;
-        
-        // Wrist (point 0) is red, others are green
-        final paint = i == 0 ? paintWrist : paintPoints;
-        
-        // Draw circle
-        canvas.drawCircle(Offset(x, y), 6, paint);
-        
-        // Draw index number
-        final textPainter = TextPainter(
-          text: TextSpan(
-            text: '$i',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        textPainter.paint(canvas, Offset(x + 8, y - 8));
+        final x = landmark[0];
+        final y = landmark[1];
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
       }
     }
+    
+    // Add padding (10% of size)
+    final paddingX = (maxX - minX) * 0.15;
+    final paddingY = (maxY - minY) * 0.15;
+    
+    minX = (minX - paddingX).clamp(0.0, 1.0);
+    minY = (minY - paddingY).clamp(0.0, 1.0);
+    maxX = (maxX + paddingX).clamp(0.0, 1.0);
+    maxY = (maxY + paddingY).clamp(0.0, 1.0);
+    
+    // Convert to screen coordinates
+    final rect = Rect.fromLTRB(
+      minX * viewWidth,
+      minY * viewHeight,
+      maxX * viewWidth,
+      maxY * viewHeight,
+    );
 
-    // Draw legend
-    _drawLegend(canvas);
-  }
+    // ============================================
+    // DRAW RECTANGLE WITH CORNERS
+    // ============================================
+    
+    // Main rectangle border
+    final borderColor = isAlif ? Colors.green : Colors.red;
+    final borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
 
-  void _drawLegend(Canvas canvas) {
-    final legendPaint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
+    canvas.drawRect(rect, borderPaint);
+
+    // Glow effect (shadow)
+    final glowPaint = Paint()
+      ..color = borderColor.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+
+    canvas.drawRect(rect, glowPaint);
+
+    // ============================================
+    // DRAW CORNER TABS
+    // ============================================
+    final cornerSize = 20.0;
+    final cornerPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    // Top-left corner
+    canvas.drawLine(
+      Offset(rect.left, rect.top + cornerSize),
+      Offset(rect.left, rect.top),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.left, rect.top),
+      Offset(rect.left + cornerSize, rect.top),
+      cornerPaint,
+    );
+
+    // Top-right corner
+    canvas.drawLine(
+      Offset(rect.right, rect.top + cornerSize),
+      Offset(rect.right, rect.top),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.right, rect.top),
+      Offset(rect.right - cornerSize, rect.top),
+      cornerPaint,
+    );
+
+    // Bottom-left corner
+    canvas.drawLine(
+      Offset(rect.left, rect.bottom - cornerSize),
+      Offset(rect.left, rect.bottom),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.left, rect.bottom),
+      Offset(rect.left + cornerSize, rect.bottom),
+      cornerPaint,
+    );
+
+    // Bottom-right corner
+    canvas.drawLine(
+      Offset(rect.right, rect.bottom - cornerSize),
+      Offset(rect.right, rect.bottom),
+      cornerPaint,
+    );
+    canvas.drawLine(
+      Offset(rect.right, rect.bottom),
+      Offset(rect.right - cornerSize, rect.bottom),
+      cornerPaint,
+    );
+
+    // ============================================
+    // DRAW LABEL ON TOP OF RECTANGLE
+    // ============================================
+    final label = isAlif ? 'ALIF' : 'Not Alif';
+    final labelColor = isAlif ? Colors.green : Colors.red;
+    
+    // Label background
+    final labelPaint = Paint()
+      ..color = Colors.black.withOpacity(0.8)
       ..style = PaintingStyle.fill;
 
-    // Legend background
-    final rect = Rect.fromLTWH(10, 10, 120, 60);
+    final labelRect = Rect.fromLTWH(
+      rect.left + 10,
+      rect.top - 30,
+      80,
+      25,
+    );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(8)),
-      legendPaint,
+      RRect.fromRectAndRadius(labelRect, const Radius.circular(5)),
+      labelPaint,
     );
 
-    // Legend text
-    const textStyle = TextStyle(
-      color: Colors.white,
-      fontSize: 10,
+    // Label text
+    final textStyle = TextStyle(
+      color: labelColor,
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
     );
 
-    // Green dot
-    canvas.drawCircle(const Offset(25, 25), 5, Paint()..color = Colors.green);
-    _drawText(canvas, "Landmarks", const Offset(40, 28), textStyle);
-
-    // Red dot
-    canvas.drawCircle(const Offset(25, 45), 5, Paint()..color = Colors.red);
-    _drawText(canvas, "Wrist", const Offset(40, 48), textStyle);
-
-    // Yellow line
-    canvas.drawLine(
-      const Offset(20, 60),
-      const Offset(30, 60),
-      Paint()..color = Colors.yellow..strokeWidth = 2,
-    );
-    _drawText(canvas, "Connections", const Offset(40, 63), textStyle);
-  }
-
-  void _drawText(Canvas canvas, String text, Offset offset, TextStyle style) {
+    final textSpan = TextSpan(text: label, style: textStyle);
     final textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
+      text: textSpan,
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();
-    textPainter.paint(canvas, offset);
+    textPainter.paint(
+      canvas,
+      Offset(rect.left + 15, rect.top - 28),
+    );
+
+    // ============================================
+    // DRAW CONFIDENCE ON BOTTOM RIGHT
+    // ============================================
+    final confidenceText = '${(confidence * 100).toStringAsFixed(0)}%';
+    final confidenceStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      background: Paint()..color = Colors.black.withOpacity(0.7),
+    );
+
+    final confSpan = TextSpan(text: confidenceText, style: confidenceStyle);
+    final confPainter = TextPainter(
+      text: confSpan,
+      textDirection: TextDirection.ltr,
+    );
+    confPainter.layout();
+    confPainter.paint(
+      canvas,
+      Offset(rect.right - 50, rect.bottom + 10),
+    );
+
+    // ============================================
+    // DRAW LANDMARKS AS SMALL DOTS
+    // ============================================
+    final dotPaint = Paint()
+      ..color = Colors.cyan
+      ..style = PaintingStyle.fill;
+
+    for (var landmark in landmarks) {
+      if (landmark.length >= 2) {
+        final x = landmark[0] * viewWidth;
+        final y = landmark[1] * viewHeight;
+        canvas.drawCircle(Offset(x, y), 4, dotPaint);
+      }
+    }
   }
 
   @override

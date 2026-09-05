@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
-import 'alif_detection_page.dart';
 import 'drawer_page.dart';
-import 'tflite_test_page.dart'; // ✅ ADDED
+import 'hand_detection_screen.dart'; // ✅ CHANGED: Now using Hand Detection
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -108,12 +107,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 2. TFLite Test (NEW)
+                      // 2. Hand Detection (UPDATED)
                       _buildFeatureCard(
-                        title: 'TFLite Test',
-                        subtitle: 'Model Testing',
-                        description: 'Test your Alif detection model with images.',
-                        icon: Icons.science,
+                        title: 'Hand Detection',
+                        subtitle: 'Real-time Alif Detection',
+                        description: 'Detect hand landmarks and classify Alif in real-time.',
+                        icon: Icons.back_hand,
                         gradient: LinearGradient(
                           colors: [Colors.deepPurple, Colors.purpleAccent],
                           begin: Alignment.topLeft,
@@ -123,34 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const RealtimeDetectionPage(),
+                              builder: (context) => const HandDetectionScreen(),
                             ),
                           );
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 3. Alif Detection
-                      _buildFeatureCard(
-                        title: 'Alif Detection',
-                        subtitle: 'Urdu Sign Detection',
-                        description: 'Detect Alif and other signs with your model.',
-                        icon: Icons.auto_awesome,
-                        gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Colors.purpleAccent],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AlifDetectionPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // 4. Fav Signs
+                      // 3. Fav Signs
                       _buildFeatureCard(
                         title: 'Fav Signs',
                         subtitle: 'Your saved signs',
