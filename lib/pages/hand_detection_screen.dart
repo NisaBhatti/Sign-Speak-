@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -6,7 +7,6 @@ import 'package:image/image.dart' as img;
 import '../services/hand_detector.dart';
 import '../services/alif_classifier.dart';
 
-/// Main Screen - Like your Python script but in Flutter
 class HandDetectionScreen extends StatefulWidget {
   const HandDetectionScreen({Key? key}) : super(key: key);
 
@@ -23,23 +23,95 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
   double _fps = 0.0;
   DateTime _lastFpsUpdate = DateTime.now();
   List<List<double>> _landmarks = [];
+  Timer? _dummyTimer;
+  double _testConfidence = 0.5;
 
   @override
   void initState() {
     super.initState();
     _initialize();
+    _startDummyLandmarkAnimation();
+  }
+
+  // ============================================
+  // ANIMATE DUMMY LANDMARKS FOR TESTING
+  // ============================================
+  void _startDummyLandmarkAnimation() {
+    _dummyTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
+      // Generate moving dummy landmarks
+      final dummyLandmarks = _generateMovingDummyLandmarks();
+      
+      // Classify with dummy landmarks
+      AlifClassifier.classify(dummyLandmarks).then((result) {
+        if (mounted) {
+          setState(() {
+            _result = result;
+            _landmarks = dummyLandmarks;
+          });
+        }
+      });
+    });
+  }
+
+  List<List<double>> _generateMovingDummyLandmarks() {
+    final landmarks = <List<double>>[];
+    final time = DateTime.now().millisecondsSinceEpoch / 1000;
+    
+    // ✅ FIXED: Use math.sin() properly
+    final wave = sin(time * 0.5) * 0.05;
+    
+    for (int i = 0; i < 21; i++) {
+      double x, y;
+      
+      if (i == 0) {
+        x = 0.5 + wave * 0.5;
+        y = 0.6 + wave * 0.3;
+      } else if (i <= 4) {
+        final t = (i - 1) / 3.0;
+        x = 0.3 + 0.2 * t + wave * 0.3;
+        y = 0.4 + 0.2 * t + wave * 0.2;
+      } else if (i <= 8) {
+        final t = (i - 5) / 3.0;
+        x = 0.4 + 0.05 * t + wave * 0.2;
+        y = 0.2 + 0.15 * t + wave * 0.1;
+      } else if (i <= 12) {
+        final t = (i - 9) / 3.0;
+        x = 0.5 + 0.05 * t + wave * 0.2;
+        y = 0.15 + 0.15 * t + wave * 0.1;
+      } else if (i <= 16) {
+        final t = (i - 13) / 3.0;
+        x = 0.6 + 0.05 * t + wave * 0.2;
+        y = 0.2 + 0.15 * t + wave * 0.1;
+      } else {
+        final t = (i - 17) / 3.0;
+        x = 0.7 + 0.05 * t + wave * 0.2;
+        y = 0.3 + 0.15 * t + wave * 0.1;
+      }
+      
+      // ✅ FIXED: Use math.sin() properly
+      _testConfidence = 0.3 + sin(time * 0.1).abs() * 0.6;
+      
+      landmarks.add([
+        x.clamp(0.05, 0.95),
+        y.clamp(0.05, 0.95)
+      ]);
+    }
+    
+    return landmarks;
   }
 
   Future<void> _initialize() async {
     try {
-      // Load both models (like Python script)
       await HandDetector.loadModel();
       await AlifClassifier.loadModel();
       _isReady = true;
       
       setState(() {});
-      
-      // Initialize camera
       await _initializeCamera();
     } catch (e) {
       print('❌ Initialization error: $e');
@@ -56,7 +128,7 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
       
       _controller = CameraController(
         frontCamera,
-        ResolutionPreset.medium,
+        ResolutionPreset.low,
         enableAudio: false,
       );
       
@@ -71,9 +143,6 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
     }
   }
 
-  // ============================================
-  // CONVERT CAMERA IMAGE TO BYTES
-  // ============================================
   Future<Uint8List?> _convertCameraImageToBytes(CameraImage image) async {
     try {
       final width = image.width;
@@ -120,19 +189,14 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
       return null;
       
     } catch (e) {
-      print('❌ Image conversion error: $e');
       return null;
     }
   }
 
-  // ============================================
-  // PROCESS CAMERA IMAGE (Like Python's while loop)
-  // ============================================
   void _processCameraImage(CameraImage image) {
     if (_isProcessing || !_isReady) return;
     _isProcessing = true;
     
-    // Calculate FPS
     _frameCount++;
     final now = DateTime.now();
     if (now.difference(_lastFpsUpdate) > const Duration(seconds: 1)) {
@@ -145,51 +209,38 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
     _convertCameraImageToBytes(image).then((jpegBytes) async {
       if (jpegBytes != null && mounted) {
         try {
-          // Step 1: Detect hand landmarks (like MediaPipe)
           final landmarks = await HandDetector.detectHand(jpegBytes);
           
-          if (landmarks.isEmpty) {
-            setState(() {
-              _result = AlifResult.empty();
-              _landmarks = [];
-            });
-            _isProcessing = false;
-            return;
+          if (landmarks.isNotEmpty) {
+            final result = await AlifClassifier.classify(landmarks);
+            if (mounted) {
+              setState(() {
+                _result = result;
+                _landmarks = landmarks;
+              });
+            }
           }
-          
-          // Step 2: Classify ALIF (like your Python model)
-          final result = await AlifClassifier.classify(landmarks);
-          
-          if (mounted) {
-            setState(() {
-              _result = result;
-              _landmarks = landmarks;
-            });
-          }
-          
         } catch (e) {
-          print('❌ Processing error: $e');
+          print('❌ Error: $e');
         }
       }
       _isProcessing = false;
     }).catchError((e) {
-      print('❌ Conversion error: $e');
       _isProcessing = false;
     });
   }
 
-  // ============================================
-  // DRAW HAND LANDMARKS (Like MediaPipe's draw_landmarks)
-  // ============================================
   Widget _buildHandOverlay() {
-    if (_landmarks.isEmpty || !_result.hasHand) {
+    if (_landmarks.isEmpty) {
       return Container();
     }
     
     return CustomPaint(
-      painter: HandLandmarkPainter(
+      painter: CleanHandPainter(
         landmarks: _landmarks,
         isAlif: _result.isAlif,
+        hasHand: _result.hasHand,
+        confidence: _result.confidence,
         viewWidth: MediaQuery.of(context).size.width,
         viewHeight: MediaQuery.of(context).size.height,
       ),
@@ -199,6 +250,7 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
 
   @override
   void dispose() {
+    _dummyTimer?.cancel();
     _controller?.stopImageStream();
     _controller?.dispose();
     HandDetector.close();
@@ -229,43 +281,43 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
       ),
       body: Stack(
         children: [
-          // Camera Preview (like cv2.imshow)
           if (_controller != null && _controller!.value.isInitialized)
             CameraPreview(_controller!),
           
-          // Hand Landmarks (like mp_drawing.draw_landmarks)
           _buildHandOverlay(),
           
-          // Status Bar (like cv2.putText)
+          // Status Bar
           Positioned(
             top: 20,
             left: 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Icon(
+                    _result.hasHand
+                        ? (_result.isAlif ? Icons.check_circle : Icons.cancel)
+                        : Icons.handshake,
+                    color: _result.hasHand
+                        ? (_result.isAlif ? Colors.green : Colors.red)
+                        : Colors.grey,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 10),
                   Text(
                     _result.label,
                     style: TextStyle(
                       color: _result.hasHand
                           ? (_result.isAlif ? Colors.green : Colors.red)
                           : Colors.grey,
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'FPS: ${_fps.toStringAsFixed(1)} | Landmarks: ${_landmarks.length}',
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -273,26 +325,36 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
             ),
           ),
           
-          // Bottom info (like Python's "Show your hand to camera")
+          // Bottom Info
           Positioned(
             bottom: 20,
             left: 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.all(15),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                _result.hasHand
-                    ? '✅ Hand detected - ${_landmarks.length} landmarks'
-                    : '👋 Show your hand to camera',
-                style: TextStyle(
-                  color: _result.hasHand ? Colors.green : Colors.white70,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'FPS: ${_fps.toStringAsFixed(0)}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  Text(
+                    'Landmarks: ${_landmarks.length}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  Text(
+                    'Conf: ${(_result.confidence * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      color: _result.hasHand ? Colors.green : Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -303,42 +365,34 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
 }
 
 // ============================================
-// HAND LANDMARK PAINTER (Like MediaPipe's draw_landmarks)
+// CLEAN HAND PAINTER
 // ============================================
-class HandLandmarkPainter extends CustomPainter {
+class CleanHandPainter extends CustomPainter {
   final List<List<double>> landmarks;
   final bool isAlif;
+  final bool hasHand;
+  final double confidence;
   final double viewWidth;
   final double viewHeight;
 
-  HandLandmarkPainter({
+  CleanHandPainter({
     required this.landmarks,
     required this.isAlif,
+    required this.hasHand,
+    required this.confidence,
     required this.viewWidth,
     required this.viewHeight,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (landmarks.isEmpty) return;
+    if (landmarks.isEmpty || !hasHand) return;
 
-    // Colors (like MediaPipe styling)
     final color = isAlif ? Colors.green : Colors.red;
-    
-    final paintLines = Paint()
-      ..color = Colors.yellow
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
 
-    final paintPoints = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final paintWrist = Paint()
-      ..color = Colors.red
-      ..style = PaintingStyle.fill;
-
-    // Hand connections (MediaPipe HAND_CONNECTIONS)
+    // ============================================
+    // SMALL CONNECTIONS
+    // ============================================
     final connections = [
       [0, 1], [1, 2], [2, 3], [3, 4],
       [0, 5], [5, 6], [6, 7], [7, 8],
@@ -347,62 +401,76 @@ class HandLandmarkPainter extends CustomPainter {
       [0, 17], [17, 18], [18, 19], [19, 20],
     ];
 
-    // Draw connections (like MediaPipe)
-    for (var connection in connections) {
-      if (connection[0] < landmarks.length && connection[1] < landmarks.length) {
-        final p1 = landmarks[connection[0]];
-        final p2 = landmarks[connection[1]];
-        
+    final linePaint = Paint()
+      ..color = Colors.yellow.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    for (var conn in connections) {
+      if (conn[0] < landmarks.length && conn[1] < landmarks.length) {
+        final p1 = landmarks[conn[0]];
+        final p2 = landmarks[conn[1]];
         if (p1.length >= 2 && p2.length >= 2) {
-          final x1 = p1[0] * viewWidth;
-          final y1 = p1[1] * viewHeight;
-          final x2 = p2[0] * viewWidth;
-          final y2 = p2[1] * viewHeight;
-          
-          canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paintLines);
+          canvas.drawLine(
+            Offset(p1[0] * viewWidth, p1[1] * viewHeight),
+            Offset(p2[0] * viewWidth, p2[1] * viewHeight),
+            linePaint,
+          );
         }
       }
     }
 
-    // Draw landmarks (like MediaPipe)
+    // ============================================
+    // SMALL POINTS
+    // ============================================
+    final pointPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final wristPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
+
     for (int i = 0; i < landmarks.length && i < 21; i++) {
-      final landmark = landmarks[i];
-      if (landmark.length >= 2) {
-        final x = landmark[0] * viewWidth;
-        final y = landmark[1] * viewHeight;
+      final l = landmarks[i];
+      if (l.length >= 2) {
+        final x = l[0] * viewWidth;
+        final y = l[1] * viewHeight;
         
-        final paint = i == 0 ? paintWrist : paintPoints;
-        canvas.drawCircle(Offset(x, y), 6, paint);
+        final radius = i == 0 ? 3.5 : 2.5;
+        final paint = i == 0 ? wristPaint : pointPaint;
+        
+        canvas.drawCircle(Offset(x, y), radius, paint);
       }
     }
 
-    // Draw bounding box (like cv2.rectangle)
-    _drawBoundingBox(canvas);
+    // ============================================
+    // TIGHT BOUNDING BOX
+    // ============================================
+    _drawTightBox(canvas, color);
   }
 
-  void _drawBoundingBox(Canvas canvas) {
+  void _drawTightBox(Canvas canvas, Color color) {
     if (landmarks.isEmpty) return;
 
-    // Calculate bounding box
     double minX = 1.0, minY = 1.0, maxX = 0.0, maxY = 0.0;
     
-    for (var landmark in landmarks) {
-      if (landmark.length >= 2) {
-        if (landmark[0] < minX) minX = landmark[0];
-        if (landmark[1] < minY) minY = landmark[1];
-        if (landmark[0] > maxX) maxX = landmark[0];
-        if (landmark[1] > maxY) maxY = landmark[1];
+    for (var l in landmarks) {
+      if (l.length >= 2) {
+        if (l[0] < minX) minX = l[0];
+        if (l[1] < minY) minY = l[1];
+        if (l[0] > maxX) maxX = l[0];
+        if (l[1] > maxY) maxY = l[1];
       }
     }
     
-    // Add padding
-    final paddingX = (maxX - minX) * 0.15;
-    final paddingY = (maxY - minY) * 0.15;
+    final padX = (maxX - minX) * 0.03;
+    final padY = (maxY - minY) * 0.03;
     
-    minX = (minX - paddingX).clamp(0.0, 1.0);
-    minY = (minY - paddingY).clamp(0.0, 1.0);
-    maxX = (maxX + paddingX).clamp(0.0, 1.0);
-    maxY = (maxY + paddingY).clamp(0.0, 1.0);
+    minX = (minX - padX).clamp(0.0, 1.0);
+    minY = (minY - padY).clamp(0.0, 1.0);
+    maxX = (maxX + padX).clamp(0.0, 1.0);
+    maxY = (maxY + padY).clamp(0.0, 1.0);
     
     final rect = Rect.fromLTRB(
       minX * viewWidth,
@@ -411,17 +479,14 @@ class HandLandmarkPainter extends CustomPainter {
       maxY * viewHeight,
     );
 
-    // Draw rectangle
     final borderPaint = Paint()
-      ..color = isAlif ? Colors.green : Colors.red
+      ..color = color.withOpacity(0.7)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
+      ..strokeWidth = 1.5;
+      
     canvas.drawRect(rect, borderPaint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
