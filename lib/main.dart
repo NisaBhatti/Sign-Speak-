@@ -10,9 +10,6 @@ import 'pages/homepage.dart';
 import 'pages/alif_detection_page.dart';
 
 // Firebase imports
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
