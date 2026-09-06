@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'drawer_page.dart';
-import 'hand_detection_screen.dart'; // ✅ CHANGED: Now using Hand Detection
+import 'alif_detection_page.dart'; // ✅ Changed to Alif Detection Page
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,11 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 2. Hand Detection (UPDATED)
+                      // 2. Alif Detection (NEW)
                       _buildFeatureCard(
-                        title: 'Hand Detection',
-                        subtitle: 'Real-time Alif Detection',
-                        description: 'Detect hand landmarks and classify Alif in real-time.',
+                        title: '🔍 Alif Detection',
+                        subtitle: 'Real-time Hand Detection',
+                        description: 'Detect Alif (ا) sign using your camera in real-time.',
                         icon: Icons.back_hand,
                         gradient: LinearGradient(
                           colors: [Colors.deepPurple, Colors.purpleAccent],
@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const HandDetectionScreen(),
+                              builder: (context) => const AlifDetectionPage(),
                             ),
                           );
                         },

@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
-import '../services/hand_detector.dart';
-import '../services/alif_classifier.dart';
+import '../services/mediapipe_service.dart';
 
 class HandDetectionScreen extends StatefulWidget {
   const HandDetectionScreen({Key? key}) : super(key: key);
@@ -16,106 +14,28 @@ class HandDetectionScreen extends StatefulWidget {
 
 class _HandDetectionScreenState extends State<HandDetectionScreen> {
   CameraController? _controller;
-  AlifResult _result = AlifResult.empty();
+  DetectionResult _result = DetectionResult.empty();
   bool _isProcessing = false;
   bool _isReady = false;
   int _frameCount = 0;
   double _fps = 0.0;
   DateTime _lastFpsUpdate = DateTime.now();
   List<List<double>> _landmarks = [];
-  Timer? _dummyTimer;
-  double _testConfidence = 0.5;
 
   @override
   void initState() {
     super.initState();
     _initialize();
-    _startDummyLandmarkAnimation();
-  }
-
-  // ============================================
-  // ANIMATE DUMMY LANDMARKS FOR TESTING
-  // ============================================
-  void _startDummyLandmarkAnimation() {
-    _dummyTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      
-      // Generate moving dummy landmarks
-      final dummyLandmarks = _generateMovingDummyLandmarks();
-      
-      // Classify with dummy landmarks
-      AlifClassifier.classify(dummyLandmarks).then((result) {
-        if (mounted) {
-          setState(() {
-            _result = result;
-            _landmarks = dummyLandmarks;
-          });
-        }
-      });
-    });
-  }
-
-  List<List<double>> _generateMovingDummyLandmarks() {
-    final landmarks = <List<double>>[];
-    final time = DateTime.now().millisecondsSinceEpoch / 1000;
-    
-    // ✅ FIXED: Use math.sin() properly
-    final wave = sin(time * 0.5) * 0.05;
-    
-    for (int i = 0; i < 21; i++) {
-      double x, y;
-      
-      if (i == 0) {
-        x = 0.5 + wave * 0.5;
-        y = 0.6 + wave * 0.3;
-      } else if (i <= 4) {
-        final t = (i - 1) / 3.0;
-        x = 0.3 + 0.2 * t + wave * 0.3;
-        y = 0.4 + 0.2 * t + wave * 0.2;
-      } else if (i <= 8) {
-        final t = (i - 5) / 3.0;
-        x = 0.4 + 0.05 * t + wave * 0.2;
-        y = 0.2 + 0.15 * t + wave * 0.1;
-      } else if (i <= 12) {
-        final t = (i - 9) / 3.0;
-        x = 0.5 + 0.05 * t + wave * 0.2;
-        y = 0.15 + 0.15 * t + wave * 0.1;
-      } else if (i <= 16) {
-        final t = (i - 13) / 3.0;
-        x = 0.6 + 0.05 * t + wave * 0.2;
-        y = 0.2 + 0.15 * t + wave * 0.1;
-      } else {
-        final t = (i - 17) / 3.0;
-        x = 0.7 + 0.05 * t + wave * 0.2;
-        y = 0.3 + 0.15 * t + wave * 0.1;
-      }
-      
-      // ✅ FIXED: Use math.sin() properly
-      _testConfidence = 0.3 + sin(time * 0.1).abs() * 0.6;
-      
-      landmarks.add([
-        x.clamp(0.05, 0.95),
-        y.clamp(0.05, 0.95)
-      ]);
-    }
-    
-    return landmarks;
   }
 
   Future<void> _initialize() async {
-    try {
-      await HandDetector.loadModel();
-      await AlifClassifier.loadModel();
-      _isReady = true;
-      
-      setState(() {});
-      await _initializeCamera();
-    } catch (e) {
-      print('❌ Initialization error: $e');
-    }
+    // Check if plugin is working
+    final connected = await MediaPipeService.ping();
+    _isReady = connected;
+    print('🔌 MediaPipe connected: $connected');
+    
+    setState(() {});
+    await _initializeCamera();
   }
 
   Future<void> _initializeCamera() async {
@@ -128,7 +48,7 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
       
       _controller = CameraController(
         frontCamera,
-        ResolutionPreset.low,
+        ResolutionPreset.medium,
         enableAudio: false,
       );
       
@@ -209,16 +129,12 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
     _convertCameraImageToBytes(image).then((jpegBytes) async {
       if (jpegBytes != null && mounted) {
         try {
-          final landmarks = await HandDetector.detectHand(jpegBytes);
-          
-          if (landmarks.isNotEmpty) {
-            final result = await AlifClassifier.classify(landmarks);
-            if (mounted) {
-              setState(() {
-                _result = result;
-                _landmarks = landmarks;
-              });
-            }
+          final result = await MediaPipeService.detectHand(jpegBytes);
+          if (mounted) {
+            setState(() {
+              _result = result;
+              _landmarks = result.landmarks;
+            });
           }
         } catch (e) {
           print('❌ Error: $e');
@@ -231,16 +147,14 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
   }
 
   Widget _buildHandOverlay() {
-    if (_landmarks.isEmpty) {
+    if (_landmarks.isEmpty || !_result.hasHand) {
       return Container();
     }
     
     return CustomPaint(
-      painter: CleanHandPainter(
+      painter: HandLandmarkPainter(
         landmarks: _landmarks,
         isAlif: _result.isAlif,
-        hasHand: _result.hasHand,
-        confidence: _result.confidence,
         viewWidth: MediaQuery.of(context).size.width,
         viewHeight: MediaQuery.of(context).size.height,
       ),
@@ -250,11 +164,8 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
 
   @override
   void dispose() {
-    _dummyTimer?.cancel();
     _controller?.stopImageStream();
     _controller?.dispose();
-    HandDetector.close();
-    AlifClassifier.close();
     super.dispose();
   }
 
@@ -273,8 +184,8 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              _isReady ? '✅ Ready' : '⏳ Loading',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              _isReady ? '✅ MediaPipe' : '❌ Not Ready',
+              style: const TextStyle(color: Colors.white, fontSize: 10),
             ),
           ),
         ],
@@ -311,7 +222,11 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    _result.label,
+                    _result.hasHand
+                        ? (_result.isAlif 
+                          ? '✅ ALIF ${(_result.confidence * 100).toStringAsFixed(0)}%'
+                          : '❌ Not Alif ${(_result.confidence * 100).toStringAsFixed(0)}%')
+                        : '👋 Show your hand',
                     style: TextStyle(
                       color: _result.hasHand
                           ? (_result.isAlif ? Colors.green : Colors.red)
@@ -365,34 +280,28 @@ class _HandDetectionScreenState extends State<HandDetectionScreen> {
 }
 
 // ============================================
-// CLEAN HAND PAINTER
+// HAND LANDMARK PAINTER
 // ============================================
-class CleanHandPainter extends CustomPainter {
+class HandLandmarkPainter extends CustomPainter {
   final List<List<double>> landmarks;
   final bool isAlif;
-  final bool hasHand;
-  final double confidence;
   final double viewWidth;
   final double viewHeight;
 
-  CleanHandPainter({
+  HandLandmarkPainter({
     required this.landmarks,
     required this.isAlif,
-    required this.hasHand,
-    required this.confidence,
     required this.viewWidth,
     required this.viewHeight,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (landmarks.isEmpty || !hasHand) return;
+    if (landmarks.isEmpty) return;
 
     final color = isAlif ? Colors.green : Colors.red;
 
-    // ============================================
-    // SMALL CONNECTIONS
-    // ============================================
+    // Connections
     final connections = [
       [0, 1], [1, 2], [2, 3], [3, 4],
       [0, 5], [5, 6], [6, 7], [7, 8],
@@ -402,7 +311,7 @@ class CleanHandPainter extends CustomPainter {
     ];
 
     final linePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.6)
+      ..color = Colors.yellow.withOpacity(0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -420,9 +329,7 @@ class CleanHandPainter extends CustomPainter {
       }
     }
 
-    // ============================================
-    // SMALL POINTS
-    // ============================================
+    // Points
     final pointPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
@@ -437,20 +344,18 @@ class CleanHandPainter extends CustomPainter {
         final x = l[0] * viewWidth;
         final y = l[1] * viewHeight;
         
-        final radius = i == 0 ? 3.5 : 2.5;
+        final radius = i == 0 ? 4.0 : 3.0;
         final paint = i == 0 ? wristPaint : pointPaint;
         
         canvas.drawCircle(Offset(x, y), radius, paint);
       }
     }
 
-    // ============================================
-    // TIGHT BOUNDING BOX
-    // ============================================
-    _drawTightBox(canvas, color);
+    // Bounding box
+    _drawBoundingBox(canvas, color);
   }
 
-  void _drawTightBox(Canvas canvas, Color color) {
+  void _drawBoundingBox(Canvas canvas, Color color) {
     if (landmarks.isEmpty) return;
 
     double minX = 1.0, minY = 1.0, maxX = 0.0, maxY = 0.0;
@@ -464,8 +369,8 @@ class CleanHandPainter extends CustomPainter {
       }
     }
     
-    final padX = (maxX - minX) * 0.03;
-    final padY = (maxY - minY) * 0.03;
+    final padX = (maxX - minX) * 0.1;
+    final padY = (maxY - minY) * 0.1;
     
     minX = (minX - padX).clamp(0.0, 1.0);
     minY = (minY - padY).clamp(0.0, 1.0);
@@ -482,7 +387,7 @@ class CleanHandPainter extends CustomPainter {
     final borderPaint = Paint()
       ..color = color.withOpacity(0.7)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 2.0;
       
     canvas.drawRect(rect, borderPaint);
   }
