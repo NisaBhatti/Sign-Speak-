@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/favourite_service.dart';
 
 class WordsPage extends StatefulWidget {
   const WordsPage({super.key});
@@ -16,95 +17,113 @@ class _WordsPageState extends State<WordsPage> {
 
   // Search query
   String _searchQuery = '';
+  String _selectedCategory = 'All';
 
-  // ✅ COMMON SIGNS LIST
+  final FavouriteService _favouriteService = FavouriteService();
+
+  // Common Signs List with Urdu translations
   final List<Map<String, dynamic>> _signs = [
     {
       'name': 'Hello',
+      'urdu': 'ہیلو',
       'image': 'assets/images/sign_hello.png',
       'category': 'Greetings',
       'description': 'Wave your hand near your head',
     },
     {
       'name': 'Thank You',
+      'urdu': 'شکریہ',
       'image': 'assets/images/sign_thankyou.png',
       'category': 'Greetings',
       'description': 'Touch your chin with fingertips and move forward',
     },
     {
       'name': 'Sorry',
+      'urdu': 'معاف کیجیے',
       'image': 'assets/images/sign_sorry.png',
       'category': 'Emotions',
       'description': 'Make a fist and circle over your chest',
     },
     {
       'name': 'Yes',
+      'urdu': 'جی ہاں',
       'image': 'assets/images/sign_yes.png',
       'category': 'Basic',
       'description': 'Make a fist and nod your head up and down',
     },
     {
       'name': 'No',
+      'urdu': 'نہیں',
       'image': 'assets/images/sign_no.png',
       'category': 'Basic',
       'description': 'Shake your head or tap index and middle fingers',
     },
     {
       'name': 'Help',
+      'urdu': 'مدد',
       'image': 'assets/images/sign_help.png',
       'category': 'Emergency',
       'description': 'Place one hand on top of the other and lift up',
     },
     {
       'name': 'Please',
+      'urdu': 'برائے مہربانی',
       'image': 'assets/images/sign_please.png',
       'category': 'Basic',
       'description': 'Rub your chest in a circular motion',
     },
     {
       'name': 'Good Morning',
+      'urdu': 'صبح بخیر',
       'image': 'assets/images/sign_goodmorning.png',
       'category': 'Greetings',
       'description': 'Place hand on chest and move outward',
     },
     {
       'name': 'Good Night',
+      'urdu': 'شب بخیر',
       'image': 'assets/images/sign_goodnight.png',
       'category': 'Greetings',
       'description': 'Place hand on chin and move downward',
     },
     {
       'name': 'Friend',
+      'urdu': 'دوست',
       'image': 'assets/images/sign_friend.png',
       'category': 'Relationships',
       'description': 'Interlock index fingers and twist',
     },
     {
       'name': 'Family',
+      'urdu': 'خاندان',
       'image': 'assets/images/sign_family.png',
       'category': 'Relationships',
       'description': 'Circle both hands in front of chest',
     },
     {
       'name': 'Eat',
+      'urdu': 'کھانا',
       'image': 'assets/images/sign_eat.png',
       'category': 'Basic',
       'description': 'Tap fingers to mouth',
     },
     {
       'name': 'Drink',
+      'urdu': 'پینا',
       'image': 'assets/images/sign_drink.png',
       'category': 'Basic',
       'description': 'Make C shape and tilt toward mouth',
     },
     {
       'name': 'Happy',
+      'urdu': 'خوش',
       'image': 'assets/images/sign_happy.png',
       'category': 'Emotions',
       'description': 'Pat chest with flat hand',
     },
     {
       'name': 'Sad',
+      'urdu': 'اداس',
       'image': 'assets/images/sign_sad.png',
       'category': 'Emotions',
       'description': 'Draw a tear down your cheek',
@@ -117,8 +136,6 @@ class _WordsPageState extends State<WordsPage> {
     return categories.toSet().toList();
   }
 
-  String _selectedCategory = 'All';
-
   // Filtered signs based on search and category
   List<Map<String, dynamic>> get _filteredSigns {
     return _signs.where((sign) {
@@ -126,13 +143,22 @@ class _WordsPageState extends State<WordsPage> {
           sign['name']
               .toString()
               .toLowerCase()
-              .contains(_searchQuery.toLowerCase());
+              .contains(_searchQuery.toLowerCase()) ||
+          sign['urdu']
+              .toString()
+              .contains(_searchQuery);
       
       final matchesCategory = _selectedCategory == 'All' ||
           sign['category'] == _selectedCategory;
       
       return matchesSearch && matchesCategory;
     }).toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _favouriteService.loadFavourites();
   }
 
   @override
@@ -159,7 +185,7 @@ class _WordsPageState extends State<WordsPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withValues(alpha: 0.1),
+                        color: marineBlue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -188,7 +214,7 @@ class _WordsPageState extends State<WordsPage> {
                 child: Text(
                   'Learn Common Sign Language Signs',
                   style: TextStyle(
-                    color: marineBlue.withValues(alpha: 0.7),
+                    color: marineBlue.withOpacity(0.7),
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -204,7 +230,7 @@ class _WordsPageState extends State<WordsPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withOpacity(0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -231,7 +257,7 @@ class _WordsPageState extends State<WordsPage> {
                 ),
               ),
 
-              // Category Filter
+              // Category Filter - SAME AS BEFORE
               Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -258,7 +284,7 @@ class _WordsPageState extends State<WordsPage> {
                             _selectedCategory = category;
                           });
                         },
-                        backgroundColor: Colors.white.withValues(alpha: 0.7),
+                        backgroundColor: Colors.white.withOpacity(0.7),
                         selectedColor: lightBlue,
                         side: BorderSide(
                           color: isSelected ? lightBlue : Colors.transparent,
@@ -306,7 +332,7 @@ class _WordsPageState extends State<WordsPage> {
                         child: GridView.builder(
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.85,
+                            childAspectRatio: 0.8,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
                           ),
@@ -326,6 +352,8 @@ class _WordsPageState extends State<WordsPage> {
   }
 
   Widget _buildSignCard(Map<String, dynamic> sign) {
+    final isFav = _favouriteService.isFavourite(sign['name']);
+
     return GestureDetector(
       onTap: () {
         _showSignDetail(sign);
@@ -336,7 +364,7 @@ class _WordsPageState extends State<WordsPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -345,18 +373,72 @@ class _WordsPageState extends State<WordsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ✅ Sign Image - Size Controlled with SizedBox
-            SizedBox(
-              height: 110,  // 👈 IMAGE HEIGHT FIXED (kam kiya)
+            // Sign Image with Favourite Button
+            Container(
+              height: 120,
               width: double.infinity,
-              child: ClipRRect(
+              decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
-                child: _buildImage(sign['image']),
+                color: Colors.grey.shade100,
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: _buildImage(sign['image']),
+                  ),
+                  // Favourite Button
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.grey,
+                          size: 20,
+                        ),
+                        onPressed: () async {
+                          await _favouriteService.toggleFavourite(sign);
+                          setState(() {});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isFav 
+                                  ? 'Removed from favourites' 
+                                  : 'Added to favourites',
+                              ),
+                              duration: const Duration(seconds: 1),
+                              backgroundColor: isFav ? Colors.red : Colors.green,
+                            ),
+                          );
+                        },
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                          minWidth: 36,
+                          minHeight: 36,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            // Sign Info
+            // Sign Info - ENGLISH + URDU (Category REMOVED)
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -372,22 +454,18 @@ class _WordsPageState extends State<WordsPage> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: lightBlue.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 2),
+                  Text(
+                    sign['urdu'],
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
                     ),
-                    child: Text(
-                      sign['category'],
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: lightBlue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  // ❌ CATEGORY TAG REMOVED - ab nahi dikhega
                 ],
               ),
             ),
@@ -400,25 +478,26 @@ class _WordsPageState extends State<WordsPage> {
   Widget _buildImage(String imagePath) {
     return Image.asset(
       imagePath,
-      fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya taake puri image dikhe
+      fit: BoxFit.cover,
       width: double.infinity,
+      height: 120,
       errorBuilder: (context, error, stackTrace) {
         return Container(
-          color: Colors.grey.shade100,
+          color: Colors.grey.shade200,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.image_not_supported,
-                size: 30,
+                size: 40,
                 color: Colors.grey.shade400,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 'No Image',
                 style: TextStyle(
                   color: Colors.grey.shade500,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -429,113 +508,163 @@ class _WordsPageState extends State<WordsPage> {
   }
 
   void _showSignDetail(Map<String, dynamic> sign) {
+    final isFav = _favouriteService.isFavourite(sign['name']);
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              
-              // ✅ Detail Image - Size Controlled
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  sign['image'],
-                  height: 160,  // 👈 DETAIL IMAGE SIZE (kam kiya)
-                  width: double.infinity,
-                  fit: BoxFit.contain,  // ✅ 'cover' se 'contain' kiya
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 160,
-                      color: Colors.grey.shade200,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              
-              Text(
-                sign['name'],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: marineBlue,
-                ),
-              ),
-              const SizedBox(height: 8),
-              
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  color: lightBlue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  sign['category'],
-                  style: TextStyle(
-                    color: lightBlue,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  sign['description'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: lightBlue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  child: const Text('Close'),
-                ),
+                  const SizedBox(height: 20),
+
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      sign['image'],
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 180,
+                          color: Colors.grey.shade200,
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              sign['name'],
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: marineBlue,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              sign['urdu'],
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.grey,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          await _favouriteService.toggleFavourite(sign);
+                          setState(() {});
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isFav 
+                                  ? 'Removed from favourites' 
+                                  : 'Added to favourites',
+                              ),
+                              duration: const Duration(seconds: 1),
+                              backgroundColor: isFav ? Colors.red : Colors.green,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: lightBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      sign['category'],
+                      style: TextStyle(
+                        color: lightBlue,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      sign['description'],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Close'),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-              const SizedBox(height: 8),
-            ],
-          ),
+            );
+          },
         );
       },
     );
