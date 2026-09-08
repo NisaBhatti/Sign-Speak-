@@ -216,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
+                
                 child: Icon(icon, color: Colors.white, size: 28),
               ),
               const SizedBox(width: 16),
