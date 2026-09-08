@@ -40,8 +40,8 @@
     <!-- 📱 APPLICATION                              -->
     <!-- ============================================ -->
     <application
+        android:name="androidx.multidex.MultiDexApplication"
         android:label="Sign Speak"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
         android:theme="@style/LaunchTheme"
@@ -73,27 +73,12 @@
         </activity>
         
         <!-- ============================================ -->
-        <!-- 🔥 ML KIT DEPENDENCIES (for Hand Detection) -->
-        <!-- ============================================ -->
-        <meta-data
-            android:name="com.google.mlkit.vision.DEPENDENCIES"
-            android:value="hand" />
-        
-        <!-- ============================================ -->
         <!-- 🏗️ FLUTTER EMBEDDING                        -->
         <!-- ============================================ -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-            
-        <!-- ============================================ -->
-        <!-- 🔥 FIREBASE CONFIGURATION                   -->
-        <!-- ============================================ -->
-        <!-- REMOVE THIS LINE - It's causing the error -->
-        <!-- <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id" /> -->
-            
+        
         <!-- ============================================ -->
         <!-- 🖼️ FILE PROVIDER (for camera images)        -->
         <!-- ============================================ -->
@@ -107,35 +92,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
         
-        <!-- ============================================ -->
-        <!-- 🔧 WORKAROUND FOR GOOGLE ML KIT SMART REPLY -->
-        <!-- ============================================ -->
-        <meta-data
-            android:name="com.google.android.gms.vision.DEPENDENCIES"
-            android:value="" />
-        
     </application>
-    
-    <!-- ============================================ -->
-    <!-- 🔍 QUERIES (for Android 11+ - API 30+)      -->
-    <!-- ============================================ -->
-    <queries>
-        <!-- Camera intent -->
-        <intent>
-            <action android:name="android.media.action.IMAGE_CAPTURE" />
-        </intent>
-        
-        <!-- Gallery intent -->
-        <intent>
-            <action android:name="android.intent.action.PICK" />
-            <data android:mimeType="image/*" />
-        </intent>
-        
-        <!-- Process text intent -->
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT" />
-            <data android:mimeType="text/plain" />
-        </intent>
-    </queries>
     
 </manifest>

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
-import 'drawer_page.dart';
 import 'dictionary.dart';
+<<<<<<< HEAD
 import 'favourite_signs.dart';   // 👈 SIRF YEH IMPORT ADD HUA HAI
+=======
+import 'drawer_page.dart';
+import 'alif_detection_page.dart'; // ✅ Changed to Alif Detection Page
+>>>>>>> 35e970310cb11d666f04aaeee5c1d9fd66ccb810
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,7 +104,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder: (context) => CameraAccessScreen(),
+                              builder: (context) => const CameraAccessScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // 2. Alif Detection (NEW)
+                      _buildFeatureCard(
+                        title: '🔍 Alif Detection',
+                        subtitle: 'Real-time Hand Detection',
+                        description: 'Detect Alif (ا) sign using your camera in real-time.',
+                        icon: Icons.back_hand,
+                        gradient: LinearGradient(
+                          colors: [Colors.deepPurple, Colors.purpleAccent],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AlifDetectionPage(),
                             ),
                           );
                         },

@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
-import 'pages/alif_detection_page.dart';
+import 'pages/hand_detection_screen.dart'; // ✅ NEW: Real-time hand detection
 
 // Firebase imports
 
@@ -101,7 +101,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/alif-detection': (context) => const AlifDetectionPage(),
+        '/hand-detection': (context) => const HandDetectionScreen(), // ✅ NEW ROUTE
       },
     );
   }
@@ -679,14 +679,14 @@ class WelcomeScreen extends StatelessWidget {
                             _buildQuickAccessButton(
                               context,
                               icon: Icons.back_hand,
-                              label: 'Hand Detection',
-                              route: '/alif-detection',
+                              label: 'Alif Detection',
+                              route: '/hand-detection', // ✅ UPDATED
                             ),
                             const SizedBox(width: 12),
                             _buildQuickAccessButton(
                               context,
                               icon: Icons.home,
-                              label: 'Home (Test)',
+                              label: 'Home',
                               route: '/home',
                            ),
                           ],
@@ -711,7 +711,7 @@ class WelcomeScreen extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushReplacementNamed(context, route);
+        Navigator.pushNamed(context, route);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(
