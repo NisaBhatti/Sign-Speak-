@@ -56,7 +56,7 @@ class _AlphabetsPageState extends State<AlphabetsPage> {
     {'letter': 'ب', 'image': 'assets/images/sign_bay.png', 'description': 'Bay - Dot below sign'},
     {'letter': 'پ', 'image': 'assets/images/sign_pay.png', 'description': 'Pay - Three dots sign'},
     {'letter': 'ت', 'image': 'assets/images/sign_tay.png', 'description': 'Tay - Two dots sign'},
-    {'letter': 'ٹ', 'image': 'assets/images/sign_tay_urdu.png', 'description': 'Tay Urdu - Unique sign'},
+    {'letter': 'ٹ', 'image': 'assets/images/sign_taay_urdu.png', 'description': 'Tay Urdu - Unique sign'},
     {'letter': 'ث', 'image': 'assets/images/sign_say.png', 'description': 'Say - Three dots sign'},
     {'letter': 'ج', 'image': 'assets/images/sign_jeem.png', 'description': 'Jeem - Curved sign'},
     {'letter': 'چ', 'image': 'assets/images/sign_chey.png', 'description': 'Chey - Three dots sign'},

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
-import 'drawer_page.dart';
-import 'alif_detection_page.dart'; // ✅ Changed to Alif Detection Page
+import 'favourite_signs.dart';   // 👈 SIRF YEH IMPORT ADD HUA HAI
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -146,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 3. Favourite Signs
+                      // 3. Favourite Signs - SIRF ISME CHANGE HUA HAI
                       _buildFeatureCard(
                         title: 'Favourite Signs',
                         subtitle: 'Your saved signs',
@@ -158,16 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          if (isGuest) {
-                            _showGuestDialog();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Favorites feature coming soon!'),
-                                backgroundColor: Color.fromARGB(255, 0, 94, 255),
-                              ),
-                            );
-                          }
+                          // 👇 DIRECT FAVOURITE PAGE OPEN HOGA
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FavouriteSignsPage(),
+                            ),
+                          );
                         },
                       ),
                       // Removed the extra SizedBox at the bottom
@@ -247,33 +243,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showGuestDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Guest Mode'),
-          ],
-        ),
-        content: const Text('Sign in to save your favourite signs and access them across devices!'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: marineBlue),
-            child: const Text('Sign In'),
-          ),
-        ],
       ),
     );
   }
