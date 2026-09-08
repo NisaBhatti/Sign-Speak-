@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:image/image.dart' as img;
 import '../services/hand_detection_service.dart';
 
 class AlifDetectionPage extends StatefulWidget {

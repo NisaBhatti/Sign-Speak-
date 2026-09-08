@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
-<<<<<<< HEAD
-import 'favourite_signs.dart';   // 👈 SIRF YEH IMPORT ADD HUA HAI
-=======
 import 'drawer_page.dart';
-import 'alif_detection_page.dart'; // ✅ Changed to Alif Detection Page
->>>>>>> 35e970310cb11d666f04aaeee5c1d9fd66ccb810
+import 'alif_detection_page.dart';
+import 'favourite_signs.dart';   // 👈 YEH IMPORT ADD KIYA
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Welcome text
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12), // Reduced bottom padding
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
                 child: Text(
                   'What would you like to do today?',
                   style: TextStyle(
@@ -86,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Feature cards
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20), // Removed vertical padding
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
                       // 1. Real-Time Translation
@@ -110,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 2. Alif Detection (NEW)
+                      // 2. Alif Detection
                       _buildFeatureCard(
                         title: '🔍 Alif Detection',
                         subtitle: 'Real-time Hand Detection',
@@ -131,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 2. Dictionary
+                      // 3. Dictionary
                       _buildFeatureCard(
                         title: 'Sign Book',
                         subtitle: 'Browse 500+ signs',
@@ -150,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 3. Favourite Signs - SIRF ISME CHANGE HUA HAI
+                      // 4. Favourite Signs
                       _buildFeatureCard(
                         title: 'Favourite Signs',
                         subtitle: 'Your saved signs',
@@ -162,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          // 👇 DIRECT FAVOURITE PAGE OPEN HOGA
+                          // 👇 CLASS NAME FIXED - FavouriteSignsPage
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -171,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                      // Removed the extra SizedBox at the bottom
                     ],
                   ),
                 ),
