@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -9,7 +8,6 @@ class FavouriteService {
 
   List<Map<String, dynamic>> _favourites = [];
 
-  // Load favourites from SharedPreferences
   Future<void> loadFavourites() async {
     final prefs = await SharedPreferences.getInstance();
     final String? favouritesJson = prefs.getString('favourites');
@@ -19,14 +17,12 @@ class FavouriteService {
     }
   }
 
-  // Save favourites to SharedPreferences
   Future<void> _saveFavourites() async {
     final prefs = await SharedPreferences.getInstance();
     final String encoded = json.encode(_favourites);
     await prefs.setString('favourites', encoded);
   }
 
-  // Add to favourites
   Future<void> addFavourite(Map<String, dynamic> sign) async {
     final exists = _favourites.any((item) => item['name'] == sign['name']);
     if (!exists) {
@@ -35,21 +31,17 @@ class FavouriteService {
     }
   }
 
-  // Remove from favourites
   Future<void> removeFavourite(String signName) async {
     _favourites.removeWhere((item) => item['name'] == signName);
     await _saveFavourites();
   }
 
-  // Check if sign is favourite
   bool isFavourite(String signName) {
     return _favourites.any((item) => item['name'] == signName);
   }
 
-  // Get all favourites
   List<Map<String, dynamic>> get favourites => _favourites;
 
-  // Toggle favourite
   Future<void> toggleFavourite(Map<String, dynamic> sign) async {
     if (isFavourite(sign['name'])) {
       await removeFavourite(sign['name']);
@@ -58,7 +50,6 @@ class FavouriteService {
     }
   }
 
-  // Clear all favourites
   Future<void> clearAllFavourites() async {
     _favourites.clear();
     await _saveFavourites();

@@ -192,23 +192,12 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey.shade200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image_not_supported,
-                                size: 40,
-                                color: Colors.grey.shade400,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'No Image',
-                                style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
                           ),
                         );
                       },
@@ -232,7 +221,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         icon: const Icon(
                           Icons.favorite,
                           color: Colors.red,
-                          size: 22,
+                          size: 20,
                         ),
                         onPressed: () async {
                           await _favouriteService.removeFavourite(sign['name']);
@@ -318,7 +307,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
@@ -340,7 +329,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               Text(
                 sign['name'],
                 style: TextStyle(
@@ -350,7 +339,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
@@ -367,7 +356,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -384,7 +373,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
