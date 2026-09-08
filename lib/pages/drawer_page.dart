@@ -24,7 +24,7 @@ class DrawerPage extends StatelessWidget {
           Navigator.pop(context); // Close when tapping outside
         },
         child: Container(
-          color: Colors.black.withOpacity(0.4), // Semi-transparent overlay
+          color: Colors.black.withValues(alpha: 0.4), // Semi-transparent overlay
           child: Align(
             alignment: Alignment.centerLeft,
             child: GestureDetector(
@@ -124,8 +124,8 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  drawerDarkBlue.withOpacity(0.9),
-                  drawerColor4.withOpacity(0.9),
+                  drawerDarkBlue.withValues(alpha: 0.9),
+                  drawerColor4.withValues(alpha: 0.9),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -293,7 +293,7 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: drawerDarkBlue.withOpacity(0.2),
+                  color: drawerDarkBlue.withValues(alpha: 0.2),
                   width: 0.5,
                 ),
               ),
@@ -303,7 +303,7 @@ class CustomDrawer extends StatelessWidget {
                 Text(
                   'Version 1.0.0',
                   style: TextStyle(
-                    color: drawerDarkBlue.withOpacity(0.6),
+                    color: drawerDarkBlue.withValues(alpha: 0.6),
                     fontSize: 12,
                   ),
                   textAlign: TextAlign.center,
@@ -312,7 +312,7 @@ class CustomDrawer extends StatelessWidget {
                 Text(
                   '© 2024 Signs Speak',
                   style: TextStyle(
-                    color: drawerDarkBlue.withOpacity(0.5),
+                    color: drawerDarkBlue.withValues(alpha: 0.5),
                     fontSize: 10,
                   ),
                   textAlign: TextAlign.center,
@@ -347,8 +347,8 @@ class CustomDrawer extends StatelessWidget {
         ),
       ),
       onTap: onTap,
-      hoverColor: drawerColor4.withOpacity(0.1),
-      splashColor: drawerColor4.withOpacity(0.2),
+      hoverColor: drawerColor4.withValues(alpha: 0.1),
+      splashColor: drawerColor4.withValues(alpha: 0.2),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
     );
   }
@@ -528,7 +528,7 @@ void showCustomDrawer(BuildContext context) {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Close drawer',
-    barrierColor: Colors.black.withOpacity(0.3),
+    barrierColor: Colors.black.withValues(alpha: 0.3),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (context, animation, secondaryAnimation) {
       return SlideTransition(

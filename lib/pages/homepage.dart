@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -63,37 +63,36 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Signs Speak',
                       style: TextStyle(color: lightBlue, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 48), // symmetry
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
               // Welcome text
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12), // Reduced bottom padding
                 child: Text(
                   'What would you like to do today?',
                   style: TextStyle(
-                    color: marineBlue.withOpacity(0.7),
+                    color: marineBlue.withValues(alpha: 0.7),
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              // Feature cards – now scrollable
+              // Feature cards
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20), // Removed vertical padding
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
                       // 1. Real-Time Translation
                       _buildFeatureCard(
-                        title: 'Real-Time Translation',
+                        title: 'Real Translation',
                         subtitle: 'Live camera detection',
                         description: 'Recognise signs instantly with your camera.',
                         icon: Icons.videocam_outlined,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -128,14 +127,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // 3. Fav Signs
+                      // 2. Dictionary
                       _buildFeatureCard(
-                        title: 'Fav Signs',
+                        title: 'Sign Book',
+                        subtitle: 'Browse 500+ signs',
+                        description: 'Search the complete dictionary.',
+                        icon: Icons.book,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const DictionaryPage()),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // 3. Favourite Signs
+                      _buildFeatureCard(
+                        title: 'Favourite Signs',
                         subtitle: 'Your saved signs',
                         description: 'Quick access to favourite signs.',
                         icon: Icons.favorite_border,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withOpacity(0.9), lightBlue],
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -152,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                       ),
-                      const SizedBox(height: 20),
+                      // Removed the extra SizedBox at the bottom
                     ],
                   ),
                 ),
@@ -181,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.15),
+              color: marineBlue.withValues(alpha: 0.15),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -195,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: Colors.white, size: 28),
@@ -210,10 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text(subtitle,
-                        style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12)),
                     const SizedBox(height: 2),
                     Text(description,
-                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
                   ],
                 ),
               ),
@@ -221,10 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.arrow_forward, color: Colors.white.withOpacity(0.8), size: 18),
+                child: Icon(Icons.arrow_forward, color: Colors.white.withValues(alpha: 0.8), size: 18),
               ),
             ],
           ),

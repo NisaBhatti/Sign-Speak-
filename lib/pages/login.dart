@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: darkBlue.withOpacity(0.4),
+                                color: darkBlue.withValues(alpha: 0.4),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -457,7 +457,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
+            color: lightBlue.withValues(alpha: 0.5),
             fontSize: 16,
           ),
           filled: true,
@@ -465,14 +465,14 @@ class _LoginScreenState extends State<LoginScreen> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.3),
+              color: lightBlue.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.3),
+              color: lightBlue.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -529,7 +529,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: lightBlue.withOpacity(0.5),
+            color: lightBlue.withValues(alpha: 0.5),
             fontSize: 16,
           ),
           filled: true,
@@ -537,14 +537,14 @@ class _LoginScreenState extends State<LoginScreen> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.3),
+              color: lightBlue.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(
-              color: lightBlue.withOpacity(0.3),
+              color: lightBlue.withValues(alpha: 0.3),
               width: 1,
             ),
           ),

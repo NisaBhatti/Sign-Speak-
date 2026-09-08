@@ -191,14 +191,14 @@ Violations may result in:
                   Text(
                     'All documents are version controlled',
                     style: TextStyle(
-                      color: marineBlue.withOpacity(0.6),
+                      color: marineBlue.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Current version: 1.0',
                     style: TextStyle(
-                      color: marineBlue.withOpacity(0.4),
+                      color: marineBlue.withValues(alpha: 0.4),
                       fontSize: 12,
                     ),
                   ),
@@ -219,7 +219,7 @@ Violations may result in:
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: marineBlue.withOpacity(0.7),
+          color: marineBlue.withValues(alpha: 0.7),
           letterSpacing: 1.0,
         ),
       ),
@@ -243,7 +243,7 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, color1.withOpacity(0.3)],
+            colors: [Colors.white, color1.withValues(alpha: 0.3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -262,7 +262,7 @@ Violations may result in:
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: marineBlue.withOpacity(0.2),
+                  color: marineBlue.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -285,7 +285,7 @@ Violations may result in:
               Text(
                 subtitle, 
                 style: TextStyle(
-                  color: lightBlue.withOpacity(0.8),
+                  color: lightBlue.withValues(alpha: 0.8),
                   fontSize: 13,
                 ),
               ),
@@ -294,7 +294,7 @@ Violations may result in:
                 'Updated: $lastUpdated',
                 style: TextStyle(
                   fontSize: 11,
-                  color: marineBlue.withOpacity(0.5),
+                  color: marineBlue.withValues(alpha: 0.5),
                 ),
               ),
             ],
@@ -303,7 +303,7 @@ Violations may result in:
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: lightBlue.withOpacity(0.1),
+              color: lightBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -346,7 +346,7 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, color1.withOpacity(0.3)],
+            colors: [Colors.white, color1.withValues(alpha: 0.3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -365,7 +365,7 @@ Violations may result in:
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: marineBlue.withOpacity(0.2),
+                  color: marineBlue.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -384,7 +384,7 @@ Violations may result in:
           subtitle: Text(
             subtitle,
             style: TextStyle(
-              color: lightBlue.withOpacity(0.8),
+              color: lightBlue.withValues(alpha: 0.8),
               fontSize: 13,
             ),
           ),
@@ -392,7 +392,7 @@ Violations may result in:
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: lightBlue.withOpacity(0.1),
+              color: lightBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -460,7 +460,7 @@ Violations may result in:
                 const SizedBox(width: 12),
                 Text(
                   'signsspeak@app.com',
-                  style: TextStyle(color: marineBlue.withOpacity(0.8)),
+                  style: TextStyle(color: marineBlue.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -471,7 +471,7 @@ Violations may result in:
                 const SizedBox(width: 12),
                 Text(
                   '+1-234-567-8900',
-                  style: TextStyle(color: marineBlue.withOpacity(0.8)),
+                  style: TextStyle(color: marineBlue.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -536,7 +536,7 @@ Violations may result in:
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: lightBlue.withOpacity(0.3),
+                  color: lightBlue.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -545,7 +545,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withOpacity(0.1),
+                    color: lightBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.share, color: marineBlue),
@@ -564,7 +564,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withOpacity(0.1),
+                    color: lightBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.print, color: marineBlue),
@@ -583,7 +583,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withOpacity(0.1),
+                    color: lightBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.download, color: marineBlue),
@@ -618,7 +618,7 @@ Violations may result in:
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: lightBlue.withOpacity(0.3),
+                color: lightBlue.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -635,7 +635,7 @@ Violations may result in:
           Text(
             'Manage your privacy preferences and consents.',
             style: TextStyle(
-              color: lightBlue.withOpacity(0.8),
+              color: lightBlue.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -734,7 +734,7 @@ Violations may result in:
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: lightBlue.withOpacity(0.7),
+                    color: lightBlue.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -745,9 +745,9 @@ Violations may result in:
             value: value,
             onChanged: (newValue) {},
             activeThumbColor: lightBlue,
-            activeTrackColor: lightBlue.withOpacity(0.3),
+            activeTrackColor: lightBlue.withValues(alpha: 0.3),
             inactiveThumbColor: marineBlue,
-            inactiveTrackColor: marineBlue.withOpacity(0.2),
+            inactiveTrackColor: marineBlue.withValues(alpha: 0.2),
           ),
         ],
       ),
@@ -810,7 +810,7 @@ Violations may result in:
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, color1.withOpacity(0.3)],
+            colors: [Colors.white, color1.withValues(alpha: 0.3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -824,7 +824,7 @@ Violations may result in:
               gradient: LinearGradient(
                 colors: accepted 
                     ? [lightBlue, marineBlue] 
-                    : [marineBlue.withOpacity(0.5), lightBlue.withOpacity(0.3)],
+                    : [marineBlue.withValues(alpha: 0.5), lightBlue.withValues(alpha: 0.3)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -845,7 +845,7 @@ Violations may result in:
           subtitle: Text(
             'Accepted on $date',
             style: TextStyle(
-              color: lightBlue.withOpacity(0.8),
+              color: lightBlue.withValues(alpha: 0.8),
             ),
           ),
           trailing: Container(
@@ -854,7 +854,7 @@ Violations may result in:
               gradient: LinearGradient(
                 colors: accepted 
                     ? [lightBlue, marineBlue] 
-                    : [marineBlue.withOpacity(0.3), lightBlue.withOpacity(0.2)],
+                    : [marineBlue.withValues(alpha: 0.3), lightBlue.withValues(alpha: 0.2)],
               ),
               borderRadius: BorderRadius.circular(20),
             ),
@@ -959,10 +959,10 @@ class PolicyDocumentViewer extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Column(
@@ -983,7 +983,7 @@ class PolicyDocumentViewer extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: lightBlue.withOpacity(0.1),
+                        color: lightBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -1002,10 +1002,10 @@ class PolicyDocumentViewer extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
                 child: Text(
@@ -1031,7 +1031,7 @@ class PolicyDocumentViewer extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: marineBlue.withOpacity(0.3),
+                      color: marineBlue.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 8),
                     ),

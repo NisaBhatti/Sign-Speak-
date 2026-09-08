@@ -243,7 +243,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -372,7 +372,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: darkBlue.withOpacity(0.3),
+                                color: darkBlue.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -454,7 +454,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -469,7 +469,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           labelStyle: TextStyle(color: lightBlue, fontSize: 14),
           floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(color: lightBlue.withOpacity(0.5), fontSize: 14),
+          hintStyle: TextStyle(color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
@@ -478,7 +478,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.5), width: 1),
+            borderSide: BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -503,7 +503,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -518,7 +518,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           labelStyle: TextStyle(color: lightBlue, fontSize: 14),
           floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(color: lightBlue.withOpacity(0.5), fontSize: 14),
+          hintStyle: TextStyle(color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
@@ -527,7 +527,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withOpacity(0.5), width: 1),
+            borderSide: BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

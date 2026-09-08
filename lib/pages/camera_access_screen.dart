@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'live_camera.dart';
+import 'live_camera.dart'; // Make sure this import matches your live camera file name
 
 class CameraAccessScreen extends StatefulWidget {
   const CameraAccessScreen({super.key});
@@ -9,27 +9,11 @@ class CameraAccessScreen extends StatefulWidget {
 }
 
 class _CameraAccessScreenState extends State<CameraAccessScreen> {
-  // Updated color palette from file
-  static const Color color1 = Color(0xFFCFE8EA);   // #cfe8ea - Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // #acd9d9 - Light teal
-  static const Color darkBlue = Color.fromARGB(255, 25, 19, 132); // Dark Blue
-
-  void _handleAllowAccess() {
-    // Handle camera permission logic
-    debugPrint('Camera access allowed');
-    // Navigate to camera screen or home screen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LiveCameraPage()),
-    );
-  }
-
-  void _handleMaybeLater() {
-    // Handle later option
-    debugPrint('Camera access postponed');
-    // Navigate back or to home screen without camera access
-    Navigator.pop(context);
-  }
+  // Colors matching the home page
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   Widget build(BuildContext context) {
@@ -39,161 +23,187 @@ class _CameraAccessScreenState extends State<CameraAccessScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              color1, // Light blue-green at top
-              color2, // Light teal at bottom
-            ],
+            colors: [color1, color2],
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo/Icon - CIRCULAR
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        darkBlue,
-                        darkBlue, // Dark Blue
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(60), // CIRCULAR
-                    boxShadow: [
-                      BoxShadow(
-                        color: darkBlue.withOpacity(0.3), // Dark Blue shadow
-                        blurRadius: 20,
-                        offset: Offset(0, 10),
-                      ),
-                    ],
-                    border: Border.all(
-                      color: darkBlue, // Dark Blue border
-                      width: 2,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.white, // White icon
-                    size: 50,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Title
-                Text(
-                  'Camera Access',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color.fromARGB(255, 8, 4, 84), // Dark Blue text
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Description
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Our app needs access to your camera to translate sign language in real-time. We will never record or store any video.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 0, 109, 176), // marine text
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-
-                // Buttons
-                Column(
+          child: Column(
+            children: [
+              // App bar with back button
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Allow Access Button
                     Container(
-                      width: double.infinity,
-                      height: 56,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 8, 4, 84), // White background
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: darkBlue.withOpacity(0.4), // Dark Blue shadow
-                            blurRadius: 15,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: darkBlue.withOpacity(0.3), // Subtle border
-                          width: 1.5,
-                        ),
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: ElevatedButton(
-                        onPressed: _handleAllowAccess,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'Allow Access',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 255, 255, 255), // Dark Blue text
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.015,
-                          ),
-                        ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // Maybe Later Button
-                    Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 8, 4, 84), // White background
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: darkBlue.withOpacity(0.5), // Dark Blue border
-                          width: 2,
-                        ),
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _handleMaybeLater,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'Maybe Later',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 255, 255, 255), // Dark Blue text
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.015,
-                          ),
-                        ),
-                      ),
+                    Text(
+                      'Real-Time Translation',
+                      style: TextStyle(color: lightBlue, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(width: 48),
                   ],
                 ),
-              ],
+              ),
+              // Welcome text
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+                child: Text(
+                  'Choose translation mode',
+                  style: TextStyle(
+                    color: marineBlue.withValues(alpha: 0.7),
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Feature cards
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    children: [
+                      // 1. Alphabet Translation - Goes to Live Camera
+                      _buildFeatureCard(
+                        title: 'Alphabet',
+                        subtitle: 'English & Urdu Signs detection',
+                        description: 'Recognise individual letters in real-time.',
+                        icon: Icons.abc,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LiveCameraPage(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      // 2. Word Translation - Coming Soon
+                      _buildFeatureCard(
+                        title: 'Word',
+                        subtitle: 'Learn Common Words',
+                        description: 'Explore common sign language words.',
+                        icon: Icons.menu_book,
+                        gradient: LinearGradient(
+                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Word translation feature coming soon!'),
+                              backgroundColor: Color.fromARGB(255, 0, 94, 255),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard({
+    required String title,
+    required String subtitle,
+    required String description,
+    required IconData icon,
+    required Gradient gradient,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 150,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: marineBlue.withValues(alpha: 0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
             ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(icon, color: Colors.white, size: 32),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(title,
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold
+                        )),
+                    const SizedBox(height: 4), // Reduced from 6 to 4
+                    Text(subtitle,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.85), 
+                          fontSize: 12, // Reduced from 14 to 12
+                          fontWeight: FontWeight.w500,
+                        )),
+                    const SizedBox(height: 2), // Reduced from 4 to 2
+                    Text(description,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7), 
+                          fontSize: 10, // Reduced from 12 to 10
+                        )),
+                  ],
+                ),
+              ),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.arrow_forward, 
+                  color: Colors.white.withValues(alpha: 0.8), 
+                  size: 20
+                ),
+              ),
+            ],
           ),
         ),
       ),

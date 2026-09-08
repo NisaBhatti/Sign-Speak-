@@ -160,7 +160,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: darkBlue.withOpacity(0.1),
+                      color: darkBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
@@ -176,7 +176,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: darkBlue.withOpacity(0.1),
+                    color: darkBlue.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.security, size: 40, color: darkBlue),
@@ -195,7 +195,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 Text.rich(
                   TextSpan(
                     text: 'We\'ve sent a 6-digit code to\n',
-                    style: TextStyle(fontSize: 16, color: darkBlue.withOpacity(0.7)),
+                    style: TextStyle(fontSize: 16, color: darkBlue.withValues(alpha: 0.7)),
                     children: [
                       TextSpan(
                         text: widget.email,
@@ -228,7 +228,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: darkBlue.withOpacity(0.3)),
+                            borderSide: BorderSide(color: darkBlue.withValues(alpha: 0.3)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -259,7 +259,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                     if (!_canResend)
                       Text(
                         'Resend code in ${_timerSeconds}s',
-                        style: TextStyle(color: darkBlue.withOpacity(0.7), fontSize: 14),
+                        style: TextStyle(color: darkBlue.withValues(alpha: 0.7), fontSize: 14),
                       )
                     else
                       TextButton(

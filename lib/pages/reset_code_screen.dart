@@ -107,7 +107,7 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
                   alignment: Alignment.centerLeft,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: darkBlue.withOpacity(0.1),
+                      color: darkBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
@@ -132,7 +132,7 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
                 
                 Text(
                   'Paste the code from your email\nSent to: ${widget.email}',
-                  style: TextStyle(fontSize: 16, color: darkBlue.withOpacity(0.7)),
+                  style: TextStyle(fontSize: 16, color: darkBlue.withValues(alpha: 0.7)),
                   textAlign: TextAlign.center,
                 ),
                 
@@ -148,7 +148,7 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: darkBlue.withOpacity(0.3)),
+                      borderSide: BorderSide(color: darkBlue.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -163,7 +163,7 @@ class _ResetCodeScreenState extends State<ResetCodeScreen> {
                 
                 Text(
                   'Tip: In the email link, find "oobCode=" and copy the code after it',
-                  style: TextStyle(fontSize: 12, color: darkBlue.withOpacity(0.5)),
+                  style: TextStyle(fontSize: 12, color: darkBlue.withValues(alpha: 0.5)),
                   textAlign: TextAlign.center,
                 ),
                 

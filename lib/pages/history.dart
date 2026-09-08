@@ -114,7 +114,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: color1.withOpacity(0.8),
+                color: color1.withValues(alpha: 0.8),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
@@ -161,11 +161,11 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
                 height: 48,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: lightBlue.withOpacity(0.3)), 
-                  color: Colors.white.withOpacity(0.7),
+                  border: Border.all(color: lightBlue.withValues(alpha: 0.3)), 
+                  color: Colors.white.withValues(alpha: 0.7),
                   boxShadow: [
                     BoxShadow(
-                      color: marineBlue.withOpacity(0.1),
+                      color: marineBlue.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -200,7 +200,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
                         decoration: InputDecoration(
                           hintText: 'Search your translations...',
                           hintStyle: TextStyle(
-                            color: lightBlue.withOpacity(0.5),
+                            color: lightBlue.withValues(alpha: 0.5),
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
                           ),
@@ -243,14 +243,14 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.white, color1.withOpacity(0.5)],
+          colors: [Colors.white, color1.withValues(alpha: 0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withOpacity(0.1),
+            color: marineBlue.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -301,7 +301,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
                 height: 40,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [lightBlue.withOpacity(0.1), marineBlue.withOpacity(0.1)],
+                    colors: [lightBlue.withValues(alpha: 0.1), marineBlue.withValues(alpha: 0.1)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -323,7 +323,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
                 height: 40,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [lightBlue.withOpacity(0.1), marineBlue.withOpacity(0.1)],
+                    colors: [lightBlue.withValues(alpha: 0.1), marineBlue.withValues(alpha: 0.1)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -370,7 +370,7 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: marineBlue.withOpacity(0.2),
+                  color: marineBlue.withValues(alpha: 0.2),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
