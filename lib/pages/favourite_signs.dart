@@ -1,138 +1,25 @@
 import 'package:flutter/material.dart';
+import '../services/favourite_service.dart';
 
-class WordsPage extends StatefulWidget {
-  const WordsPage({super.key});
+class FavouriteSignsPage extends StatefulWidget {
+  const FavouriteSignsPage({super.key});
 
   @override
-  State<WordsPage> createState() => _WordsPageState();
+  State<FavouriteSignsPage> createState() => _FavouriteSignsPageState();
 }
 
-class _WordsPageState extends State<WordsPage> {
-  // Colors matching your app
+class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
-  // Search query
-  String _searchQuery = '';
+  final FavouriteService _favouriteService = FavouriteService();
 
-  // Common Signs List with Images
-  final List<Map<String, dynamic>> _signs = [
-    {
-      'name': 'Hello',
-      'image': 'assets/images/sign_hello.png',
-      'category': 'Greetings',
-      'description': 'Wave your hand near your head',
-    },
-    {
-      'name': 'Thank You',
-      'image': 'assets/images/sign_thankyou.png',
-      'category': 'Greetings',
-      'description': 'Touch your chin with fingertips and move forward',
-    },
-    {
-      'name': 'Sorry',
-      'image': 'assets/images/sign_sorry.png',
-      'category': 'Emotions',
-      'description': 'Make a fist and circle over your chest',
-    },
-    {
-      'name': 'Yes',
-      'image': 'assets/images/sign_yes.png',
-      'category': 'Basic',
-      'description': 'Make a fist and nod your head up and down',
-    },
-    {
-      'name': 'No',
-      'image': 'assets/images/sign_no.png',
-      'category': 'Basic',
-      'description': 'Shake your head or tap index and middle fingers',
-    },
-    {
-      'name': 'Help',
-      'image': 'assets/images/sign_help.png',
-      'category': 'Emergency',
-      'description': 'Place one hand on top of the other and lift up',
-    },
-    {
-      'name': 'Please',
-      'image': 'assets/images/sign_please.png',
-      'category': 'Basic',
-      'description': 'Rub your chest in a circular motion',
-    },
-    {
-      'name': 'Good Morning',
-      'image': 'assets/images/sign_goodmorning.png',
-      'category': 'Greetings',
-      'description': 'Place hand on chest and move outward',
-    },
-    {
-      'name': 'Good Night',
-      'image': 'assets/images/sign_goodnight.png',
-      'category': 'Greetings',
-      'description': 'Place hand on chin and move downward',
-    },
-    {
-      'name': 'Friend',
-      'image': 'assets/images/sign_friend.png',
-      'category': 'Relationships',
-      'description': 'Interlock index fingers and twist',
-    },
-    {
-      'name': 'Family',
-      'image': 'assets/images/sign_family.png',
-      'category': 'Relationships',
-      'description': 'Circle both hands in front of chest',
-    },
-    {
-      'name': 'Eat',
-      'image': 'assets/images/sign_eat.png',
-      'category': 'Basic',
-      'description': 'Tap fingers to mouth',
-    },
-    {
-      'name': 'Drink',
-      'image': 'assets/images/sign_drink.png',
-      'category': 'Basic',
-      'description': 'Make C shape and tilt toward mouth',
-    },
-    {
-      'name': 'Happy',
-      'image': 'assets/images/sign_happy.png',
-      'category': 'Emotions',
-      'description': 'Pat chest with flat hand',
-    },
-    {
-      'name': 'Sad',
-      'image': 'assets/images/sign_sad.png',
-      'category': 'Emotions',
-      'description': 'Draw a tear down your cheek',
-    },
-  ];
-
-  // Get unique categories for filter
-  List<String> get _categories {
-    final categories = _signs.map((sign) => sign['category'] as String).toList();
-    return categories.toSet().toList();
-  }
-
-  String _selectedCategory = 'All';
-
-  // Filtered signs based on search and category
-  List<Map<String, dynamic>> get _filteredSigns {
-    return _signs.where((sign) {
-      final matchesSearch = _searchQuery.isEmpty ||
-          sign['name']
-              .toString()
-              .toLowerCase()
-              .contains(_searchQuery.toLowerCase());
-      
-      final matchesCategory = _selectedCategory == 'All' ||
-          sign['category'] == _selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    _favouriteService.loadFavourites();
   }
 
   @override
@@ -170,120 +57,70 @@ class _WordsPageState extends State<WordsPage> {
                       ),
                     ),
                     Text(
-                      'Common Signs',
+                      'Favourite Signs',
                       style: TextStyle(
                         color: lightBlue,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 48),
+                    if (_favouriteService.favourites.isNotEmpty)
+                      IconButton(
+                        icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+                        onPressed: () {
+                          _showClearDialog();
+                        },
+                      ),
                   ],
                 ),
               ),
 
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search signs...',
-                      prefixIcon: Icon(Icons.search, color: lightBlue),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Category Filter
-              Container(
-                height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _categories.length + 1,
-                  itemBuilder: (context, index) {
-                    final category = index == 0 ? 'All' : _categories[index - 1];
-                    final isSelected = _selectedCategory == category;
-                    
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : marineBlue,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedCategory = category;
-                          });
-                        },
-                        backgroundColor: Colors.white.withOpacity(0.7),
-                        selectedColor: lightBlue,
-                        side: BorderSide(
-                          color: isSelected ? lightBlue : Colors.transparent,
-                          width: 1,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              // Signs Grid
+              // Content
               Expanded(
-                child: _filteredSigns.isEmpty
+                child: _favouriteService.favourites.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.search_off,
-                              size: 64,
+                              Icons.favorite_border,
+                              size: 80,
                               color: Colors.grey.shade400,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No signs found',
+                              'No Favourite Signs',
                               style: TextStyle(
-                                color: Colors.grey.shade500,
-                                fontSize: 18,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Try adjusting your search',
+                              'Go to Dictionary and tap ❤️ to add signs',
                               style: TextStyle(
-                                color: Colors.grey.shade400,
                                 fontSize: 14,
+                                color: Colors.grey.shade500,
                               ),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: lightBlue,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Go to Dictionary'),
                             ),
                           ],
                         ),
@@ -293,14 +130,14 @@ class _WordsPageState extends State<WordsPage> {
                         child: GridView.builder(
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.85,
+                            childAspectRatio: 0.8,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
                           ),
-                          itemCount: _filteredSigns.length,
+                          itemCount: _favouriteService.favourites.length,
                           itemBuilder: (context, index) {
-                            final sign = _filteredSigns[index];
-                            return _buildSignCard(sign);
+                            final sign = _favouriteService.favourites[index];
+                            return _buildFavouriteCard(sign);
                           },
                         ),
                       ),
@@ -312,7 +149,7 @@ class _WordsPageState extends State<WordsPage> {
     );
   }
 
-  Widget _buildSignCard(Map<String, dynamic> sign) {
+  Widget _buildFavouriteCard(Map<String, dynamic> sign) {
     return GestureDetector(
       onTap: () {
         _showSignDetail(sign);
@@ -332,17 +169,93 @@ class _WordsPageState extends State<WordsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sign Image
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
+            Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
-                child: _buildImage(sign['image']),
+                color: Colors.grey.shade100,
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: Image.asset(
+                      sign['image'],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 120,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 40,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'No Image',
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 22,
+                        ),
+                        onPressed: () async {
+                          await _favouriteService.removeFavourite(sign['name']);
+                          setState(() {});
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Removed from favourites'),
+                              duration: Duration(seconds: 1),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        },
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                          minWidth: 36,
+                          minHeight: 36,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            // Sign Info
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -383,38 +296,6 @@ class _WordsPageState extends State<WordsPage> {
     );
   }
 
-  Widget _buildImage(String imagePath) {
-    return Image.asset(
-      imagePath,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      errorBuilder: (context, error, stackTrace) {
-        // Agar image load na ho toh placeholder
-        return Container(
-          color: Colors.grey.shade100,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.image_not_supported,
-                size: 40,
-                color: Colors.grey.shade400,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'No Image',
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   void _showSignDetail(Map<String, dynamic> sign) {
     showModalBottomSheet(
       context: context,
@@ -428,7 +309,6 @@ class _WordsPageState extends State<WordsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Handle bar
               Container(
                 width: 40,
                 height: 4,
@@ -439,17 +319,16 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Sign Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   sign['image'],
-                  height: 150,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      height: 150,
+                      height: 180,
                       color: Colors.grey.shade200,
                       child: const Icon(
                         Icons.image_not_supported,
@@ -462,7 +341,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Sign Name
               Text(
                 sign['name'],
                 style: TextStyle(
@@ -473,7 +351,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 8),
               
-              // Category
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
@@ -491,7 +368,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 16),
               
-              // Description
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -509,7 +385,6 @@ class _WordsPageState extends State<WordsPage> {
               ),
               const SizedBox(height: 20),
               
-              // Close Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -528,6 +403,48 @@ class _WordsPageState extends State<WordsPage> {
               const SizedBox(height: 8),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showClearDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            'Clear Favourites',
+            style: TextStyle(color: marineBlue),
+          ),
+          content: Text(
+            'Are you sure you want to remove all favourite signs?',
+            style: TextStyle(color: Colors.grey.shade700),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: TextStyle(color: marineBlue)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _favouriteService.clearAllFavourites();
+                setState(() {});
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All favourites cleared'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Clear All'),
+            ),
+          ],
         );
       },
     );
