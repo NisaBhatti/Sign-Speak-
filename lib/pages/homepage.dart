@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:signspeak/pages/alif_detection_page.dart';
+import 'package:signspeak/pages/drawer_page.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
 import 'favourite_signs.dart';   // 👈 SIRF YEH IMPORT ADD HUA HAI
