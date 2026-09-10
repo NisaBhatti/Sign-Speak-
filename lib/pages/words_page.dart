@@ -251,6 +251,7 @@ class _WordsPageState extends State<WordsPage> {
       'description': 'Claw hand pulled from face',
     },
     {
+      
       'name': 'Hungry',
       'urdu': 'بھوکا',
       'image': 'assets/images/sign_hungry.png',
