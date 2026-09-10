@@ -23,6 +23,7 @@ class _WordsPageState extends State<WordsPage> {
 
   // Common Signs List with Urdu translations
   final List<Map<String, dynamic>> _signs = [
+    // ============ EXISTING SIGNS (15) ============
     {
       'name': 'Hello',
       'urdu': 'ہیلو',
@@ -127,6 +128,148 @@ class _WordsPageState extends State<WordsPage> {
       'image': 'assets/images/sign_sad.png',
       'category': 'Emotions',
       'description': 'Draw a tear down your cheek',
+    },
+
+    // ============ 20 NAYI SIGNS ADDED ============
+    {
+      'name': 'Mother',
+      'urdu': 'ماں',
+      'image': 'assets/images/sign_mother.png',
+      'category': 'Relationships',
+      'description': 'Touch thumb to chin with open hand',
+    },
+    {
+      'name': 'Father',
+      'urdu': 'والد',
+      'image': 'assets/images/sign_father.png',
+      'category': 'Relationships',
+      'description': 'Touch thumb to forehead with open hand',
+    },
+    {
+      'name': 'Brother',
+      'urdu': 'بھائی',
+      'image': 'assets/images/sign_brother.png',
+      'category': 'Relationships',
+      'description': 'Bring both hands together at forehead',
+    },
+    {
+      'name': 'Sister',
+      'urdu': 'بہن',
+      'image': 'assets/images/sign_sister.png',
+      'category': 'Relationships',
+      'description': 'Bring both hands together at chin',
+    },
+    {
+      'name': 'Water',
+      'urdu': 'پانی',
+      'image': 'assets/images/sign_water.png',
+      'category': 'Basic',
+      'description': 'Tap chin with W-shaped hand',
+    },
+    {
+      'name': 'Food',
+      'urdu': 'کھانا',
+      'image': 'assets/images/sign_food.png',
+      'category': 'Basic',
+      'description': 'Bring fingers to mouth repeatedly',
+    },
+    {
+      'name': 'Home',
+      'urdu': 'گھر',
+      'image': 'assets/images/sign_home.png',
+      'category': 'Places',
+      'description': 'Bring both hands to your chest',
+    },
+    {
+      'name': 'School',
+      'urdu': 'اسکول',
+      'image': 'assets/images/sign_school.png',
+      'category': 'Places',
+      'description': 'Clap hands together and separate',
+    },
+    {
+      'name': 'Hospital',
+      'urdu': 'ہسپتال',
+      'image': 'assets/images/sign_hospital.png',
+      'category': 'Places',
+      'description': 'Draw a cross on your upper arm',
+    },
+    {
+      'name': 'Teacher',
+      'urdu': 'استاد',
+      'image': 'assets/images/sign_teacher.png',
+      'category': 'Education',
+      'description': 'Touch forehead with fingertips and move outward',
+    },
+    {
+      'name': 'Student',
+      'urdu': 'طالب علم',
+      'image': 'assets/images/sign_student.png',
+      'category': 'Education',
+      'description': 'Flat hand on palm and move to forehead',
+    },
+    {
+      'name': 'Book',
+      'urdu': 'کتاب',
+      'image': 'assets/images/sign_book.png',
+      'category': 'Education',
+      'description': 'Palms together opening like a book',
+    },
+    {
+      'name': 'Time',
+      'urdu': 'وقت',
+      'image': 'assets/images/sign_time.png',
+      'category': 'Basic',
+      'description': 'Tap wrist with index finger',
+    },
+    {
+      'name': 'Today',
+      'urdu': 'آج',
+      'image': 'assets/images/sign_today.png',
+      'category': 'Basic',
+      'description': 'Bring both hands down in front of body',
+    },
+    {
+      'name': 'Tomorrow',
+      'urdu': 'کل',
+      'image': 'assets/images/sign_tomorrow.png',
+      'category': 'Basic',
+      'description': 'Thumb on cheek and move forward',
+    },
+    {
+      'name': 'Beautiful',
+      'urdu': 'خوبصورت',
+      'image': 'assets/images/sign_beautiful.png',
+      'category': 'Emotions',
+      'description': 'Circle hand around face',
+    },
+    {
+      'name': 'Angry',
+      'urdu': 'غصے میں',
+      'image': 'assets/images/sign_angry.png',
+      'category': 'Emotions',
+      'description': 'Claw hand pulled from face',
+    },
+    {
+      'name': 'Hungry',
+      'urdu': 'بھوکا',
+      'image': 'assets/images/sign_hungry.png',
+      'category': 'Basic',
+      'description': 'C-hand slides down chest',
+    },
+    {
+      'name': 'Thirsty',
+      'urdu': 'پیاسا',
+      'image': 'assets/images/sign_thirsty.png',
+      'category': 'Basic',
+      'description': 'Index finger slides down throat',
+    },
+    {
+      'name': 'Tired',
+      'urdu': 'تھکا ہوا',
+      'image': 'assets/images/sign_tired.png',
+      'category': 'Emotions',
+      'description': 'Fingertips on chest with drooping shoulders',
     },
   ];
 
@@ -465,7 +608,6 @@ class _WordsPageState extends State<WordsPage> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  // ❌ CATEGORY TAG REMOVED - ab nahi dikhega
                 ],
               ),
             ),
