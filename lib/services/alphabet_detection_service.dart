@@ -3,39 +3,91 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class AlphabetDetectionService {
-  static const String BASE_URL = 'http://192.168.1.62:5000';
-  static const String DETECT_URL = '$BASE_URL/detect';
-  static const String PING_URL = '$BASE_URL/ping';
-  static const String MODELS_URL = '$BASE_URL/models';
+  // ✅ Try these IPs in order
+  static const List<String> POSSIBLE_HOSTS = [
+    'http://192.168.100.7:5000',
+    'http://192.168.1.62:5000',
+    'http://192.168.1.100:5000',
+    'http://192.168.0.100:5000',
+    'http://10.0.0.100:5000',
+  ];
 
+  static String? _activeBaseUrl;
+  static const int PORT = 5000;
+
+  /// Find which host is reachable (call once at app start)
+  static Future<String?> findServer() async {
+    if (_activeBaseUrl != null) return _activeBaseUrl;
+
+    print('🔎 Searching for server...');
+
+    for (final host in POSSIBLE_HOSTS) {
+      try {
+        print('  Trying $host ...');
+        final r = await http
+            .get(Uri.parse('$host/ping'))
+            .timeout(const Duration(seconds: 2));
+        if (r.statusCode == 200) {
+          _activeBaseUrl = host;
+          print('✅ Found server at: $host');
+          return host;
+        }
+      } catch (_) {
+        // try next
+      }
+    }
+
+    print('❌ No server found on any host');
+    return null;
+  }
+
+  /// Force reset (e.g. on pull-to-refresh)
+  static void resetServer() {
+    _activeBaseUrl = null;
+  }
+
+  static String get _base => _activeBaseUrl ?? POSSIBLE_HOSTS[0];
+  static String get DETECT_URL => '$_base/detect';
+  static String get PING_URL => '$_base/ping';
+  static String get MODELS_URL => '$_base/models';
+
+  // ============================================
+  // PING SERVER
+  // ============================================
   static Future<Map<String, dynamic>> pingServer() async {
     try {
-      final response = await http.get(Uri.parse(PING_URL));
+      if (_activeBaseUrl == null) {
+        await findServer();
+      }
+      if (_activeBaseUrl == null) {
+        return {'connected': false, 'error': 'Server not found'};
+      }
+
+      final response = await http
+          .get(Uri.parse(PING_URL))
+          .timeout(const Duration(seconds: 3));
       return {'connected': response.statusCode == 200};
     } catch (e) {
+      print('❌ Ping error: $e');
       return {'connected': false, 'error': e.toString()};
     }
   }
 
-  static Future<List<AlphabetModel>> getAvailableModels() async {
-    try {
-      final response = await http.get(Uri.parse(MODELS_URL));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final List models = data['models'] ?? [];
-        return models.map((m) => AlphabetModel.fromJson(m)).toList();
-      }
-    } catch (e) {
-      print('Error getting models: $e');
-    }
-    return [];
-  }
-
+  // ============================================
+  // DETECT ALPHABET
+  // ============================================
   static Future<DetectionResult> detectAlphabet(
     Uint8List imageBytes, {
     required String alphabet,
   }) async {
     try {
+      if (_activeBaseUrl == null) {
+        await findServer();
+      }
+      if (_activeBaseUrl == null) {
+        return DetectionResult.error('Server not found');
+      }
+
       final base64Image = base64Encode(imageBytes);
 
       final response = await http
@@ -50,7 +102,7 @@ class AlphabetDetectionService {
           .timeout(
             const Duration(seconds: 3),
             onTimeout: () {
-              throw Exception('Connection timeout');
+              throw Exception('Timeout');
             },
           );
 
@@ -66,6 +118,9 @@ class AlphabetDetectionService {
   }
 }
 
+// ============================================
+// ALPHABET MODEL
+// ============================================
 class AlphabetModel {
   final String name;
   final String display;
@@ -86,6 +141,9 @@ class AlphabetModel {
   }
 }
 
+// ============================================
+// DETECTION RESULT
+// ============================================
 class DetectionResult {
   final bool hasHand;
   final bool isAlphabet;
@@ -110,7 +168,10 @@ class DetectionResult {
       hasHand: json['hasHand'] ?? false,
       isAlphabet: json['isAlphabet'] ?? false,
       confidence: (json['confidence'] ?? 0.0).toDouble(),
-      landmarks: (json['landmarks'] as List?)?.map((e) => (e as num).toDouble()).toList() ?? [],
+      landmarks: (json['landmarks'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
       alphabet: json['alphabet'] ?? '',
       display: json['display'] ?? '',
       message: json['message'] ?? '',

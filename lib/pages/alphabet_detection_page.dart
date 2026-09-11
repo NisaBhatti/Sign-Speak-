@@ -38,16 +38,20 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
   }
 
   Future<void> _initialize() async {
+    print('🔌 Checking server connection...');
     final status = await AlphabetDetectionService.pingServer();
     _isConnected = status['connected'] ?? false;
-    
+    print('🔌 Server connected: $_isConnected');
+
     setState(() {});
-    
+
     if (_isConnected) {
       await _initializeCamera();
     } else {
       setState(() {
-        _result = DetectionResult.error('Server not connected!');
+        _result = DetectionResult.error(
+          'Server not connected!\nMake sure Python server is running.',
+        );
       });
     }
   }
@@ -59,19 +63,20 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
         (camera) => camera.lensDirection == CameraLensDirection.front,
         orElse: () => cameras[0],
       );
-      
+
       _controller = CameraController(
         frontCamera,
         ResolutionPreset.medium,
         enableAudio: false,
       );
-      
+
       await _controller!.initialize();
-      
+
       if (mounted) {
         setState(() {});
         _controller!.startImageStream(_processCameraImage);
       }
+      print('✅ Camera initialized');
     } catch (e) {
       print('❌ Camera error: $e');
     }
@@ -81,16 +86,16 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
     try {
       final width = image.width;
       final height = image.height;
-      
+
       Uint8List rgbBytes = Uint8List(width * height * 3);
-      
+
       if (image.format.group == ImageFormatGroup.yuv420) {
         final yPlane = image.planes[0];
         final uPlane = image.planes[1];
         final vPlane = image.planes[2];
-        
+
         int rgbIndex = 0;
-        
+
         for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
             final yValue = yPlane.bytes[y * yPlane.bytesPerRow + x] & 0xFF;
@@ -98,30 +103,34 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
             final uvY = y ~/ 2;
             final uValue = uPlane.bytes[uvY * uPlane.bytesPerRow + uvX] & 0xFF;
             final vValue = vPlane.bytes[uvY * vPlane.bytesPerRow + uvX] & 0xFF;
-            
+
             int r = (yValue + 1.402 * (vValue - 128)).round();
-            int g = (yValue - 0.344 * (uValue - 128) - 0.714 * (vValue - 128)).round();
+            int g = (yValue -
+                    0.344 * (uValue - 128) -
+                    0.714 * (vValue - 128))
+                .round();
             int b = (yValue + 1.772 * (uValue - 128)).round();
-            
+
             rgbBytes[rgbIndex++] = r.clamp(0, 255).toInt();
             rgbBytes[rgbIndex++] = g.clamp(0, 255).toInt();
             rgbBytes[rgbIndex++] = b.clamp(0, 255).toInt();
           }
         }
-        
+
         final imgImage = img.Image.fromBytes(
           width: width,
           height: height,
           bytes: rgbBytes.buffer,
           numChannels: 3,
         );
-        
+
         final jpegBytes = img.encodeJpg(imgImage);
         return Uint8List.fromList(jpegBytes);
       }
-      
+
       return null;
     } catch (e) {
+      print('❌ Conversion error: $e');
       return null;
     }
   }
@@ -129,7 +138,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
   void _processCameraImage(CameraImage image) {
     if (_isProcessing || !_isConnected) return;
     _isProcessing = true;
-    
+
     _frameCount++;
     final now = DateTime.now();
     if (now.difference(_lastFpsUpdate) > const Duration(seconds: 1)) {
@@ -138,7 +147,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
       _lastFpsUpdate = now;
       if (mounted) setState(() {});
     }
-    
+
     _convertCameraImageToBytes(image).then((jpegBytes) async {
       if (jpegBytes != null && mounted) {
         try {
@@ -153,7 +162,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
             });
           }
         } catch (e) {
-          print('❌ Error: $e');
+          print('❌ Detection error: $e');
         }
       }
       _isProcessing = false;
@@ -166,7 +175,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
     if (_landmarks.isEmpty || !_result.hasHand) {
       return Container();
     }
-    
+
     return CustomPaint(
       painter: HandLandmarkPainter(
         landmarks: _landmarks,
@@ -191,8 +200,11 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text(widget.arabic, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 8),
+            Text(
+              widget.arabic,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 10),
             Text(widget.displayName),
           ],
         ),
@@ -206,9 +218,20 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
               color: _isConnected ? Colors.green : Colors.red,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              _isConnected ? '✅' : '❌',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _isConnected ? Icons.cloud_done : Icons.cloud_off,
+                  color: Colors.white,
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _isConnected ? 'Server' : 'Offline',
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ],
             ),
           ),
         ],
@@ -217,10 +240,9 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
         children: [
           if (_controller != null && _controller!.value.isInitialized)
             CameraPreview(_controller!),
-          
+
           _buildLandmarkOverlay(),
-          
-          // Top Status
+
           Positioned(
             top: 20,
             left: 20,
@@ -238,7 +260,9 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
                     children: [
                       Icon(
                         _result.hasHand
-                            ? (_result.isAlphabet ? Icons.check_circle : Icons.cancel)
+                            ? (_result.isAlphabet
+                                ? Icons.check_circle
+                                : Icons.cancel)
                             : Icons.handshake,
                         color: _result.hasHand
                             ? (_result.isAlphabet ? Colors.green : Colors.red)
@@ -246,14 +270,19 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
                         size: 28,
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        _result.label,
-                        style: TextStyle(
-                          color: _result.hasHand
-                              ? (_result.isAlphabet ? Colors.green : Colors.red)
-                              : Colors.grey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          _result.label,
+                          style: TextStyle(
+                            color: _result.hasHand
+                                ? (_result.isAlphabet
+                                    ? Colors.green
+                                    : Colors.red)
+                                : Colors.grey,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -264,18 +293,21 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
                     children: [
                       Text(
                         '⚡ ${_fps.toStringAsFixed(0)} FPS',
-                        style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        style: const TextStyle(
+                            color: Colors.white54, fontSize: 12),
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        '📍 ${_landmarks.length} points',
-                        style: const TextStyle(color: Colors.white54, fontSize: 12),
+                        '📍 ${_landmarks.length ~/ 2} pts',
+                        style: const TextStyle(
+                            color: Colors.white54, fontSize: 12),
                       ),
                       const SizedBox(width: 16),
                       Text(
                         '🎯 ${(_result.confidence * 100).toStringAsFixed(0)}%',
                         style: TextStyle(
-                          color: _result.hasHand ? Colors.green : Colors.grey,
+                          color:
+                              _result.hasHand ? Colors.green : Colors.grey,
                           fontSize: 12,
                         ),
                       ),
@@ -285,8 +317,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
               ),
             ),
           ),
-          
-          // Bottom Hint
+
           Positioned(
             bottom: 30,
             left: 20,
@@ -298,15 +329,19 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                _result.hasHand
-                    ? (_result.isAlphabet 
-                        ? '✅ Correct! You are showing ${widget.displayName}'
-                        : '❌ This is not ${widget.displayName}')
-                    : '👋 Show your hand to camera',
+                !_isConnected
+                    ? '❌ Server offline — check Python server'
+                    : _result.hasHand
+                        ? (_result.isAlphabet
+                            ? '✅ Correct! You are showing ${widget.displayName}'
+                            : '❌ This is not ${widget.displayName}')
+                        : '👋 Show your hand to camera',
                 style: TextStyle(
-                  color: _result.hasHand
-                      ? (_result.isAlphabet ? Colors.green : Colors.red)
-                      : Colors.grey,
+                  color: !_isConnected
+                      ? Colors.red
+                      : _result.hasHand
+                          ? (_result.isAlphabet ? Colors.green : Colors.red)
+                          : Colors.grey,
                   fontSize: 12,
                 ),
                 textAlign: TextAlign.center,
@@ -357,7 +392,7 @@ class HandLandmarkPainter extends CustomPainter {
     ];
 
     final linePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.6)
+      ..color = Colors.yellow.withOpacity(0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -367,8 +402,12 @@ class HandLandmarkPainter extends CustomPainter {
       }
     }
 
-    final pointPaint = Paint()..color = color..style = PaintingStyle.fill;
-    final wristPaint = Paint()..color = Colors.red..style = PaintingStyle.fill;
+    final pointPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final wristPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
 
     for (int i = 0; i < points.length; i++) {
       final radius = i == 0 ? 5.0 : 3.5;
@@ -376,7 +415,6 @@ class HandLandmarkPainter extends CustomPainter {
       canvas.drawCircle(points[i], radius, paint);
     }
 
-    // Bounding box
     double minX = double.infinity, minY = double.infinity;
     double maxX = -double.infinity, maxY = -double.infinity;
 
@@ -395,11 +433,67 @@ class HandLandmarkPainter extends CustomPainter {
 
     final rect = Rect.fromLTRB(minX, minY, maxX, maxY);
 
+    final glowPaint = Paint()
+      ..color = color.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 20
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+    canvas.drawRect(rect, glowPaint);
+
     final borderPaint = Paint()
-      ..color = color.withOpacity(0.7)
+      ..color = color.withOpacity(0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(rect, borderPaint);
+
+    const cornerSize = 15.0;
+    final cornerPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    canvas.drawLine(
+        Offset(minX, minY + cornerSize), Offset(minX, minY), cornerPaint);
+    canvas.drawLine(
+        Offset(minX, minY), Offset(minX + cornerSize, minY), cornerPaint);
+    canvas.drawLine(
+        Offset(maxX, minY + cornerSize), Offset(maxX, minY), cornerPaint);
+    canvas.drawLine(
+        Offset(maxX, minY), Offset(maxX - cornerSize, minY), cornerPaint);
+    canvas.drawLine(
+        Offset(minX, maxY - cornerSize), Offset(minX, maxY), cornerPaint);
+    canvas.drawLine(
+        Offset(minX, maxY), Offset(minX + cornerSize, maxY), cornerPaint);
+    canvas.drawLine(
+        Offset(maxX, maxY - cornerSize), Offset(maxX, maxY), cornerPaint);
+    canvas.drawLine(
+        Offset(maxX, maxY), Offset(maxX - cornerSize, maxY), cornerPaint);
+
+    final label = isAlphabet ? 'MATCH!' : 'Not Match';
+    final labelColor = isAlphabet ? Colors.green : Colors.red;
+
+    final labelPaint = Paint()
+      ..color = Colors.black.withOpacity(0.7)
+      ..style = PaintingStyle.fill;
+
+    final labelRect = Rect.fromLTWH(minX + 10, minY - 28, 90, 22);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(labelRect, const Radius.circular(4)),
+      labelPaint,
+    );
+
+    final textStyle = TextStyle(
+      color: labelColor,
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+    );
+    final textSpan = TextSpan(text: label, style: textStyle);
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, Offset(minX + 14, minY - 26));
   }
 
   @override

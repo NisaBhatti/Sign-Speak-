@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../services/alphabet_detection_service.dart';
 import 'alphabet_detection_page.dart';
 
 class AlphabetSelectionPage extends StatefulWidget {
@@ -10,63 +9,53 @@ class AlphabetSelectionPage extends StatefulWidget {
 }
 
 class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
-  List<AlphabetModel> _models = [];
   bool _isLoading = true;
+
+  // ============================================
+  // ALL ALPHABETS (matches python_server models)
+  // ============================================
+  final List<Map<String, String>> _alphabets = [
+    {'name': 'alif',     'display': 'Alif',     'arabic': 'ا'},
+    {'name': 'bay',      'display': 'Bay',      'arabic': 'ب'},
+    {'name': 'tay',      'display': 'Tay',      'arabic': 'ت'},
+    {'name': 'thay',     'display': 'Thay',     'arabic': 'ث'},
+    {'name': 'seen',     'display': 'Seen',     'arabic': 'س'},
+    {'name': 'sheen',    'display': 'Sheen',    'arabic': 'ش'},
+    {'name': 'suaad',    'display': 'Suaad',    'arabic': 'ص'},
+    {'name': 'zvad',     'display': 'Zvad',     'arabic': 'ض'},
+    {'name': 'toayn',    'display': 'Toayn',    'arabic': 'ط'},
+    {'name': 'zoyn',     'display': 'Zoyn',     'arabic': 'ظ'},
+    {'name': 'ain',      'display': 'Ain',      'arabic': 'ع'},
+    {'name': 'ghain',    'display': 'Ghain',    'arabic': 'غ'},
+    {'name': 'fe',       'display': 'Fe',       'arabic': 'ف'},
+    {'name': 'quaaf',    'display': 'Quaaf',    'arabic': 'ق'},
+    {'name': 'kaf',      'display': 'Kaf',      'arabic': 'ك'},
+    {'name': 'gaf',      'display': 'Gaf',      'arabic': 'گ'},
+    {'name': 'lam',      'display': 'Lam',      'arabic': 'ل'},
+    {'name': 'mim',      'display': 'Mim',      'arabic': 'م'},
+    {'name': 'noon',     'display': 'Noon',     'arabic': 'ن'},
+    {'name': 'vao',      'display': 'Vao',      'arabic': 'و'},
+    {'name': 'hamza',    'display': 'Hamza',    'arabic': 'ء'},
+    {'name': 'choti_ye', 'display': 'Choti Ye', 'arabic': 'ی'},
+    {'name': 'bari_ye',  'display': 'Bari Ye',  'arabic': 'ے'},
+    {'name': 'ray',      'display': 'Ray',      'arabic': 'ر'},
+    {'name': 'rray',     'display': 'Rray',     'arabic': 'ڑ'},
+    {'name': 'zay',      'display': 'Zay',      'arabic': 'ز'},
+    {'name': 'dal',      'display': 'Dal',      'arabic': 'د'},
+    {'name': 'daal',     'display': 'Daal',     'arabic': 'ڈ'},
+    {'name': 'zal',      'display': 'Zal',      'arabic': 'ذ'},
+    {'name': 'khay',     'display': 'Khay',     'arabic': 'خ'},
+    {'name': 'rre',      'display': 'Rre',      'arabic': 'ڑ'},
+  ];
 
   @override
   void initState() {
     super.initState();
-    _loadModels();
-  }
-
-  Future<void> _loadModels() async {
-    final models = await AlphabetDetectionService.getAvailableModels();
-    
-    if (models.isEmpty) {
-      // Fallback: Use predefined list if server is not responding
-      _models = _getDefaultModels();
-    } else {
-      _models = models;
-    }
-    
-    setState(() {
-      _isLoading = false;
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     });
-  }
-
-  List<AlphabetModel> _getDefaultModels() {
-    return [
-      AlphabetModel(name: 'alif', display: 'Alif', arabic: 'ا'),
-      AlphabetModel(name: 'bay', display: 'Bay', arabic: 'ب'),
-      AlphabetModel(name: 'tay', display: 'Tay', arabic: 'ت'),
-      AlphabetModel(name: 'thay', display: 'Thay', arabic: 'ث'),
-      AlphabetModel(name: 'seen', display: 'Seen', arabic: 'س'),
-      AlphabetModel(name: 'sheen', display: 'Sheen', arabic: 'ش'),
-      AlphabetModel(name: 'suaad', display: 'Suaad', arabic: 'ص'),
-      AlphabetModel(name: 'zvad', display: 'Zvad', arabic: 'ض'),
-      AlphabetModel(name: 'toayn', display: 'Toayn', arabic: 'ط'),
-      AlphabetModel(name: 'zoyn', display: 'Zoyn', arabic: 'ظ'),
-      AlphabetModel(name: 'ain', display: 'Ain', arabic: 'ع'),
-      AlphabetModel(name: 'ghain', display: 'Ghain', arabic: 'غ'),
-      AlphabetModel(name: 'fe', display: 'Fe', arabic: 'ف'),
-      AlphabetModel(name: 'quaaf', display: 'Quaaf', arabic: 'ق'),
-      AlphabetModel(name: 'kaf', display: 'Kaf', arabic: 'ك'),
-      AlphabetModel(name: 'gaf', display: 'Gaf', arabic: 'گ'),
-      AlphabetModel(name: 'lam', display: 'Lam', arabic: 'ل'),
-      AlphabetModel(name: 'mim', display: 'Mim', arabic: 'م'),
-      AlphabetModel(name: 'noon', display: 'Noon', arabic: 'ن'),
-      AlphabetModel(name: 'vao', display: 'Vao', arabic: 'و'),
-      AlphabetModel(name: 'hamza', display: 'Hamza', arabic: 'ء'),
-      AlphabetModel(name: 'choti_ye', display: 'Choti Ye', arabic: 'ی'),
-      AlphabetModel(name: 'bari_ye', display: 'Bari Ye', arabic: 'ے'),
-      AlphabetModel(name: 'ray', display: 'Ray', arabic: 'ر'),
-      AlphabetModel(name: 'rray', display: 'Rray', arabic: 'ڑ'),
-      AlphabetModel(name: 'zay', display: 'Zay', arabic: 'ز'),
-      AlphabetModel(name: 'dal', display: 'Dal', arabic: 'د'),
-      AlphabetModel(name: 'daal', display: 'Daal', arabic: 'ڈ'),
-      AlphabetModel(name: 'zal', display: 'Zal', arabic: 'ذ'),
-      AlphabetModel(name: 'khay', display: 'Khay', arabic: 'خ'),
-    ];
   }
 
   @override
@@ -76,102 +65,70 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
         title: const Text('📚 Select Alphabet'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              setState(() => _isLoading = true);
-              _loadModels();
-            },
-          ),
-        ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _models.isEmpty
-              ? _buildEmptyState()
-              : Column(
-                  children: [
-                    // Header
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      color: Colors.blueAccent.withOpacity(0.1),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.blueAccent),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${_models.length} alphabets available',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueAccent,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Grid
-                    Expanded(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 0.9,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading alphabets...'),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.blueAccent.withOpacity(0.1),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.blueAccent),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${_alphabets.length} alphabets available',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
                         ),
-                        itemCount: _models.length,
-                        itemBuilder: (context, index) {
-                          final model = _models[index];
-                          return _buildAlphabetCard(context, model);
-                        },
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 0.85,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: _alphabets.length,
+                    itemBuilder: (context, index) {
+                      return _buildAlphabetCard(context, _alphabets[index]);
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'No models available',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Make sure Python server is running',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              setState(() => _isLoading = true);
-              _loadModels();
-            },
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAlphabetCard(BuildContext context, AlphabetModel model) {
+  Widget _buildAlphabetCard(
+      BuildContext context, Map<String, String> alphabet) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AlphabetDetectionPage(
-              alphabet: model.name,
-              displayName: model.display,
-              arabic: model.arabic,
+              alphabet: alphabet['name']!,
+              displayName: alphabet['display']!,
+              arabic: alphabet['arabic']!,
             ),
           ),
         );
@@ -195,24 +152,27 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Arabic letter
             Text(
-              model.arabic,
+              alphabet['arabic']!,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
-            // Display name
-            Text(
-              model.display,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                alphabet['display']!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
