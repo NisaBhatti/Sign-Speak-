@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'camera_access_screen.dart';
 import 'dictionary.dart';
-import 'favourite_signs.dart';   // 👈 SIRF YEH IMPORT ADD HUA HAI
-
+import 'favourite_signs.dart';  
+import 'alif_detection_page.dart'; //
+import 'drawer_page.dart';
+import 'alphabet_selection_page.dart'; //
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -145,6 +147,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
+                      _buildFeatureCard(
+  title: '📚 Alphabet Detection',
+  subtitle: '${30}+ Arabic/Urdu Alphabets',
+  description: 'Detect all alphabets in real-time using camera.',
+  icon: Icons.abc,
+  gradient: LinearGradient(
+    colors: [Colors.orange, Colors.deepOrange],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  ),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AlphabetSelectionPage(),
+      ),
+    );
+  },
+),
                       // 3. Favourite Signs - SIRF ISME CHANGE HUA HAI
                       _buildFeatureCard(
                         title: 'Favourite Signs',
