@@ -1,105 +1,124 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/history_service.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color color4 = Color(0xFF6CC2C0);   // Teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Translation History',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.light(
-          primary: marineBlue,                // Dark blue
-          primaryContainer: lightBlue,        // Light blue
-          secondary: color4,                  // Teal
-          secondaryContainer: color2,          // Light teal
-          tertiary: color1,                    // Light blue-green as background
-          surface: color1,                      // Light blue-green
-          onSurface: marineBlue,                // Dark blue for text
-        ),
-        fontFamily: 'Epilogue',
-        appBarTheme: AppBarTheme(
-          backgroundColor: color1,              // Light blue-green
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.015,
-            color: lightBlue,                    // Light blue
-          ),
-          iconTheme: IconThemeData(
-            color: marineBlue,                    // Dark blue
-          ),
-        ),
-      ),
-      home: const TranslationHistoryScreen(),
-    );
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+
+  final HistoryService _historyService = HistoryService();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
   }
-}
 
-class TranslationHistoryScreen extends StatefulWidget {
-  const TranslationHistoryScreen({super.key});
+  Future<void> _loadHistory() async {
+    await _historyService.loadHistory();
+    setState(() {});
+  }
 
-  @override
-  State<TranslationHistoryScreen> createState() => _TranslationHistoryScreenState();
-}
+  // Filtered history
+  List<Map<String, dynamic>> get _filteredHistory {
+    if (_searchQuery.isEmpty) return _historyService.history;
+    return _historyService.history.where((item) {
+      return item['title']
+              .toString()
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()) ||
+          item['action']
+              .toString()
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase());
+    }).toList();
+  }
 
-class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
-  // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+  // Format date
+  String _formatDate(String isoDate) {
+    try {
+      final DateTime date = DateTime.parse(isoDate);
+      final now = DateTime.now();
+      final difference = now.difference(date);
 
-  final List<TranslationItem> _translationItems = [
-    TranslationItem(
-      text: 'Hello, how are you?',
-      timestamp: 'Today, 10:45 AM',
-      isStarred: false,
-    ),
-    TranslationItem(
-      text: 'Thank you',
-      timestamp: 'Yesterday, 3:20 PM',
-      isStarred: true,
-    ),
-    TranslationItem(
-      text: 'Good morning',
-      timestamp: 'Dec 25, 2025, 9:00 AM',
-      isStarred: false,
-    ),
-    TranslationItem(
-      text: 'What\'s your name?',
-      timestamp: 'Dec 28, 2025, 5:15 PM',
-      isStarred: false,
-    ),
-  ];
+      if (difference.inMinutes < 1) {
+        return 'Just now';
+      } else if (difference.inHours < 1) {
+        return '${difference.inMinutes}m ago';
+      } else if (difference.inDays < 1) {
+        return 'Today, ${date.hour}:${date.minute.toString().padLeft(2, '0')} ${date.hour >= 12 ? "PM" : "AM"}';
+      } else if (difference.inDays < 2) {
+        return 'Yesterday, ${date.hour}:${date.minute.toString().padLeft(2, '0')} ${date.hour >= 12 ? "PM" : "AM"}';
+      } else {
+        return '${date.day}/${date.month}/${date.year}';
+      }
+    } catch (e) {
+      return 'Unknown';
+    }
+  }
 
-  String _searchText = '';
+  // Get icon for action
+  IconData _getActionIcon(String action) {
+    switch (action.toLowerCase()) {
+      case 'favourite':
+        return Icons.favorite;
+      case 'translation':
+        return Icons.translate;
+      case 'gallery':
+        return Icons.photo_library;
+      case 'camera':
+        return Icons.camera_alt;
+      case 'video':
+        return Icons.video_library;
+      case 'dictionary':
+        return Icons.menu_book;
+      case 'alphabet':
+        return Icons.abc;
+      case 'login':
+        return Icons.login;
+      case 'logout':
+        return Icons.logout;
+      default:
+        return Icons.history;
+    }
+  }
+
+  // Get color for action
+  Color _getActionColor(String action) {
+    switch (action.toLowerCase()) {
+      case 'favourite':
+        return Colors.red;
+      case 'translation':
+        return Colors.green;
+      case 'gallery':
+        return Colors.purple;
+      case 'camera':
+        return Colors.blue;
+      case 'video':
+        return Colors.orange;
+      case 'dictionary':
+        return lightBlue;
+      case 'alphabet':
+        return marineBlue;
+      default:
+        return marineBlue;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredItems = _searchText.isEmpty
-        ? _translationItems
-        : _translationItems.where((item) =>
-            item.text.toLowerCase().contains(_searchText.toLowerCase())).toList();
-
-    final isEmpty = filteredItems.isEmpty;
-
     return Scaffold(
-      backgroundColor: color1, // Light blue-green
+      backgroundColor: color1,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -108,149 +127,179 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
             colors: [color1, color2],
           ),
         ),
-        child: Column(
-          children: [
-            // App Bar - Simplified with just the arrow
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                color: color1.withValues(alpha: 0.8),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                children: [
-                  // Simple back button - NO CONTAINER
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      size: 24,
-                      color: marineBlue,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ========== APP BAR ==========
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
                     ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    splashRadius: 24,
-                  ),
-                  const SizedBox(width: 8),
-                  // Title
-                  const Expanded(
-                    child: Text(
+                    Text(
                       'History & Practice',
-                      textAlign: TextAlign.center,
                       style: TextStyle(
+                        color: lightBlue,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: -0.015,
-                        color: marineBlue,
                       ),
+                    ),
+                    // Delete All Button
+                    if (_historyService.history.isNotEmpty)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          onPressed: _showClearDialog,
+                          icon: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 22),
+                          padding: const EdgeInsets.all(6),
+                          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              // ========== SEARCH BAR ==========
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search your history...',
+                      prefixIcon: Icon(Icons.search, color: lightBlue),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: lightBlue.withValues(alpha: 0.3)), 
-                  color: Colors.white.withValues(alpha: 0.7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: marineBlue.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
-                child: Row(
-                  children: [
-                    // Search icon
-                    Container(
-                      width: 48,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          bottomLeft: Radius.circular(16),
-                        ),
-                        color: Colors.transparent,
-                      ),
-                      child: Icon(
-                        Icons.search,
-                        size: 24,
-                        color: marineBlue, // Dark blue
-                      ),
-                    ),
-                    // Search field
-                    Expanded(
-                      child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            _searchText = value;
-                          });
+              ),
+
+              // ========== HISTORY LIST ==========
+              Expanded(
+                child: _filteredHistory.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        itemCount: _filteredHistory.length,
+                        itemBuilder: (context, index) {
+                          final item = _filteredHistory[index];
+                          return _buildHistoryCard(item);
                         },
-                        decoration: InputDecoration(
-                          hintText: 'Search your translations...',
-                          hintStyle: TextStyle(
-                            color: lightBlue.withValues(alpha: 0.5),
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        style: TextStyle(
-                          color: marineBlue, // Dark blue
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                        ),
                       ),
-                    ),
-                  ],
-                ),
               ),
-            ),
-
-            // Content
-            Expanded(
-              child: isEmpty
-                  ? _buildEmptyState()
-                  : ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        const SizedBox(height: 8),
-                        ...filteredItems.map((item) => _buildTranslationCard(item)),
-                      ],
-                    ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTranslationCard(TranslationItem item) {
+  // ========== EMPTY STATE ==========
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [marineBlue, lightBlue],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: marineBlue.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.history,
+              size: 60,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No History Yet',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: marineBlue,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Your activities will appear here',
+            style: TextStyle(
+              fontSize: 14,
+              color: marineBlue.withOpacity(0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ========== HISTORY CARD ==========
+  Widget _buildHistoryCard(Map<String, dynamic> item) {
+    final action = item['action'] ?? '';
+    final actionColor = _getActionColor(action);
+    final icon = _getActionIcon(action);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, color1.withValues(alpha: 0.5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -258,153 +307,65 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
       ),
       child: Row(
         children: [
-          // Text content
+          // Icon
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: actionColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: actionColor, size: 22),
+          ),
+          const SizedBox(width: 12),
+
+          // Title + Date
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Main text - Marine Blue
                 Text(
-                  item.text,
+                  item['title'] ?? 'Activity',
                   style: TextStyle(
-                    color: marineBlue, // Dark blue
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    height: 1.5,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: marineBlue,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                // Timestamp - Light Blue
-                Text(
-                  item.timestamp,
-                  style: TextStyle(
-                    color: lightBlue, // Light blue
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    height: 1.5,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 12, color: Colors.grey.shade500),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatDate(item['timestamp'] ?? ''),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Action buttons
-          Row(
-            children: [
-              // Replay button with gradient background
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [lightBlue.withValues(alpha: 0.1), marineBlue.withValues(alpha: 0.1)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    _replayTranslation(item);
-                  },
-                  icon: const Icon(Icons.replay, size: 20),
-                  color: marineBlue, // Dark blue
-                  padding: EdgeInsets.zero,
-                ),
+          // Delete Button
+          GestureDetector(
+            onTap: () => _deleteItem(item['id']),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10),
               ),
-              const SizedBox(width: 8),
-              // Star button with gradient background
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [lightBlue.withValues(alpha: 0.1), marineBlue.withValues(alpha: 0.1)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      item.isStarred = !item.isStarred;
-                    });
-                  },
-                  icon: Icon(
-                    item.isStarred ? Icons.star : Icons.star_border,
-                    size: 20,
-                    color: item.isStarred 
-                        ? lightBlue // Light blue for starred
-                        : marineBlue, // Dark blue for unstarred
-                  ),
-                  padding: EdgeInsets.zero,
-                ),
+              child: Icon(
+                Icons.delete_outline,
+                color: Colors.red.shade400,
+                size: 18,
               ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Waving hand icon with gradient
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [lightBlue, marineBlue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: marineBlue.withValues(alpha: 0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.waving_hand,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Title - Marine Blue
-          Text(
-            'No translations yet.',
-            style: TextStyle(
-              color: marineBlue, // Dark blue
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Subtitle - Light Blue
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Text(
-              'Start a new conversation to see your history here!',
-              style: TextStyle(
-                color: lightBlue, // Light blue
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -412,29 +373,65 @@ class _TranslationHistoryScreenState extends State<TranslationHistoryScreen> {
     );
   }
 
-  void _replayTranslation(TranslationItem item) {
-    // Implement replay functionality
+  // Delete single item
+  Future<void> _deleteItem(String id) async {
+    await _historyService.deleteHistory(id);
+    setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Replaying: ${item.text}'),
-        backgroundColor: lightBlue, // Light blue
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+      const SnackBar(
+        content: Text('Deleted from history'),
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.red,
       ),
     );
   }
-}
 
-class TranslationItem {
-  String text;
-  String timestamp;
-  bool isStarred;
-
-  TranslationItem({
-    required this.text,
-    required this.timestamp,
-    required this.isStarred,
-  });
+  // Clear all dialog
+  void _showClearDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Clear History',
+            style: TextStyle(color: marineBlue, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to clear all history?',
+            style: TextStyle(color: Colors.grey.shade700),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _historyService.clearAllHistory();
+                setState(() {});
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('All history cleared'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('Clear All'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

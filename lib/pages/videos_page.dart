@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/history_service.dart';   // 👈 SIRF YEH IMPORT ADD HUA
 
 class VideosPage extends StatefulWidget {
   const VideosPage({super.key});
@@ -18,7 +19,10 @@ class _VideosPageState extends State<VideosPage> {
   // Search query
   String _searchQuery = '';
 
-  // ✅ VIDEOS LIST - YAHAN APNI VIDEOS ADD KAREIN
+  // ✅ History Service
+  final HistoryService _historyService = HistoryService();   // 👈 YEH LINE ADD HUI
+
+  // ✅ VIDEOS LIST
   final List<Map<String, dynamic>> _videos = [
     {
       'title': 'Sign Language Basics',
@@ -79,24 +83,46 @@ class _VideosPageState extends State<VideosPage> {
     }).toList();
   }
 
-  // 🎬 Video open karne ka method
-  Future<void> _openVideo(String url) async {
+  @override
+  void initState() {
+    super.initState();
+    _historyService.loadHistory();   // 👈 YEH LINE ADD HUI
+  }
+
+  // 🎬 Video open karne ka method - UPDATED
+  Future<void> _openVideo(String url, String title) async {
+    // ✅ History save karein
+    await _historyService.addHistory(
+      title: title,
+      action: 'Video',
+      details: 'Watched video tutorial',
+    );
+
+    // ✅ Video open karein (Multiple methods try karein)
     final Uri uri = Uri.parse(url);
     
     try {
+      // Method 1: Try external app (YouTube)
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        throw 'Could not launch $url';
+        // Method 2: Try in-app browser
+        await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Could not open video: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      // Method 3: Try platform default
+      try {
+        await launchUrl(uri);
+      } catch (e2) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('❌ Could not open video. Please check your internet connection.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
       }
     }
   }
@@ -244,10 +270,11 @@ class _VideosPageState extends State<VideosPage> {
     );
   }
 
-  // ========== VIDEO CARD (Matching your app style) ==========
+  // ========== VIDEO CARD ==========
   Widget _buildVideoCard(Map<String, dynamic> video) {
     return GestureDetector(
-      onTap: () => _openVideo(video['url']),
+      // 👇 YEH UPDATE HUA - Title bhi pass karein
+      onTap: () => _openVideo(video['url'], video['title']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         height: 100,

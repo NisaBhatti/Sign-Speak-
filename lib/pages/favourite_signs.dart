@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../services/favourite_service.dart';
+import '../services/history_service.dart';   // 👈 YEH ADD HUA
 
 class FavouriteSignsPage extends StatefulWidget {
   const FavouriteSignsPage({super.key});
@@ -18,11 +19,13 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
   final FavouriteService _favouriteService = FavouriteService();
   final ImagePicker _imagePicker = ImagePicker();
+  final HistoryService _historyService = HistoryService();   // 👈 YEH ADD HUA
 
   @override
   void initState() {
     super.initState();
     _favouriteService.loadFavourites();
+    _historyService.loadHistory();   // 👈 YEH ADD HUA
   }
 
   // 📸 Gallery se image pick karne ka method
@@ -46,8 +49,16 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
       };
 
       await _favouriteService.addFavourite(newSign);
+
+      // 👈 YEH ADD HUA
+      await _historyService.addHistory(
+        title: 'Image from Gallery',
+        action: 'Gallery',
+        details: 'Added image to favourites',
+      );
+
       setState(() {});
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('✅ Sign added to favourites!'),
@@ -86,8 +97,16 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
       };
 
       await _favouriteService.addFavourite(newSign);
+
+      // 👈 YEH ADD HUA
+      await _historyService.addHistory(
+        title: 'Image from Camera',
+        action: 'Camera',
+        details: 'Captured image to favourites',
+      );
+
       setState(() {});
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('✅ Sign added from camera!'),
@@ -127,7 +146,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               Text(
                 'Add Your Sign',
                 style: TextStyle(
@@ -145,7 +164,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -169,9 +188,9 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -241,7 +260,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // ========== APP BAR (Matching your app style) ==========
+              // ========== APP BAR ==========
               Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -309,7 +328,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
-  // ========== EMPTY STATE (Matching your app style) ==========
+  // ========== EMPTY STATE ==========
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -342,7 +361,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
               ),
             ),
             const SizedBox(height: 32),
-            
+
             Text(
               'No Favourite Signs Yet',
               style: TextStyle(
@@ -361,8 +380,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
               ),
             ),
             const SizedBox(height: 32),
-            
-            // Add Your Sign Card (Matching your app style)
+
             GestureDetector(
               onTap: _showAddSignDialog,
               child: Container(
@@ -439,9 +457,9 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -490,7 +508,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
-  // ========== FAVOURITE CARD (Matching your app style) ==========
+  // ========== FAVOURITE CARD ==========
   Widget _buildFavouriteCard(Map<String, dynamic> sign) {
     final isGalleryImage = sign['isGalleryImage'] == true;
 
@@ -517,7 +535,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
             Expanded(
               flex: 5,
               child: Container(
@@ -575,6 +592,14 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                       child: GestureDetector(
                         onTap: () async {
                           await _favouriteService.removeFavourite(sign['name']);
+
+                          // 👈 YEH ADD HUA
+                          await _historyService.addHistory(
+                            title: sign['name'] ?? 'Sign',
+                            action: 'Favourite',
+                            details: 'Removed from favourites',
+                          );
+
                           setState(() {});
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -608,7 +633,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
             ),
-            // Text Section
             Expanded(
               flex: 3,
               child: Padding(

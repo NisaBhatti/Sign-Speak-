@@ -12,6 +12,7 @@ const Color drawerColor2 = Color(0xFFACD9D9);
 const Color drawerColor3 = Color(0xFFB6C2C3);
 const Color drawerColor4 = Color(0xFF6CC2C0);
 const Color drawerDarkBlue = Color.fromARGB(255, 8, 4, 84);
+
 class DrawerPage extends StatelessWidget {
   const DrawerPage({super.key});
 
@@ -21,14 +22,14 @@ class DrawerPage extends StatelessWidget {
       backgroundColor: Colors.transparent,
       body: GestureDetector(
         onTap: () {
-          Navigator.pop(context); // Close when tapping outside
+          Navigator.pop(context);
         },
         child: Container(
-          color: Colors.black.withValues(alpha: 0.4), // Semi-transparent overlay
+          color: Colors.black.withValues(alpha: 0.4),
           child: Align(
             alignment: Alignment.centerLeft,
             child: GestureDetector(
-              onTap: () {}, // Prevent closing when tapping on drawer
+              onTap: () {},
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.5,
                 child: const CustomDrawer(),
@@ -40,6 +41,7 @@ class DrawerPage extends StatelessWidget {
     );
   }
 }
+
 class CustomDrawer extends StatelessWidget {
   final String? userName;
   final String? userEmail;
@@ -57,19 +59,16 @@ class CustomDrawer extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     try {
       if (onSignOut != null) {
-        onSignOut!(); // Call the sign out function from parent
+        onSignOut!();
       } else {
-        // Fallback logout if no callback provided
         await FirebaseAuth.instance.signOut();
         if (context.mounted) {
-          // Navigate to welcome screen and remove all previous routes
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const WelcomeScreen()),
             (route) => false,
           );
           
-          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Logged out successfully!'),
@@ -92,7 +91,7 @@ class CustomDrawer extends StatelessWidget {
   }
 
   void navigateAndCloseDrawer(BuildContext context, Widget page) {
-    Navigator.pop(context); // Close drawer first
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => page),
@@ -118,7 +117,7 @@ class CustomDrawer extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Drawer Header with User Info
+          // Drawer Header
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -137,16 +136,16 @@ class CustomDrawer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                    const Text(
-                      'Signs Speak',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                const Text(
+                  'Signs Speak',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+              ],
+            ),
           ),
           // Menu Items
           Expanded(
@@ -155,21 +154,21 @@ class CustomDrawer extends StatelessWidget {
               children: [
                 const SizedBox(height: 16),
                 
-                // Home Menu Item
+                // Home
                 ListTile(
                   leading: Icon(
                     Icons.home,
-                    color: drawerDarkBlue, // Dark Blue
+                    color: drawerDarkBlue,
                   ),
                   title: Text(
                     'Home',
                     style: TextStyle(
-                      color: drawerDarkBlue, // Dark Blue
+                      color: drawerDarkBlue,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context); // Close drawer first
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -178,20 +177,22 @@ class CustomDrawer extends StatelessWidget {
                     );
                   },
                 ),
+                
+                // Profile
                 ListTile(
                   leading: Icon(
                     Icons.person,
-                    color: drawerDarkBlue, // Dark Blue
+                    color: drawerDarkBlue,
                   ),
                   title: Text(
                     'Profile',
                     style: TextStyle(
-                      color: drawerDarkBlue, // Dark Blue
+                      color: drawerDarkBlue,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context); // Close drawer page
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -201,44 +202,46 @@ class CustomDrawer extends StatelessWidget {
                   },
                 ),
                 
-                // History Menu Item
+                // ✅ HISTORY - UPDATED
                 ListTile(
                   leading: Icon(
                     Icons.history,
-                    color: drawerDarkBlue, // Dark Blue
+                    color: drawerDarkBlue,
                   ),
                   title: Text(
                     'History',
                     style: TextStyle(
-                      color: drawerDarkBlue, // Dark Blue
+                      color: drawerDarkBlue,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context); // Close drawer page
+                    Navigator.pop(context);
+                    // 👇 YEH CHANGE HUA HAI - HistoryPage use karein
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TranslationHistoryScreen(),
+                        builder: (context) => const HistoryPage(),
                       ),
                     );
                   },
                 ),
-                // Settings Menu Item
+                
+                // Settings
                 ListTile(
                   leading: Icon(
                     Icons.settings,
-                    color: drawerDarkBlue, // Dark Blue
+                    color: drawerDarkBlue,
                   ),
                   title: Text(
                     'Settings',
                     style: TextStyle(
-                      color: drawerDarkBlue, // Dark Blue
+                      color: drawerDarkBlue,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   onTap: () {
-                    Navigator.pop(context); // Close drawer page
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -247,15 +250,17 @@ class CustomDrawer extends StatelessWidget {
                     );
                   },
                 ),
-               // Divider before Logout
+                
+                // Divider before Logout
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Divider(
-                    color: Color.fromARGB(255, 8, 4, 84), // Dark Blue
+                    color: Color.fromARGB(255, 8, 4, 84),
                     thickness: 0.5,
                   ),
                 ),
-      // Logout/Sign In Menu Item
+                
+                // Logout/Sign In
                 if (!isGuest)
                   _buildDrawerItem(
                     icon: Icons.logout,
@@ -263,7 +268,7 @@ class CustomDrawer extends StatelessWidget {
                     iconColor: Colors.red,
                     textColor: Colors.red,
                     onTap: () {
-                      Navigator.pop(context); // Close drawer first
+                      Navigator.pop(context);
                       _showLogoutDialog(context);
                     },
                   )
@@ -274,7 +279,7 @@ class CustomDrawer extends StatelessWidget {
                     iconColor: drawerDarkBlue,
                     textColor: drawerDarkBlue,
                     onTap: () {
-                      Navigator.pop(context); // Close drawer
+                      Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -374,7 +379,7 @@ class CustomDrawer extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context);
             },
             child: Text(
               'Cancel',
@@ -383,8 +388,8 @@ class CustomDrawer extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
-              _logout(context); // Perform logout
+              Navigator.pop(context);
+              _logout(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -399,6 +404,7 @@ class CustomDrawer extends StatelessWidget {
       ),
     );
   }
+
   void showSignInDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -451,7 +457,7 @@ class CustomDrawer extends StatelessWidget {
   }
 }
 
-// Welcome Screen with proper color definitions
+// Welcome Screen
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -463,7 +469,7 @@ class WelcomeScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [drawerColor1, drawerColor2], // Using global color constants
+            colors: [drawerColor1, drawerColor2],
           ),
         ),
         child: Center(
@@ -473,7 +479,7 @@ class WelcomeScreen extends StatelessWidget {
               Icon(
                 Icons.sign_language,
                 size: 80,
-                color: drawerDarkBlue, // Using global color constant
+                color: drawerDarkBlue,
               ),
               const SizedBox(height: 24),
               Text(
@@ -481,7 +487,7 @@ class WelcomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: drawerDarkBlue, // Using global color constant
+                  color: drawerDarkBlue,
                 ),
               ),
               const SizedBox(height: 16),
@@ -489,7 +495,7 @@ class WelcomeScreen extends StatelessWidget {
                 'Bridge the communication gap',
                 style: TextStyle(
                   fontSize: 16, 
-                  color: drawerDarkBlue, // Using global color constant
+                  color: drawerDarkBlue,
                 ),
               ),
               const SizedBox(height: 32),
@@ -503,7 +509,7 @@ class WelcomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: drawerDarkBlue, // Using global color constant
+                  backgroundColor: drawerDarkBlue,
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
