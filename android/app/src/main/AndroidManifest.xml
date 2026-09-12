@@ -37,6 +37,32 @@
         android:required="false" />
     
     <!-- ============================================ -->
+    <!-- ✅ QUERIES SECTION (FOR YOUTUBE VIDEOS)     -->
+    <!-- ============================================ -->
+    <queries>
+        <!-- YouTube App -->
+        <package android:name="com.google.android.youtube" />
+        
+        <!-- Chrome Browser -->
+        <package android:name="com.android.chrome" />
+        
+        <!-- General Browser Intent -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        
+        <!-- YouTube Intent -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="vnd.youtube" />
+        </intent>
+    </queries>
+    <!-- ============================================ -->
+    <!-- ✅ QUERIES SECTION END                       -->
+    <!-- ============================================ -->
+    
+    <!-- ============================================ -->
     <!-- 📱 APPLICATION                              -->
     <!-- ============================================ -->
     <application
