@@ -139,6 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SafeArea(
           child: Column(
             children: [
+              // ========== APP BAR ==========
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(
@@ -172,20 +173,26 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
               ),
+              // ========== BODY ==========
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Target Sign Language Section
                       _buildSectionHeader('Target Sign Language'),
                       const SizedBox(height: 8),
                       _buildLanguageCard(),
                       const SizedBox(height: 24),
+
+                      // Audio Section
                       _buildSectionHeader('Audio'),
                       const SizedBox(height: 8),
                       _buildAudioCard(),
                       const SizedBox(height: 24),
+
+                      // Information Section
                       _buildSectionHeader('Information'),
                       const SizedBox(height: 8),
                       _buildHelpItems(),
@@ -200,6 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // ========== SECTION HEADER (Matching Terms & Policies) ==========
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
@@ -214,10 +222,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // ========== LANGUAGE CARD (White Card Matching Terms & Policies) ==========
   Widget _buildLanguageCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        // ✅ White card (matching Terms & Policies)
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -242,8 +252,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildLanguageOption(String name, String value, {bool isLast = false}) {
-    final isLightMode = Theme.of(context).brightness == Brightness.light;
-
     return InkWell(
       onTap: () {
         setState(() {
@@ -259,9 +267,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ? null
               : Border(
                   bottom: BorderSide(
-                    color: isLightMode
-                        ? marineBlue.withOpacity(0.08)
-                        : color1.withOpacity(0.08),
+                    color: marineBlue.withOpacity(0.08),
                   ),
                 ),
           borderRadius: isLast
@@ -272,7 +278,7 @@ class _SettingsPageState extends State<SettingsPage> {
               : null,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
             children: [
               Expanded(
@@ -285,26 +291,28 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
+              // ✅ Radio circle (matching Terms & Policies)
               Container(
-                width: 22,
-                height: 22,
+                width: 24,
+                height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: _selectedLanguage == value
-                        ? lightBlue
-                        : isLightMode
-                            ? marineBlue.withOpacity(0.3)
-                            : color1.withOpacity(0.3),
+                        ? marineBlue
+                        : marineBlue.withOpacity(0.3),
                     width: 2,
                   ),
                 ),
                 child: _selectedLanguage == value
-                    ? Container(
-                        margin: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: lightBlue,
+                    ? Center(
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: marineBlue,
+                          ),
                         ),
                       )
                     : null,
@@ -316,10 +324,11 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // ========== AUDIO CARD (White Card) ==========
   Widget _buildAudioCard() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -350,10 +359,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   _playAudio = value;
                 });
               },
-              activeColor: lightBlue,
-              activeTrackColor: lightBlue.withOpacity(0.5),
-              inactiveThumbColor: marineBlue,
-              inactiveTrackColor: marineBlue.withOpacity(0.2),
+              activeColor: Colors.white,
+              activeTrackColor: marineBlue,
+              inactiveThumbColor: Colors.white,
+              inactiveTrackColor: Colors.grey.shade300,
             ),
           ],
         ),
@@ -373,12 +382,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  // ========== HELP ITEM (Matching Terms & Policies Card) ==========
   Widget _buildHelpItem(
       BuildContext context, String title, IconData icon) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // ✅ White card (matching Terms & Policies)
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -406,12 +417,13 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
+              // ✅ Blue gradient icon (matching Terms & Policies)
               Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [lightBlue, color4],
+                    colors: [marineBlue, lightBlue],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -427,7 +439,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 20,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 14),
@@ -441,10 +453,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: marineBlue.withOpacity(0.5),
-                size: 22,
+              // ✅ Arrow in circle (matching Terms & Policies)
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: lightBlue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chevron_right,
+                  color: marineBlue,
+                  size: 18,
+                ),
               ),
             ],
           ),
