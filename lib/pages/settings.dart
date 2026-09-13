@@ -8,11 +8,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +118,6 @@ class _SettingsPageState extends State<SettingsPage> {
     },
   ];
 
-  // Color scheme matching your app's palette
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color color4 = Color(0xFF6CC2C0);
@@ -141,12 +139,10 @@ class _SettingsPageState extends State<SettingsPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Custom AppBar - Simplified with just the arrow
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(
                   children: [
-                    // Simple back button - NO CONTAINER
                     IconButton(
                       onPressed: () {
                         Navigator.pop(context);
@@ -176,26 +172,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
               ),
-              // Body
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Target Sign Language Section
                       _buildSectionHeader('Target Sign Language'),
                       const SizedBox(height: 8),
                       _buildLanguageCard(),
                       const SizedBox(height: 24),
-
-                      // Audio Section
                       _buildSectionHeader('Audio'),
                       const SizedBox(height: 8),
                       _buildAudioCard(),
                       const SizedBox(height: 24),
-
-                      // Information Section
                       _buildSectionHeader('Information'),
                       const SizedBox(height: 8),
                       _buildHelpItems(),
@@ -218,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: marineBlue.withValues(alpha: 0.8),
+          color: marineBlue.withOpacity(0.8),
         ),
       ),
     );
@@ -231,7 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withValues(alpha: 0.08),
+            color: marineBlue.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -261,8 +251,8 @@ class _SettingsPageState extends State<SettingsPage> {
         });
       },
       borderRadius: BorderRadius.circular(16),
-      splashColor: lightBlue.withValues(alpha: 0.1),
-      highlightColor: lightBlue.withValues(alpha: 0.05),
+      splashColor: lightBlue.withOpacity(0.1),
+      highlightColor: lightBlue.withOpacity(0.05),
       child: Container(
         decoration: BoxDecoration(
           border: isLast
@@ -270,8 +260,8 @@ class _SettingsPageState extends State<SettingsPage> {
               : Border(
                   bottom: BorderSide(
                     color: isLightMode
-                        ? marineBlue.withValues(alpha: 0.08)
-                        : color1.withValues(alpha: 0.08),
+                        ? marineBlue.withOpacity(0.08)
+                        : color1.withOpacity(0.08),
                   ),
                 ),
           borderRadius: isLast
@@ -304,8 +294,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: _selectedLanguage == value
                         ? lightBlue
                         : isLightMode
-                            ? marineBlue.withValues(alpha: 0.3)
-                            : color1.withValues(alpha: 0.3),
+                            ? marineBlue.withOpacity(0.3)
+                            : color1.withOpacity(0.3),
                     width: 2,
                   ),
                 ),
@@ -333,7 +323,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withValues(alpha: 0.08),
+            color: marineBlue.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -361,9 +351,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
               activeColor: lightBlue,
-              activeTrackColor: lightBlue.withValues(alpha: 0.5),
+              activeTrackColor: lightBlue.withOpacity(0.5),
               inactiveThumbColor: marineBlue,
-              inactiveTrackColor: marineBlue.withValues(alpha: 0.2),
+              inactiveTrackColor: marineBlue.withOpacity(0.2),
             ),
           ],
         ),
@@ -392,7 +382,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: marineBlue.withValues(alpha: 0.08),
+            color: marineBlue.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -410,8 +400,8 @@ class _SettingsPageState extends State<SettingsPage> {
           }
         },
         borderRadius: BorderRadius.circular(16),
-        splashColor: lightBlue.withValues(alpha: 0.1),
-        highlightColor: lightBlue.withValues(alpha: 0.05),
+        splashColor: lightBlue.withOpacity(0.1),
+        highlightColor: lightBlue.withOpacity(0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -428,7 +418,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: marineBlue.withValues(alpha: 0.2),
+                      color: marineBlue.withOpacity(0.2),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -453,7 +443,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Icon(
                 Icons.chevron_right,
-                color: marineBlue.withValues(alpha: 0.5),
+                color: marineBlue.withOpacity(0.5),
                 size: 22,
               ),
             ],
