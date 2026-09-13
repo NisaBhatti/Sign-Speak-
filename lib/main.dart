@@ -7,7 +7,6 @@ import 'firebase_options.dart';
 import 'pages/login.dart';
 import 'pages/signup.dart';
 import 'pages/homepage.dart';
-import 'pages/hand_detection_screen.dart'; // ✅ NEW: Real-time hand detection
 
 // Firebase imports
 
@@ -101,7 +100,6 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/hand-detection': (context) => const HandDetectionScreen(), // ✅ NEW ROUTE
       },
     );
   }

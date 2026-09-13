@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'camera_access_screen.dart';
+import 'package:signspeak/pages/alphabet_selection_page.dart';
+import 'package:signspeak/pages/drawer_page.dart';
 import 'dictionary.dart';
-import 'drawer_page.dart';
-import 'alif_detection_page.dart';
 import 'favourite_signs.dart';
-import '../services/history_service.dart';   // 👈 YEH ADD HUA
+import '../services/history_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final HistoryService _historyService = HistoryService();   // 👈 YEH ADD HUA
+  final HistoryService _historyService = HistoryService();
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: Column(
             children: [
+              // ============================
+              // TOP BAR
+              // ============================
               Container(
                 height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -54,83 +57,142 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
-                        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                        onPressed: () =>
+                            _scaffoldKey.currentState?.openDrawer(),
                         icon: Icon(Icons.menu, color: marineBlue, size: 22),
                         padding: const EdgeInsets.all(6),
-                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
                       ),
                     ),
-                    Text('Signs Speak', style: TextStyle(color: lightBlue, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Signs Speak',
+                      style: TextStyle(
+                          color: lightBlue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(width: 48),
                   ],
                 ),
               ),
+
+              // ============================
+              // WELCOME TEXT
+              // ============================
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
-                child: Text('What would you like to do today?', style: TextStyle(color: marineBlue.withValues(alpha: 0.7), fontSize: 24, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'What would you like to do today?',
+                  style: TextStyle(
+                    color: marineBlue.withValues(alpha: 0.7),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+
+              // ============================
+              // THREE FEATURE CARDS
+              // ============================
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
+                      // 1. ALPHABET DETECTION
                       _buildFeatureCard(
-                        title: 'Real Translation',
-                        subtitle: 'Live camera detection',
-                        description: 'Recognise signs instantly with your camera.',
-                        icon: Icons.videocam_outlined,
-                        gradient: LinearGradient(colors: [marineBlue.withValues(alpha: 0.9), lightBlue], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const CameraAccessScreen()));
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildFeatureCard(
-                        title: '🔍 Alif Detection',
-                        subtitle: 'Real-time Hand Detection',
-                        description: 'Detect Alif (ا) sign using your camera in real-time.',
+                        title: 'Alphabet Detection',
+                        subtitle: 'All Arabic/Urdu alphabets',
+                        description:
+                            'Detect Alif, Bay, Jeem and more in real-time.',
                         icon: Icons.back_hand,
-                        gradient: LinearGradient(colors: [Colors.deepPurple, Colors.purpleAccent], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const AlifDetectionPage()));
+                        gradient: LinearGradient(
+                          colors: [Colors.deepPurple, Colors.purpleAccent],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        onTap: () async {
+                          await _historyService.addHistory(
+                            title: 'Alphabet Detection',
+                            action: 'Detection',
+                            details: 'Opened alphabet detection',
+                          );
+                          if (!mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AlphabetSelectionPage(),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 16),
+
+                      // 2. SIGN BOOK
                       _buildFeatureCard(
                         title: 'Sign Book',
                         subtitle: 'Browse 500+ signs',
                         description: 'Search the complete dictionary.',
                         icon: Icons.book,
-                        gradient: LinearGradient(colors: [marineBlue.withValues(alpha: 0.9), lightBlue], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        gradient: LinearGradient(
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         onTap: () async {
-                          // 👈 YEH ADD HUA
                           await _historyService.addHistory(
                             title: 'Sign Book',
                             action: 'Dictionary',
                             details: 'Opened dictionary',
                           );
-                          
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryPage()));
+                          if (!mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DictionaryPage(),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 16),
+
+                      // 3. FAVOURITE SIGNS
                       _buildFeatureCard(
                         title: 'Favourite Signs',
                         subtitle: 'Your saved signs',
                         description: 'Quick access to favourite signs.',
                         icon: Icons.favorite_border,
-                        gradient: LinearGradient(colors: [marineBlue.withValues(alpha: 0.9), lightBlue], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        gradient: LinearGradient(
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         onTap: () async {
-                          // 👈 YEH ADD HUA
                           await _historyService.addHistory(
                             title: 'Favourite Signs',
                             action: 'Favourite',
                             details: 'Opened favourites',
                           );
-                          
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const FavouriteSignsPage()));
+                          if (!mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const FavouriteSignsPage(),
+                            ),
+                          );
                         },
                       ),
+
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -142,6 +204,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ============================
+  // FEATURE CARD WIDGET
+  // ============================
   Widget _buildFeatureCard({
     required String title,
     required String subtitle,
@@ -157,7 +222,13 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: marineBlue.withValues(alpha: 0.15), blurRadius: 15, offset: const Offset(0, 5))],
+          boxShadow: [
+            BoxShadow(
+              color: marineBlue.withValues(alpha: 0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -166,7 +237,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 width: 56,
                 height: 56,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Icon(icon, color: Colors.white, size: 28),
               ),
               const SizedBox(width: 16),
@@ -175,19 +249,45 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12)),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 12,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(description, style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                child: Icon(Icons.arrow_forward, color: Colors.white.withValues(alpha: 0.8), size: 18),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white.withValues(alpha: 0.8),
+                  size: 18,
+                ),
               ),
             ],
           ),
