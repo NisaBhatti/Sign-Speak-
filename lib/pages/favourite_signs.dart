@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../services/favourite_service.dart';
+import '../services/history_service.dart';   // 👈 YEH ADD HUA
 
 class FavouriteSignsPage extends StatefulWidget {
   const FavouriteSignsPage({super.key});
@@ -15,11 +18,231 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   final FavouriteService _favouriteService = FavouriteService();
+  final ImagePicker _imagePicker = ImagePicker();
+  final HistoryService _historyService = HistoryService();   // 👈 YEH ADD HUA
 
   @override
   void initState() {
     super.initState();
     _favouriteService.loadFavourites();
+    _historyService.loadHistory();   // 👈 YEH ADD HUA
+  }
+
+  // 📸 Gallery se image pick karne ka method
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 500,
+        maxHeight: 500,
+        imageQuality: 80,
+      );
+
+      if (image == null) return;
+
+      final newSign = {
+        'name': 'My Sign ${DateTime.now().millisecondsSinceEpoch}',
+        'image': image.path,
+        'category': 'Gallery',
+        'description': 'Image picked from gallery',
+        'isGalleryImage': true,
+      };
+
+      await _favouriteService.addFavourite(newSign);
+
+      // 👈 YEH ADD HUA
+      await _historyService.addHistory(
+        title: 'Image from Gallery',
+        action: 'Gallery',
+        details: 'Added image to favourites',
+      );
+
+      setState(() {});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Sign added to favourites!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // 📷 Camera se image capture karne ka method
+  Future<void> _pickImageFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 500,
+        maxHeight: 500,
+        imageQuality: 80,
+      );
+
+      if (image == null) return;
+
+      final newSign = {
+        'name': 'My Sign ${DateTime.now().millisecondsSinceEpoch}',
+        'image': image.path,
+        'category': 'Camera',
+        'description': 'Image captured from camera',
+        'isGalleryImage': true,
+      };
+
+      await _favouriteService.addFavourite(newSign);
+
+      // 👈 YEH ADD HUA
+      await _historyService.addHistory(
+        title: 'Image from Camera',
+        action: 'Camera',
+        details: 'Captured image to favourites',
+      );
+
+      setState(() {});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Sign added from camera!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // 🆕 Add Sign Dialog
+  void _showAddSignDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Text(
+                'Add Your Sign',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: marineBlue,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Choose a source to add your sign',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildAddOption(
+                    icon: Icons.photo_library,
+                    label: 'Gallery',
+                    color: lightBlue,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImageFromGallery();
+                    },
+                  ),
+                  _buildAddOption(
+                    icon: Icons.camera_alt,
+                    label: 'Camera',
+                    color: marineBlue,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAddOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -37,7 +260,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // App Bar
+              // ========== APP BAR ==========
               Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -64,83 +287,39 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (_favouriteService.favourites.isNotEmpty)
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
-                        onPressed: () {
-                          _showClearDialog();
-                        },
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: marineBlue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.add, color: marineBlue),
+                            onPressed: _showAddSignDialog,
+                            tooltip: 'Add Your Sign',
+                            padding: const EdgeInsets.all(6),
+                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                          ),
+                        ),
+                        if (_favouriteService.favourites.isNotEmpty)
+                          IconButton(
+                            icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
+                            onPressed: () {
+                              _showClearDialog();
+                            },
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
 
-              // Content
+              // ========== CONTENT ==========
               Expanded(
                 child: _favouriteService.favourites.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.favorite_border,
-                              size: 80,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No Favourite Signs',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Go to Dictionary and tap ❤️ to add signs',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: lightBlue,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text('Go to Dictionary'),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: GridView.builder(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.8,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                          itemCount: _favouriteService.favourites.length,
-                          itemBuilder: (context, index) {
-                            final sign = _favouriteService.favourites[index];
-                            return _buildFavouriteCard(sign);
-                          },
-                        ),
-                      ),
+                    ? _buildEmptyState()
+                    : _buildFavouritesGrid(),
               ),
             ],
           ),
@@ -149,82 +328,278 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
+  // ========== EMPTY STATE ==========
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [marineBlue, lightBlue],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: marineBlue.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.favorite_border,
+                size: 60,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            Text(
+              'No Favourite Signs Yet',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: marineBlue,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Add signs from Dictionary\nor from your Gallery',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: marineBlue.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            GestureDetector(
+              onTap: _showAddSignDialog,
+              child: Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [marineBlue, lightBlue],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: marineBlue.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.add, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Add Your Sign',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Gallery or Camera',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.book, size: 18),
+                  label: const Text('Dictionary'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: lightBlue,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: _pickImageFromGallery,
+                  icon: const Icon(Icons.photo_library, size: 18),
+                  label: const Text('Gallery'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: lightBlue,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ========== FAVOURITES GRID ==========
+  Widget _buildFavouritesGrid() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+        ),
+        itemCount: _favouriteService.favourites.length,
+        itemBuilder: (context, index) {
+          final sign = _favouriteService.favourites[index];
+          return _buildFavouriteCard(sign);
+        },
+      ),
+    );
+  }
+
+  // ========== FAVOURITE CARD ==========
   Widget _buildFavouriteCard(Map<String, dynamic> sign) {
+    final isGalleryImage = sign['isGalleryImage'] == true;
+
     return GestureDetector(
       onTap: () {
         _showSignDetail(sign);
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [marineBlue, lightBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: marineBlue.withOpacity(0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                color: Colors.grey.shade100,
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: Image.asset(
-                      sign['image'],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 120,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          child: const Center(
-                            child: Icon(
-                              Icons.image_not_supported,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+            Expanded(
+              flex: 5,
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                          ),
-                        ],
+                ),
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(20),
                       ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.favorite,
-                          color: Colors.red,
-                          size: 20,
+                      child: isGalleryImage
+                          ? Image.file(
+                              File(sign['image']),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildNoImage();
+                              },
+                            )
+                          : Image.asset(
+                              sign['image'],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildNoImage();
+                              },
+                            ),
+                    ),
+                    if (isGalleryImage)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.photo_library,
+                            color: lightBlue,
+                            size: 14,
+                          ),
                         ),
-                        onPressed: () async {
+                      ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: () async {
                           await _favouriteService.removeFavourite(sign['name']);
+
+                          // 👈 YEH ADD HUA
+                          await _historyService.addHistory(
+                            title: sign['name'] ?? 'Sign',
+                            action: 'Favourite',
+                            details: 'Removed from favourites',
+                          );
+
                           setState(() {});
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -234,49 +609,60 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                             ),
                           );
                         },
-                        padding: const EdgeInsets.all(4),
-                        constraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 36,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                            size: 16,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sign['name'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: marineBlue,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: lightBlue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      sign['category'],
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: lightBlue,
-                        fontWeight: FontWeight.w500,
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      sign['name'] ?? 'My Sign',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      sign['category'] ?? 'Gallery',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -285,7 +671,33 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
+  Widget _buildNoImage() {
+    return Container(
+      color: Colors.white.withOpacity(0.1),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.image_not_supported,
+            size: 40,
+            color: Colors.white.withOpacity(0.5),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'No Image',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showSignDetail(Map<String, dynamic> sign) {
+    final isGalleryImage = sign['isGalleryImage'] == true;
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -310,28 +722,46 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  sign['image'],
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 180,
-                      color: Colors.grey.shade200,
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        size: 50,
-                        color: Colors.grey,
+                child: isGalleryImage
+                    ? Image.file(
+                        File(sign['image']),
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 250,
+                            color: Colors.grey.shade200,
+                            child: const Icon(
+                              Icons.broken_image,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        sign['image'],
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 250,
+                            color: Colors.grey.shade200,
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
               const SizedBox(height: 16),
 
               Text(
-                sign['name'],
+                sign['name'] ?? 'My Sign',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -347,7 +777,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  sign['category'],
+                  sign['category'] ?? 'Gallery',
                   style: TextStyle(
                     color: lightBlue,
                     fontSize: 14,
@@ -364,7 +794,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  sign['description'],
+                  sign['description'] ?? 'Image from gallery',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -402,9 +832,12 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
             'Clear Favourites',
-            style: TextStyle(color: marineBlue),
+            style: TextStyle(color: marineBlue, fontWeight: FontWeight.bold),
           ),
           content: Text(
             'Are you sure you want to remove all favourite signs?',
@@ -413,7 +846,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: TextStyle(color: marineBlue)),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -430,6 +863,9 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
               child: const Text('Clear All'),
             ),

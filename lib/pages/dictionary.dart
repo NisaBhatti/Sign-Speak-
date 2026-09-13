@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'words_page.dart';
 import 'alphabets_page.dart';
+import 'videos_page.dart';   // 👈 YEH IMPORT ADD HUA
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -10,7 +11,6 @@ class DictionaryPage extends StatefulWidget {
 }
 
 class _DictionaryPageState extends State<DictionaryPage> {
-  // Colors matching Home Screen
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
@@ -31,7 +31,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // App bar with back button - matching Home Screen style
+              // App bar
               Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -40,7 +40,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withValues(alpha: 0.1),
+                        color: marineBlue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -58,7 +58,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 48), // symmetry
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -69,7 +69,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 child: Text(
                   'Learn Sign Language',
                   style: TextStyle(
-                    color: marineBlue.withValues(alpha: 0.7),
+                    color: marineBlue.withOpacity(0.7),
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -84,14 +84,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     children: [
                       const SizedBox(height: 10),
                       
-                      // 1. Words Button - Navigates to WordsPage
+                      // 1. Words Button
                       _buildFeatureCard(
                         title: 'Words',
                         subtitle: 'Learn Common Words',
                         description: 'Explore common sign language words.',
                         icon: Icons.menu_book,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -107,14 +107,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 2. A to Z / الف تا یئ Button - Navigates to AlphabetsPage
+                      // 2. A to Z / الف تا یئ
                       _buildFeatureCard(
                         title: 'A to Z / الف تا یئ',
                         subtitle: 'English & Urdu Signs',
                         description: 'Learn signs from A to Z and الف to یئ.',
                         icon: Icons.abc,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -130,22 +130,23 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 3. Videos Button - Coming Soon
+                      // 3. Videos Button - UPDATED
                       _buildFeatureCard(
                         title: 'Videos',
                         subtitle: 'Video Tutorials',
                         description: 'Watch sign language video tutorials.',
                         icon: Icons.video_library,
                         gradient: LinearGradient(
-                          colors: [marineBlue.withValues(alpha: 0.9), lightBlue],
+                          colors: [marineBlue.withOpacity(0.9), lightBlue],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Videos feature coming soon!'),
-                              backgroundColor: Color.fromARGB(255, 0, 109, 176),
+                          // 👇 YEH UPDATE HUA
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const VideosPage(),
                             ),
                           );
                         },
@@ -180,7 +181,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withValues(alpha: 0.15),
+              color: marineBlue.withOpacity(0.15),
               blurRadius: 15,
               offset: const Offset(0, 5),
             ),
@@ -194,7 +195,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: Colors.white, size: 28),
@@ -217,7 +218,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -225,7 +226,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     Text(
                       description,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 10,
                       ),
                     ),
@@ -236,12 +237,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.arrow_forward,
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: Colors.white.withOpacity(0.8),
                   size: 18,
                 ),
               ),
