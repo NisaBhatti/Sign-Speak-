@@ -40,7 +40,7 @@ dependencies:
   google_fonts: ^6.3.3
 
   # ===== VIDEO OPENING =====
-  url_launcher: ^6.3.0   # 👈 SIRF YEH ADD HUA HAI
+  url_launcher: ^6.3.0
   
   # ===== STATE MANAGEMENT =====
   provider: ^6.1.2
@@ -60,6 +60,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.1   # 👈 SIRF YEH ADD HUA HAI
 
 flutter:
   uses-material-design: true
@@ -69,3 +70,15 @@ flutter:
     - assets/models/alif_robust.tflite
     - assets/models/hand_landmarker.tflite  
     - assets/models/hand_detection.tflite
+
+# 👇 SIRF YEH SECTION ADD HUA HAI (App Icon Change Karne Ke Liye)
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+    background_color: "#FFFFFF"
+    theme_color: "#080454"
