@@ -3,23 +3,15 @@ import 'package:flutter/material.dart';
 class TermsPoliciesScreen extends StatelessWidget {
   const TermsPoliciesScreen({super.key});
 
-  // Color scheme matching your app's palette
-  static const Color color1 = Color(0xFFCFE8EA);   // Light blue-green
-  static const Color color2 = Color(0xFFACD9D9);   // Light teal
-  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84); // Dark blue
-  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176); // Light blue
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: color1,
-      appBar: AppBar(
-        title: const Text('Terms & Policies'),
-        backgroundColor: color1,
-        foregroundColor: marineBlue,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -28,18 +20,54 @@ class TermsPoliciesScreen extends StatelessWidget {
             colors: [color1, color2],
           ),
         ),
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          children: [
-            _buildSectionHeader('Legal Documents'),
-            
-            _buildPolicyItem(
-              context,
-              icon: Icons.description,
-              title: 'Terms of Service',
-              subtitle: 'User agreement and conditions',
-              lastUpdated: 'Dec 12, 2025',
-              content: '''
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ========== APP BAR ==========
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Terms & Policies',
+                      style: TextStyle(
+                        color: lightBlue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ========== CONTENT ==========
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  children: [
+                    _buildSectionHeader('Legal Documents'),
+
+                    _buildPolicyItem(
+                      context,
+                      icon: Icons.description,
+                      title: 'Terms of Service',
+                      subtitle: 'User agreement and conditions',
+                      lastUpdated: 'Dec 12, 2025',
+                      content: '''
 # Terms of Service
 
 ## 1. Agreement to Terms
@@ -63,15 +91,15 @@ We are not liable for any indirect damages arising from your use.
 ## 7. Changes to Terms
 We may update these terms at any time. Continued use constitutes acceptance.
 ''',
-            ),
-            
-            _buildPolicyItem(
-              context,
-              icon: Icons.privacy_tip,
-              title: 'Privacy Policy',
-              subtitle: 'How we handle your data',
-              lastUpdated: 'Dec 12, 2025',
-              content: '''
+                    ),
+
+                    _buildPolicyItem(
+                      context,
+                      icon: Icons.privacy_tip,
+                      title: 'Privacy Policy',
+                      subtitle: 'How we handle your data',
+                      lastUpdated: 'Dec 12, 2025',
+                      content: '''
 # Privacy Policy
 
 ## 1. Information We Collect
@@ -92,15 +120,15 @@ You have the right to access, correct, or delete your personal information.
 ## 6. Changes to This Policy
 We may update this privacy policy from time to time.
 ''',
-            ),
-            
-            _buildPolicyItem(
-              context,
-              icon: Icons.cookie,
-              title: 'Cookie Policy',
-              subtitle: 'Information about cookies',
-              lastUpdated: 'Dec 12, 2025',
-              content: '''
+                    ),
+
+                    _buildPolicyItem(
+                      context,
+                      icon: Icons.cookie,
+                      title: 'Cookie Policy',
+                      subtitle: 'Information about cookies',
+                      lastUpdated: 'Dec 12, 2025',
+                      content: '''
 # Cookie Policy
 
 ## What Are Cookies
@@ -120,15 +148,15 @@ We use cookies to:
 ## Managing Cookies
 You can control cookies through your browser settings.
 ''',
-            ),
-            
-            _buildPolicyItem(
-              context,
-              icon: Icons.gavel,
-              title: 'Acceptable Use Policy',
-              subtitle: 'Rules for using our service',
-              lastUpdated: 'Dec 12, 2025',
-              content: '''
+                    ),
+
+                    _buildPolicyItem(
+                      context,
+                      icon: Icons.gavel,
+                      title: 'Acceptable Use Policy',
+                      subtitle: 'Rules for using our service',
+                      lastUpdated: 'Dec 12, 2025',
+                      content: '''
 # Acceptable Use Policy
 
 ## Prohibited Activities
@@ -152,80 +180,83 @@ Violations may result in:
 - Account suspension
 - Permanent ban
 ''',
-            ),
-            
-            _buildSectionHeader('Consent Management'),
-            
-            _buildConsentItem(
-              context,
-              icon: Icons.settings,
-              title: 'Consent Preferences',
-              subtitle: 'Manage your privacy choices',
-              onTap: () => _showConsentPreferences(context),
-            ),
-            
-            _buildConsentItem(
-              context,
-              icon: Icons.history,
-              title: 'Consent History',
-              subtitle: 'View your acceptance records',
-              onTap: () => _showConsentHistory(context),
-            ),
-            
-            _buildSectionHeader('Contact'),
-            
-            _buildConsentItem(
-              context,
-              icon: Icons.help,
-              title: 'Legal Questions',
-              subtitle: 'Contact our legal team',
-              onTap: () => _contactLegalTeam(context),
-            ),
-            
-            // Version information
-            Container(
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Text(
-                    'All documents are version controlled',
-                    style: TextStyle(
-                      color: marineBlue.withValues(alpha: 0.6),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Current version: 1.0',
-                    style: TextStyle(
-                      color: marineBlue.withValues(alpha: 0.4),
-                      fontSize: 12,
+
+                    _buildSectionHeader('Consent Management'),
+
+                    _buildConsentItem(
+                      context,
+                      icon: Icons.settings,
+                      title: 'Consent Preferences',
+                      subtitle: 'Manage your privacy choices',
+                      onTap: () => _showConsentPreferences(context),
                     ),
-                  ),
-                ],
+
+                    _buildConsentItem(
+                      context,
+                      icon: Icons.history,
+                      title: 'Consent History',
+                      subtitle: 'View your acceptance records',
+                      onTap: () => _showConsentHistory(context),
+                    ),
+
+                    _buildSectionHeader('Contact'),
+
+                    _buildConsentItem(
+                      context,
+                      icon: Icons.help,
+                      title: 'Legal Questions',
+                      subtitle: 'Contact our legal team',
+                      onTap: () => _contactLegalTeam(context),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Text(
+                            'All documents are version controlled',
+                            style: TextStyle(
+                              color: marineBlue.withOpacity(0.6),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Current version: 1.0',
+                            style: TextStyle(
+                              color: marineBlue.withOpacity(0.4),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(24, 24, 16, 8),
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: marineBlue.withValues(alpha: 0.7),
-          letterSpacing: 1.0,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: marineBlue.withOpacity(0.7),
+          letterSpacing: 0.5,
         ),
       ),
     );
   }
-  
+
   Widget _buildPolicyItem(
     BuildContext context, {
     required IconData icon,
@@ -234,97 +265,99 @@ Violations may result in:
     required String lastUpdated,
     required String content,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PolicyDocumentViewer(
+              title: title,
+              content: content,
+              lastUpdated: lastUpdated,
+            ),
+          ),
+        );
+      },
+      onLongPress: () => _showDocumentOptions(context, title),
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, color1.withValues(alpha: 0.3)],
+            colors: [marineBlue, lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: marineBlue.withOpacity(0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        child: ListTile(
-          leading: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [lightBlue, marineBlue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(14),
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: marineBlue.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              child: Icon(icon, color: Colors.white, size: 24),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: marineBlue,
-              fontSize: 16,
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 2),
-              Text(
-                subtitle, 
-                style: TextStyle(
-                  color: lightBlue.withValues(alpha: 0.8),
-                  fontSize: 13,
-                ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.85),
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Updated: $lastUpdated',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                'Updated: $lastUpdated',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: marineBlue.withValues(alpha: 0.5),
-                ),
-              ),
-            ],
-          ),
-          trailing: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: lightBlue.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.chevron_right,
-              color: marineBlue,
-              size: 18,
-            ),
-          ),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PolicyDocumentViewer(
-                  title: title,
-                  content: content,
-                  lastUpdated: lastUpdated,
-                ),
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
               ),
-            );
-          },
-          onLongPress: () => _showDocumentOptions(context, title),
+              child: const Icon(
+                Icons.chevron_right,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -337,76 +370,84 @@ Violations may result in:
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, color1.withValues(alpha: 0.3)],
+            colors: [marineBlue, lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: marineBlue.withOpacity(0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        child: ListTile(
-          leading: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [marineBlue, lightBlue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(14),
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: marineBlue.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              child: Icon(icon, color: Colors.white, size: 24),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: marineBlue,
-              fontSize: 16,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.85),
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              color: lightBlue.withValues(alpha: 0.8),
-              fontSize: 13,
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.chevron_right,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
-          ),
-          trailing: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: lightBlue.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.chevron_right,
-              color: marineBlue,
-              size: 18,
-            ),
-          ),
-          onTap: onTap,
+          ],
         ),
       ),
     );
   }
-  
+
   void _showConsentPreferences(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -428,16 +469,16 @@ Violations may result in:
       ),
     );
   }
-  
+
   void _showConsentHistory(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => _buildConsentHistoryScreen(),
+        builder: (routeContext) => _buildConsentHistoryScreen(routeContext),
       ),
     );
   }
-  
+
   void _contactLegalTeam(BuildContext context) {
     showDialog(
       context: context,
@@ -460,7 +501,7 @@ Violations may result in:
                 const SizedBox(width: 12),
                 Text(
                   'signsspeak@app.com',
-                  style: TextStyle(color: marineBlue.withValues(alpha: 0.8)),
+                  style: TextStyle(color: marineBlue.withOpacity(0.8)),
                 ),
               ],
             ),
@@ -471,7 +512,7 @@ Violations may result in:
                 const SizedBox(width: 12),
                 Text(
                   '+1-234-567-8900',
-                  style: TextStyle(color: marineBlue.withValues(alpha: 0.8)),
+                  style: TextStyle(color: marineBlue.withOpacity(0.8)),
                 ),
               ],
             ),
@@ -510,7 +551,7 @@ Violations may result in:
       ),
     );
   }
-  
+
   void _showDocumentOptions(BuildContext context, String title) {
     showModalBottomSheet(
       context: context,
@@ -536,7 +577,7 @@ Violations may result in:
                 height: 4,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: lightBlue.withValues(alpha: 0.3),
+                  color: lightBlue.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -545,7 +586,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withValues(alpha: 0.1),
+                    color: lightBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.share, color: marineBlue),
@@ -564,7 +605,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withValues(alpha: 0.1),
+                    color: lightBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.print, color: marineBlue),
@@ -583,7 +624,7 @@ Violations may result in:
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: lightBlue.withValues(alpha: 0.1),
+                    color: lightBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.download, color: marineBlue),
@@ -604,7 +645,7 @@ Violations may result in:
       },
     );
   }
-  
+
   Widget _buildConsentPreferencesSheet(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -618,7 +659,7 @@ Violations may result in:
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: lightBlue.withValues(alpha: 0.3),
+                color: lightBlue.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -635,7 +676,7 @@ Violations may result in:
           Text(
             'Manage your privacy preferences and consents.',
             style: TextStyle(
-              color: lightBlue.withValues(alpha: 0.8),
+              color: lightBlue.withOpacity(0.8),
               fontSize: 14,
             ),
           ),
@@ -710,7 +751,7 @@ Violations may result in:
       ),
     );
   }
-  
+
   Widget _buildPreferenceToggle({
     required String title,
     required String subtitle,
@@ -734,7 +775,7 @@ Violations may result in:
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: lightBlue.withValues(alpha: 0.7),
+                    color: lightBlue.withOpacity(0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -744,26 +785,19 @@ Violations may result in:
           Switch(
             value: value,
             onChanged: (newValue) {},
-            activeThumbColor: lightBlue,
-            activeTrackColor: lightBlue.withValues(alpha: 0.3),
+            activeColor: lightBlue,
+            activeTrackColor: lightBlue.withOpacity(0.3),
             inactiveThumbColor: marineBlue,
-            inactiveTrackColor: marineBlue.withValues(alpha: 0.2),
+            inactiveTrackColor: marineBlue.withOpacity(0.2),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildConsentHistoryScreen() {
+
+  Widget _buildConsentHistoryScreen(BuildContext context) {
     return Scaffold(
       backgroundColor: color1,
-      appBar: AppBar(
-        title: const Text('Consent History'),
-        backgroundColor: color1,
-        foregroundColor: marineBlue,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -772,90 +806,133 @@ Violations may result in:
             colors: [color1, color2],
           ),
         ),
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildHistoryItem(
-              document: 'Terms of Service',
-              date: 'Dec 12, 2025',
-              accepted: true,
-            ),
-            _buildHistoryItem(
-              document: 'Privacy Policy',
-              date: 'Dec 12, 2025',
-              accepted: true,
-            ),
-            _buildHistoryItem(
-              document: 'Cookie Policy',
-              date: 'Dec 12, 2025',
-              accepted: false,
-            ),
-          ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Consent History',
+                      style: TextStyle(
+                        color: lightBlue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildHistoryItem(
+                      document: 'Terms of Service',
+                      date: 'Dec 12, 2025',
+                      accepted: true,
+                    ),
+                    _buildHistoryItem(
+                      document: 'Privacy Policy',
+                      date: 'Dec 12, 2025',
+                      accepted: true,
+                    ),
+                    _buildHistoryItem(
+                      document: 'Cookie Policy',
+                      date: 'Dec 12, 2025',
+                      accepted: false,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
   Widget _buildHistoryItem({
     required String document,
     required String date,
     required bool accepted,
   }) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, color1.withValues(alpha: 0.3)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [marineBlue, lightBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: ListTile(
-          leading: Container(
-            width: 48,
-            height: 48,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: marineBlue.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: accepted 
-                    ? [lightBlue, marineBlue] 
-                    : [marineBlue.withValues(alpha: 0.5), lightBlue.withValues(alpha: 0.3)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
               accepted ? Icons.check : Icons.close,
               color: Colors.white,
+              size: 22,
             ),
           ),
-          title: Text(
-            document,
-            style: TextStyle(
-              color: marineBlue,
-              fontWeight: FontWeight.w600,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  document,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Accepted on $date',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
-          subtitle: Text(
-            'Accepted on $date',
-            style: TextStyle(
-              color: lightBlue.withValues(alpha: 0.8),
-            ),
-          ),
-          trailing: Container(
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: accepted 
-                    ? [lightBlue, marineBlue] 
-                    : [marineBlue.withValues(alpha: 0.3), lightBlue.withValues(alpha: 0.2)],
-              ),
+              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -867,11 +944,11 @@ Violations may result in:
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
-  
+
   void _shareDocument(BuildContext context, String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -884,7 +961,7 @@ Violations may result in:
       ),
     );
   }
-  
+
   void _printDocument(BuildContext context, String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -897,7 +974,7 @@ Violations may result in:
       ),
     );
   }
-  
+
   void _downloadDocument(BuildContext context, String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -912,12 +989,14 @@ Violations may result in:
   }
 }
 
-// PolicyDocumentViewer with updated color scheme
+// ============================================
+// POLICY DOCUMENT VIEWER
+// ============================================
 class PolicyDocumentViewer extends StatelessWidget {
   final String title;
   final String content;
   final String lastUpdated;
-  
+
   const PolicyDocumentViewer({
     super.key,
     required this.title,
@@ -925,24 +1004,15 @@ class PolicyDocumentViewer extends StatelessWidget {
     required this.lastUpdated,
   });
 
-  // Colors from main palette
-  Color get color1 => const Color(0xFFCFE8EA);
-  Color get color2 => const Color(0xFFACD9D9);
-  Color get color4 => const Color(0xFF6CC2C0);
-  Color get marineBlue => const Color.fromARGB(255, 8, 4, 84);
-  Color get lightBlue => const Color.fromARGB(255, 0, 109, 176);
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: color1,
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: color1,
-        foregroundColor: marineBlue,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -951,120 +1021,174 @@ class PolicyDocumentViewer extends StatelessWidget {
             colors: [color1, color2],
           ),
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: marineBlue,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
                       decoration: BoxDecoration(
-                        color: lightBlue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
+                        color: marineBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back, color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
                       child: Text(
-                        'Last Updated: $lastUpdated',
+                        title,
                         style: TextStyle(
-                          fontSize: 13,
                           color: lightBlue,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.8),
-                  ),
-                ),
-                child: Text(
-                  content,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.6,
-                    color: marineBlue,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              // Accept button
-              Container(
-                width: double.infinity,
-                height: 56,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [marineBlue, lightBlue],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: marineBlue.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: lightBlue,
-                        content: Text('Accepted $title'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [marineBlue, lightBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: marineBlue.withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                'Last Updated: $lastUpdated',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: const Text(
-                    'I Accept',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: marineBlue.withOpacity(0.08),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          content,
+                          style: TextStyle(
+                            fontSize: 15,
+                            height: 1.7,
+                            color: marineBlue.withOpacity(0.85),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [marineBlue, lightBlue],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: marineBlue.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: lightBlue,
+                                content: Text('Accepted $title'),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text(
+                            'I Accept',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

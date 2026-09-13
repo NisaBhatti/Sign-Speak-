@@ -74,9 +74,9 @@ class WelcomeScreen extends StatelessWidget {
             colors: [
               color1,
               color2,
-              color4.withValues(alpha: 0.5),
+              color4.withOpacity(0.5),
             ],
-            stops: [0.0, 0.5, 1.0],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -96,14 +96,61 @@ class WelcomeScreen extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // ❌ LOGO SECTION REMOVED
-                                
+                                // ============================================
+                                // ✅ LOGO - CIRCLE with APP BORDER COLOR
+                                // ============================================
+                                Container(
+                                  width: 140,
+                                  height: 140,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: marineBlue.withOpacity(0.4),
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: marineBlue.withOpacity(0.2),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Image.asset(
+                                        'assets/images/logo.png',
+                                        width: 140,
+                                        height: 140,
+                                        fit: BoxFit.contain,
+                                        semanticLabel: 'SignTranslate logo',
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: lightBlue.withOpacity(0.1),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              size: 48,
+                                              color: marineBlue,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+
                                 // App Name
                                 Text(
-                                  'SignTranslate',
+                                  'Signs Speak',
                                   style: TextStyle(
                                     color: marineBlue,
-                                    fontSize: 32,
+                                    fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.5,
                                   ),
@@ -118,6 +165,15 @@ class WelcomeScreen extends StatelessWidget {
                                     textAlign: TextAlign.center,
                                     text: TextSpan(
                                       children: [
+                                        TextSpan(
+                                          text: 'Unlock\n',
+                                          style: TextStyle(
+                                            color: lightBlue,
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w300,
+                                            height: 1.1,
+                                          ),
+                                        ),
                                         TextSpan(
                                           text: 'Communication.\n',
                                           style: TextStyle(
@@ -140,7 +196,7 @@ class WelcomeScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 50),
+                                const SizedBox(height: 40),
 
                                 // Create Account Button
                                 Container(
@@ -148,15 +204,11 @@ class WelcomeScreen extends StatelessWidget {
                                   constraints: const BoxConstraints(maxWidth: 400),
                                   height: 52,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [marineBlue, lightBlue],
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                    ),
+                                    color: marineBlue,
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: marineBlue.withValues(alpha: 0.3),
+                                        color: marineBlue.withOpacity(0.3),
                                         blurRadius: 15,
                                         offset: const Offset(0, 8),
                                       ),
@@ -198,7 +250,7 @@ class WelcomeScreen extends StatelessWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                        color: marineBlue.withValues(alpha: 0.5),
+                                        color: marineBlue.withOpacity(0.5),
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.circular(20),
@@ -209,7 +261,7 @@ class WelcomeScreen extends StatelessWidget {
                                           TextSpan(
                                             text: 'Already have an account? ',
                                             style: TextStyle(
-                                              color: marineBlue.withValues(alpha: 0.8),
+                                              color: marineBlue.withOpacity(0.8),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w400,
                                             ),
@@ -240,7 +292,7 @@ class WelcomeScreen extends StatelessWidget {
                               Container(
                                 width: 100,
                                 height: 1,
-                                color: marineBlue.withValues(alpha: 0.3),
+                                color: marineBlue.withOpacity(0.3),
                                 margin: const EdgeInsets.only(bottom: 16),
                               ),
                               GestureDetector(
@@ -254,7 +306,7 @@ class WelcomeScreen extends StatelessWidget {
                                   ),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: marineBlue.withValues(alpha: 0.3),
+                                      color: marineBlue.withOpacity(0.3),
                                       width: 1,
                                     ),
                                     borderRadius: BorderRadius.circular(20),
