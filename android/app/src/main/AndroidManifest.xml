@@ -57,15 +57,9 @@
     <!-- 📱 APPLICATION                              -->
     <!-- ============================================ -->
     <application
-<<<<<<< HEAD
-        android:name="androidx.multidex.MultiDexApplication"
-        android:label="Sign Speak"
-        android:icon="@mipmap/launcher_icon"
-=======
         android:label="signspeak"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
->>>>>>> d8184d053ded798841e5f67d5a9082ac42addf0a
         android:allowBackup="true"
         android:theme="@style/LaunchTheme">
         
