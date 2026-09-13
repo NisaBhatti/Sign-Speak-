@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
 import '../services/hand_detection_service.dart';
+import '../services/history_service.dart';   // 👈 SIRF YEH IMPORT ADD HUA
 
 class AlifDetectionPage extends StatefulWidget {
   const AlifDetectionPage({Key? key}) : super(key: key);
@@ -22,9 +23,15 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
   DateTime _lastFpsUpdate = DateTime.now();
   List<double> _landmarks = [];
 
+  // 👇 YEH ADD HUA - History ke liye
+  final HistoryService _historyService = HistoryService();
+  DateTime? _lastHistoryTime;
+  bool _lastDetectionWasAlif = false;
+
   @override
   void initState() {
     super.initState();
+    _historyService.loadHistory();   // 👈 YEH ADD HUA
     _initialize();
   }
 
@@ -39,7 +46,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     if (_isConnected) {
       await _initializeCamera();
     } else {
-      // Show error if server not connected
       setState(() {
         _result = DetectionResult.error('Server not connected!\nMake sure Python server is running.');
       });
@@ -69,6 +75,30 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
     } catch (e) {
       print('❌ Camera error: $e');
     }
+  }
+
+  // 👇 YEH NAYA METHOD ADD HUA - History save karne ke liye
+  Future<void> _saveDetectionHistory(bool isAlif, double confidence) async {
+    // Sirf Alif detect hone par save karein
+    if (!isAlif) return;
+    
+    // Sirf tab save karein jab pehle Alif nahi tha (naya detection)
+    if (_lastDetectionWasAlif) return;
+    
+    // 5 second ka gap rakhein
+    if (_lastHistoryTime != null && 
+        DateTime.now().difference(_lastHistoryTime!).inSeconds < 5) {
+      return;
+    }
+    
+    await _historyService.addHistory(
+      title: 'Alif (ا) Detected',
+      action: 'Translation',
+      details: 'Confidence: ${(confidence * 100).toStringAsFixed(0)}%',
+    );
+    
+    _lastHistoryTime = DateTime.now();
+    _lastDetectionWasAlif = true;
   }
 
   // ============================================
@@ -150,6 +180,14 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
               _result = result;
               _landmarks = result.landmarks;
             });
+            
+            // 👇 YEH ADD HUA - History save karein
+            if (result.hasHand && result.isAlif) {
+              _saveDetectionHistory(result.isAlif, result.confidence);
+            } else if (!result.isAlif) {
+              // Agar Alif nahi hai toh flag reset karein
+              _lastDetectionWasAlif = false;
+            }
           }
         } catch (e) {
           print('❌ Error: $e');
@@ -221,14 +259,11 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
       ),
       body: Stack(
         children: [
-          // Camera Preview
           if (_controller != null && _controller!.value.isInitialized)
             CameraPreview(_controller!),
           
-          // Landmark Overlay
           _buildLandmarkOverlay(),
           
-          // Top Status Bar
           Positioned(
             top: 20,
             left: 20,
@@ -241,7 +276,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
               ),
               child: Column(
                 children: [
-                  // Main Result
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -268,7 +302,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  // FPS and Landmarks info
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -302,7 +335,6 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
             ),
           ),
           
-          // Bottom Hint
           Positioned(
             bottom: 30,
             left: 20,
@@ -345,7 +377,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
 // HAND LANDMARK PAINTER
 // ============================================
 class HandLandmarkPainter extends CustomPainter {
-  final List<double> landmarks; // 42 values (21 x 2)
+  final List<double> landmarks;
   final bool isAlif;
   final double viewWidth;
   final double viewHeight;
@@ -363,7 +395,6 @@ class HandLandmarkPainter extends CustomPainter {
 
     final color = isAlif ? Colors.green : Colors.red;
 
-    // Convert flat list to 21 points
     final points = <Offset>[];
     for (int i = 0; i < 21; i++) {
       final x = landmarks[i * 2] * viewWidth;
@@ -371,9 +402,6 @@ class HandLandmarkPainter extends CustomPainter {
       points.add(Offset(x, y));
     }
 
-    // ============================================
-    // DRAW CONNECTIONS (Hand Skeleton)
-    // ============================================
     final connections = [
       [0, 1], [1, 2], [2, 3], [3, 4],
       [0, 5], [5, 6], [6, 7], [7, 8],
@@ -393,9 +421,6 @@ class HandLandmarkPainter extends CustomPainter {
       }
     }
 
-    // ============================================
-    // DRAW LANDMARK POINTS
-    // ============================================
     final pointPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
@@ -409,7 +434,6 @@ class HandLandmarkPainter extends CustomPainter {
       final paint = i == 0 ? wristPaint : pointPaint;
       canvas.drawCircle(points[i], radius, paint);
       
-      // Draw small index numbers
       if (i % 2 == 0) {
         final textPainter = TextPainter(
           text: TextSpan(
@@ -427,9 +451,6 @@ class HandLandmarkPainter extends CustomPainter {
       }
     }
 
-    // ============================================
-    // DRAW BOUNDING BOX
-    // ============================================
     _drawBoundingBox(canvas, points, color);
   }
 
@@ -454,7 +475,6 @@ class HandLandmarkPainter extends CustomPainter {
 
     final rect = Rect.fromLTRB(minX, minY, maxX, maxY);
 
-    // Glow
     final glowPaint = Paint()
       ..color = color.withOpacity(0.1)
       ..style = PaintingStyle.stroke
@@ -462,37 +482,30 @@ class HandLandmarkPainter extends CustomPainter {
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
     canvas.drawRect(rect, glowPaint);
 
-    // Border
     final borderPaint = Paint()
       ..color = color.withOpacity(0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(rect, borderPaint);
 
-    // Corner markers
     final cornerSize = 15.0;
     final cornerPaint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5;
 
-    // Top-left
     canvas.drawLine(Offset(minX, minY + cornerSize), Offset(minX, minY), cornerPaint);
     canvas.drawLine(Offset(minX, minY), Offset(minX + cornerSize, minY), cornerPaint);
 
-    // Top-right
     canvas.drawLine(Offset(maxX, minY + cornerSize), Offset(maxX, minY), cornerPaint);
     canvas.drawLine(Offset(maxX, minY), Offset(maxX - cornerSize, minY), cornerPaint);
 
-    // Bottom-left
     canvas.drawLine(Offset(minX, maxY - cornerSize), Offset(minX, maxY), cornerPaint);
     canvas.drawLine(Offset(minX, maxY), Offset(minX + cornerSize, maxY), cornerPaint);
 
-    // Bottom-right
     canvas.drawLine(Offset(maxX, maxY - cornerSize), Offset(maxX, maxY), cornerPaint);
     canvas.drawLine(Offset(maxX, maxY), Offset(maxX - cornerSize, maxY), cornerPaint);
 
-    // Label
     final label = isAlif ? 'ALIF' : 'Not Alif';
     final labelColor = isAlif ? Colors.green : Colors.red;
     

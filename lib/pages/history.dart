@@ -40,6 +40,10 @@ class _HistoryPageState extends State<HistoryPage> {
           item['action']
               .toString()
               .toLowerCase()
+              .contains(_searchQuery.toLowerCase()) ||
+          (item['details'] ?? '')
+              .toString()
+              .toLowerCase()
               .contains(_searchQuery.toLowerCase());
     }).toList();
   }
@@ -157,7 +161,6 @@ class _HistoryPageState extends State<HistoryPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // Delete All Button
                     if (_historyService.history.isNotEmpty)
                       Container(
                         decoration: BoxDecoration(
@@ -212,6 +215,24 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
               ),
+
+              // ========== HISTORY COUNT (NAYA) ==========
+              if (_historyService.history.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                  child: Row(
+                    children: [
+                      Text(
+                        '${_historyService.history.length} activities',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: marineBlue.withOpacity(0.6),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
               // ========== HISTORY LIST ==========
               Expanded(
@@ -290,6 +311,7 @@ class _HistoryPageState extends State<HistoryPage> {
     final action = item['action'] ?? '';
     final actionColor = _getActionColor(action);
     final icon = _getActionIcon(action);
+    final details = item['details'] ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -319,7 +341,7 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           const SizedBox(width: 12),
 
-          // Title + Date
+          // Title + Details + Date
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,6 +356,19 @@ class _HistoryPageState extends State<HistoryPage> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                // 👇 YEH ADD HUA - Details line
+                if (details.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    details,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 const SizedBox(height: 4),
                 Row(
                   children: [
