@@ -3,11 +3,12 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class AlphabetDetectionService {
-  // ✅ Try these IPs in order
+  // ✅ Current laptop IP is FIRST (fastest detection)
+  // If IP changes again, just add the new one at the top.
   static const List<String> POSSIBLE_HOSTS = [
-    'http://192.168.100.7:5000',
-    'http://192.168.1.62:5000',
-    'http://192.168.1.100:5000',
+    'http://192.168.1.142:5000',   // ← current IP
+    'http://192.168.100.7:5000',   // previous
+    'http://192.168.1.62:5000',    // older
     'http://192.168.0.100:5000',
     'http://10.0.0.100:5000',
   ];
@@ -15,7 +16,9 @@ class AlphabetDetectionService {
   static String? _activeBaseUrl;
   static const int PORT = 5000;
 
-  /// Find which host is reachable (call once at app start)
+  // ============================================
+  // AUTO-DETECT REACHABLE SERVER
+  // ============================================
   static Future<String?> findServer() async {
     if (_activeBaseUrl != null) return _activeBaseUrl;
 
@@ -41,7 +44,7 @@ class AlphabetDetectionService {
     return null;
   }
 
-  /// Force reset (e.g. on pull-to-refresh)
+  /// Force reset (e.g., after IP change)
   static void resetServer() {
     _activeBaseUrl = null;
   }
@@ -101,9 +104,7 @@ class AlphabetDetectionService {
           )
           .timeout(
             const Duration(seconds: 3),
-            onTimeout: () {
-              throw Exception('Timeout');
-            },
+            onTimeout: () => throw Exception('Timeout'),
           );
 
       if (response.statusCode == 200) {
