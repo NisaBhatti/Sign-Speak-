@@ -488,54 +488,36 @@ Violations may result in:
             onPressed: () async {
               Navigator.pop(context);
 
-              final Uri emailUri = Uri(
-                scheme: 'mailto',
-                path: 'signsspeak@app.com',
-                query:
-                    'subject=Legal Question - Signs Speak&body=Hello Legal Team,\n\nI have a question regarding:',
-              );
-
-              final Uri gmailWebUri = Uri.parse(
+              // 👇 Gmail ka direct compose URL - To, Subject, Body sab fill honge
+              final Uri gmailComposeUri = Uri.parse(
                 'https://mail.google.com/mail/?view=cm&fs=1'
                 '&to=signsspeak@app.com'
                 '&su=Legal%20Question%20-%20Signs%20Speak'
-                '&body=Hello%20Legal%20Team%2C%0A%0AI%20have%20a%20question%20regarding%3A',
+                '&body=Hello%20Legal%20Team%2C%0A%0AI%20have%20a%20question%20regarding%3A%20',
               );
 
               try {
-                // Pehle email app (Gmail) try karo
-                if (await canLaunchUrl(emailUri)) {
-                  await launchUrl(emailUri,
-                      mode: LaunchMode.externalApplication);
-                }
-                // Agar email app na mile toh Gmail website browser mein kholo
-                else if (await canLaunchUrl(gmailWebUri)) {
-                  await launchUrl(gmailWebUri,
+                if (await canLaunchUrl(gmailComposeUri)) {
+                  await launchUrl(gmailComposeUri,
                       mode: LaunchMode.externalApplication);
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: Colors.red,
-                        content: Text('Could not open email app or browser'),
+                        content: Text('Could not open Gmail'),
                       ),
                     );
                   }
                 }
               } catch (e) {
-                // Agar pehla fail ho jaye toh Gmail web try karo
-                try {
-                  await launchUrl(gmailWebUri,
-                      mode: LaunchMode.externalApplication);
-                } catch (e2) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.red,
-                        content: Text('Error: $e2'),
-                      ),
-                    );
-                  }
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text('Error: $e'),
+                    ),
+                  );
                 }
               }
             },
