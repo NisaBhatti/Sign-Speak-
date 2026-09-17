@@ -108,7 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Detect Alif, Bay, Jeem and more in real-time.',
                         icon: Icons.back_hand,
                         gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Colors.purpleAccent],
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),

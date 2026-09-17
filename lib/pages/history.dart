@@ -374,11 +374,15 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: [
                     Icon(Icons.access_time, size: 12, color: Colors.grey.shade500),
                     const SizedBox(width: 4),
-                    Text(
-                      _formatDate(item['timestamp'] ?? ''),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
+                    Expanded(
+                      child: Text(
+                        _formatDate(item['timestamp'] ?? ''),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

@@ -135,8 +135,12 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
       },
       child: Container(
         decoration: BoxDecoration(
+          // 👇 YAHAN SIRF COLOUR CHANGE HUA HAI (Purple → Dark Blue)
           gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade400, Colors.purple.shade200],
+            colors: [
+              const Color.fromARGB(255, 8, 4, 84).withOpacity(0.9),
+              const Color.fromARGB(255, 0, 109, 176),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
