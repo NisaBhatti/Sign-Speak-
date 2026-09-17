@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/favourite_service.dart';
-import '../services/history_service.dart';   // 👈 YEH ADD HUA
+import '../services/history_service.dart';
 
 class WordsPage extends StatefulWidget {
   const WordsPage({super.key});
@@ -19,7 +19,7 @@ class _WordsPageState extends State<WordsPage> {
   String _selectedCategory = 'All';
 
   final FavouriteService _favouriteService = FavouriteService();
-  final HistoryService _historyService = HistoryService();   // 👈 YEH ADD HUA
+  final HistoryService _historyService = HistoryService();
 
   final List<Map<String, dynamic>> _signs = [
     {'name': 'Hello', 'urdu': 'ہیلو', 'image': 'assets/images/sign_hello.png', 'category': 'Greetings', 'description': 'Wave your hand near your head'},
@@ -57,6 +57,17 @@ class _WordsPageState extends State<WordsPage> {
     {'name': 'Hungry', 'urdu': 'بھوکا', 'image': 'assets/images/sign_hungry.png', 'category': 'Basic', 'description': 'C-hand slides down chest'},
     {'name': 'Thirsty', 'urdu': 'پیاسا', 'image': 'assets/images/sign_thirsty.png', 'category': 'Basic', 'description': 'Index finger slides down throat'},
     {'name': 'Tired', 'urdu': 'تھکا ہوا', 'image': 'assets/images/sign_tired.png', 'category': 'Emotions', 'description': 'Fingertips on chest with drooping shoulders'},
+    // 👇 10 NAYE SIGNS YAHAN ADD HUE HAIN
+    {'name': 'Love', 'urdu': 'محبت', 'image': 'assets/images/sign_love.png', 'category': 'Emotions', 'description': 'Cross both arms over your chest'},
+    {'name': 'Morning', 'urdu': 'صبح', 'image': 'assets/images/sign_morning.png', 'category': 'Basic', 'description': 'Arm rises like the sun'},
+    {'name': 'Night', 'urdu': 'رات', 'image': 'assets/images/sign_night.png', 'category': 'Basic', 'description': 'Bent hand moves over the other arm'},
+    {'name': 'Money', 'urdu': 'پیسے', 'image': 'assets/images/sign_money.png', 'category': 'Basic', 'description': 'Tap flat hand on palm'},
+    {'name': 'Doctor', 'urdu': 'ڈاکٹر', 'image': 'assets/images/sign_doctor.png', 'category': 'Places', 'description': 'Tap wrist with two fingers'},
+    {'name': 'Police', 'urdu': 'پولیس', 'image': 'assets/images/sign_police.png', 'category': 'Emergency', 'description': 'Tap chest with flat hand like a badge'},
+    {'name': 'Phone', 'urdu': 'فون', 'image': 'assets/images/sign_phone.png', 'category': 'Basic', 'description': 'Hand shaped like a phone near ear'},
+    {'name': 'Car', 'urdu': 'گاڑی', 'image': 'assets/images/sign_car.png', 'category': 'Places', 'description': 'Steering motion with both hands'},
+    {'name': 'Work', 'urdu': 'کام', 'image': 'assets/images/sign_work.png', 'category': 'Education', 'description': 'Tap one fist on top of the other'},
+    {'name': 'Play', 'urdu': 'کھیلنا', 'image': 'assets/images/sign_play.png', 'category': 'Basic', 'description': 'Shake both hands with Y-shape'},
   ];
 
   List<String> get _categories {
@@ -78,7 +89,7 @@ class _WordsPageState extends State<WordsPage> {
   void initState() {
     super.initState();
     _favouriteService.loadFavourites();
-    _historyService.loadHistory();   // 👈 YEH ADD HUA
+    _historyService.loadHistory();
   }
 
   @override
@@ -246,7 +257,6 @@ class _WordsPageState extends State<WordsPage> {
                         onPressed: () async {
                           await _favouriteService.toggleFavourite(sign);
                           
-                          // 👈 YEH ADD HUA
                           await _historyService.addHistory(
                             title: sign['name'] ?? 'Sign',
                             action: 'Favourite',
@@ -357,7 +367,6 @@ class _WordsPageState extends State<WordsPage> {
                         onPressed: () async {
                           await _favouriteService.toggleFavourite(sign);
                           
-                          // 👈 YEH ADD HUA
                           await _historyService.addHistory(
                             title: sign['name'] ?? 'Sign',
                             action: 'Favourite',

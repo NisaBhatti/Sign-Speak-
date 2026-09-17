@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // 👈 YEH IMPORT ADD HUA
+import 'package:url_launcher/url_launcher.dart';
 
 class TermsPoliciesScreen extends StatelessWidget {
   const TermsPoliciesScreen({super.key});
@@ -488,34 +488,54 @@ Violations may result in:
             onPressed: () async {
               Navigator.pop(context);
 
-              // 👇 YAHAN EMAIL OPEN KARNE KA CODE ADD HUA
               final Uri emailUri = Uri(
                 scheme: 'mailto',
                 path: 'signsspeak@app.com',
-                query: 'subject=Legal Question - Signs Speak&body=Hello Legal Team,\n\nI have a question regarding:',
+                query:
+                    'subject=Legal Question - Signs Speak&body=Hello Legal Team,\n\nI have a question regarding:',
+              );
+
+              final Uri gmailWebUri = Uri.parse(
+                'https://mail.google.com/mail/?view=cm&fs=1'
+                '&to=signsspeak@app.com'
+                '&su=Legal%20Question%20-%20Signs%20Speak'
+                '&body=Hello%20Legal%20Team%2C%0A%0AI%20have%20a%20question%20regarding%3A',
               );
 
               try {
+                // Pehle email app (Gmail) try karo
                 if (await canLaunchUrl(emailUri)) {
-                  await launchUrl(emailUri);
+                  await launchUrl(emailUri,
+                      mode: LaunchMode.externalApplication);
+                }
+                // Agar email app na mile toh Gmail website browser mein kholo
+                else if (await canLaunchUrl(gmailWebUri)) {
+                  await launchUrl(gmailWebUri,
+                      mode: LaunchMode.externalApplication);
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         backgroundColor: Colors.red,
-                        content: const Text('Could not open email app'),
+                        content: Text('Could not open email app or browser'),
                       ),
                     );
                   }
                 }
               } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.red,
-                      content: Text('Error: $e'),
-                    ),
-                  );
+                // Agar pehla fail ho jaye toh Gmail web try karo
+                try {
+                  await launchUrl(gmailWebUri,
+                      mode: LaunchMode.externalApplication);
+                } catch (e2) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Error: $e2'),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -576,7 +596,8 @@ Violations may result in:
                 ),
                 title: Text(
                   'Share Document',
-                  style: TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
+                  style:
+                      TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -595,7 +616,8 @@ Violations may result in:
                 ),
                 title: Text(
                   'Print Document',
-                  style: TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
+                  style:
+                      TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -614,7 +636,8 @@ Violations may result in:
                 ),
                 title: Text(
                   'Download PDF',
-                  style: TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
+                  style:
+                      TextStyle(color: marineBlue, fontWeight: FontWeight.w500),
                 ),
                 onTap: () {
                   Navigator.pop(context);
