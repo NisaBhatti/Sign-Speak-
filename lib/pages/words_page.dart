@@ -57,7 +57,6 @@ class _WordsPageState extends State<WordsPage> {
     {'name': 'Hungry', 'urdu': 'بھوکا', 'image': 'assets/images/sign_hungry.png', 'category': 'Basic', 'description': 'C-hand slides down chest'},
     {'name': 'Thirsty', 'urdu': 'پیاسا', 'image': 'assets/images/sign_thirsty.png', 'category': 'Basic', 'description': 'Index finger slides down throat'},
     {'name': 'Tired', 'urdu': 'تھکا ہوا', 'image': 'assets/images/sign_tired.png', 'category': 'Emotions', 'description': 'Fingertips on chest with drooping shoulders'},
-    // 👇 10 NAYE SIGNS YAHAN ADD HUE HAIN
     {'name': 'Love', 'urdu': 'محبت', 'image': 'assets/images/sign_love.png', 'category': 'Emotions', 'description': 'Cross both arms over your chest'},
     {'name': 'Morning', 'urdu': 'صبح', 'image': 'assets/images/sign_morning.png', 'category': 'Basic', 'description': 'Arm rises like the sun'},
     {'name': 'Night', 'urdu': 'رات', 'image': 'assets/images/sign_night.png', 'category': 'Basic', 'description': 'Bent hand moves over the other arm'},
