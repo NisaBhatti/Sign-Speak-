@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // 👈 YEH IMPORT ADD HUA
 
 class TermsPoliciesScreen extends StatelessWidget {
   const TermsPoliciesScreen({super.key});
@@ -484,14 +485,39 @@ Violations may result in:
             ),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: lightBlue,
-                  content: const Text('Opening email client...'),
-                ),
+
+              // 👇 YAHAN EMAIL OPEN KARNE KA CODE ADD HUA
+              final Uri emailUri = Uri(
+                scheme: 'mailto',
+                path: 'signsspeak@app.com',
+                query: 'subject=Legal Question - Signs Speak&body=Hello Legal Team,\n\nI have a question regarding:',
               );
+
+              try {
+                if (await canLaunchUrl(emailUri)) {
+                  await launchUrl(emailUri);
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: const Text('Could not open email app'),
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text('Error: $e'),
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: marineBlue,
