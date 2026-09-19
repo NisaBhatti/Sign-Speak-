@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../services/history_service.dart';   // 👈 SIRF YEH IMPORT ADD HUA
+import '../services/history_service.dart';
 
 class VideosPage extends StatefulWidget {
   const VideosPage({super.key});
@@ -20,7 +20,7 @@ class _VideosPageState extends State<VideosPage> {
   String _searchQuery = '';
 
   // ✅ History Service
-  final HistoryService _historyService = HistoryService();   // 👈 YEH LINE ADD HUI
+  final HistoryService _historyService = HistoryService();
 
   // ✅ VIDEOS LIST
   final List<Map<String, dynamic>> _videos = [
@@ -66,6 +66,49 @@ class _VideosPageState extends State<VideosPage> {
       'category': 'Conversation',
       'thumbnail': '',
     },
+    // 👇 URDU SIGN LANGUAGE VIDEOS - YAHAN ADD HUI HAIN
+    {
+      'title': 'Urdu Sign Language Basics',
+      'subtitle': 'اردو اشاروں کی زبان - بنیادی باتیں',
+      'url': 'https://www.youtube.com/watch?v=ZH0mHEiTVjI',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
+    {
+      'title': 'Pakistani Sign Language Alphabet',
+      'subtitle': 'پاکستانی اشاروں کی زبان - حروف تہجی',
+      'url': 'https://www.youtube.com/watch?v=xbaX0BIHQD4&list=PLn55kp0ywMLyOHdWGYxjwwyxufUFQ2Uds',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
+    {
+      'title': 'Common Urdu Phrases in Sign Language',
+      'subtitle': 'عام اردو جملے اشاروں میں',
+      'url': 'https://www.youtube.com/watch?v=6ulmshS13Xo',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
+    {
+      'title': 'Urdu Greetings in Sign Language',
+      'subtitle': 'اردو میں سلام دعا اشاروں میں',
+      'url': 'https://www.youtube.com/watch?v=ncjJRwWdeC8',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
+    {
+      'title': 'Family Signs in Urdu',
+      'subtitle': 'خاندان کے افراد اشاروں میں',
+      'url': 'https://www.youtube.com/watch?v=B_Hq0WuqDkY',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
+    {
+      'title': 'Numbers in Urdu Sign Language',
+      'subtitle': 'اردو اشاروں میں گنتی',
+      'url': 'https://www.youtube.com/watch?v=jXybuIDFx_k',
+      'category': 'Urdu',
+      'thumbnail': '',
+    },
   ];
 
   // Filtered videos
@@ -86,7 +129,7 @@ class _VideosPageState extends State<VideosPage> {
   @override
   void initState() {
     super.initState();
-    _historyService.loadHistory();   // 👈 YEH LINE ADD HUI
+    _historyService.loadHistory();
   }
 
   // 🎬 Video open karne ka method - UPDATED
@@ -100,7 +143,7 @@ class _VideosPageState extends State<VideosPage> {
 
     // ✅ Video open karein (Multiple methods try karein)
     final Uri uri = Uri.parse(url);
-    
+
     try {
       // Method 1: Try external app (YouTube)
       if (await canLaunchUrl(uri)) {
@@ -273,7 +316,6 @@ class _VideosPageState extends State<VideosPage> {
   // ========== VIDEO CARD ==========
   Widget _buildVideoCard(Map<String, dynamic> video) {
     return GestureDetector(
-      // 👇 YEH UPDATE HUA - Title bhi pass karein
       onTap: () => _openVideo(video['url'], video['title']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -312,7 +354,7 @@ class _VideosPageState extends State<VideosPage> {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Video Info
               Expanded(
                 child: Column(
@@ -358,7 +400,7 @@ class _VideosPageState extends State<VideosPage> {
                   ],
                 ),
               ),
-              
+
               // Arrow Icon
               Container(
                 width: 32,
