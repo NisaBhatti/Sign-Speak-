@@ -678,7 +678,7 @@ class WelcomeScreen extends StatelessWidget {
                               context,
                               icon: Icons.back_hand,
                               label: 'Alif Detection',
-                              route: '/hand-detection', // ✅ UPDATED
+                              route: '/hand-detection', 
                             ),
                             const SizedBox(width: 12),
                             _buildQuickAccessButton(
