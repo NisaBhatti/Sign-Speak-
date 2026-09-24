@@ -6,7 +6,7 @@ import 'package:image/image.dart' as img;
 import '../services/hand_detection_service.dart';
 
 class AlifDetectionPage extends StatefulWidget {
-  const AlifDetectionPage({Key? key}) : super(key: key);
+  const AlifDetectionPage({super.key});
 
   @override
   State<AlifDetectionPage> createState() => _AlifDetectionPageState();
@@ -236,7 +236,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -310,7 +310,7 @@ class _AlifDetectionPageState extends State<AlifDetectionPage> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -383,7 +383,7 @@ class HandLandmarkPainter extends CustomPainter {
     ];
 
     final linePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.6)
+      ..color = Colors.yellow.withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -456,7 +456,7 @@ class HandLandmarkPainter extends CustomPainter {
 
     // Glow
     final glowPaint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
@@ -464,7 +464,7 @@ class HandLandmarkPainter extends CustomPainter {
 
     // Border
     final borderPaint = Paint()
-      ..color = color.withOpacity(0.7)
+      ..color = color.withValues(alpha: 0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(rect, borderPaint);
@@ -497,7 +497,7 @@ class HandLandmarkPainter extends CustomPainter {
     final labelColor = isAlif ? Colors.green : Colors.red;
     
     final labelPaint = Paint()
-      ..color = Colors.black.withOpacity(0.7)
+      ..color = Colors.black.withValues(alpha: 0.7)
       ..style = PaintingStyle.fill;
 
     final labelRect = Rect.fromLTWH(minX + 10, minY - 28, 70, 22);

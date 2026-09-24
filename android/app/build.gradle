@@ -19,12 +19,6 @@ android {
         jvmTarget = '17'
     }
 
-    // Prevents compression of model files
-    aaptOptions {
-        noCompress "tflite"
-        noCompress "task"
-    }
-
     defaultConfig {
         applicationId 'com.example.signspeak'
         minSdkVersion 26
@@ -53,31 +47,17 @@ flutter {
 }
 
 dependencies {
-    // ============================================
-    // CAMERA
-    // ============================================
+    // Camera
     implementation 'androidx.camera:camera-core:1.4.1'
     implementation 'androidx.camera:camera-camera2:1.4.1'
     implementation 'androidx.camera:camera-lifecycle:1.4.1'
     implementation 'androidx.camera:camera-view:1.4.1'
 
-    // ============================================
-    // ANDROIDX
-    // ============================================
+    // AndroidX
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    // ============================================
-    // FIREBASE (auto-added by Flutter plugin)
-    // ============================================
-    // No need to add manually — handled by flutter's plugin
-
-    // ============================================
-    // ❌ DO NOT ADD (causes conflicts)
-    // ============================================
-    // implementation 'com.google.mediapipe:mediapipe:...'
-    // implementation 'org.tensorflow:tensorflow-lite:...'
-    // implementation 'com.google.mlkit:...'
+    // ❌ No TFLite, no MediaPipe, no MLKit — all handled by Python server
 }

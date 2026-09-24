@@ -11,11 +11,11 @@ class AlphabetDetectionPage extends StatefulWidget {
   final String arabic;
 
   const AlphabetDetectionPage({
-    Key? key,
+    super.key,
     required this.alphabet,
     required this.displayName,
     required this.arabic,
-  }) : super(key: key);
+  });
 
   @override
   State<AlphabetDetectionPage> createState() => _AlphabetDetectionPageState();
@@ -250,7 +250,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -325,7 +325,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -392,7 +392,7 @@ class HandLandmarkPainter extends CustomPainter {
     ];
 
     final linePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.7)
+      ..color = Colors.yellow.withValues(alpha: 0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -434,14 +434,14 @@ class HandLandmarkPainter extends CustomPainter {
     final rect = Rect.fromLTRB(minX, minY, maxX, maxY);
 
     final glowPaint = Paint()
-      ..color = color.withOpacity(0.15)
+      ..color = color.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
     canvas.drawRect(rect, glowPaint);
 
     final borderPaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(rect, borderPaint);
@@ -473,7 +473,7 @@ class HandLandmarkPainter extends CustomPainter {
     final labelColor = isAlphabet ? Colors.green : Colors.red;
 
     final labelPaint = Paint()
-      ..color = Colors.black.withOpacity(0.7)
+      ..color = Colors.black.withValues(alpha: 0.7)
       ..style = PaintingStyle.fill;
 
     final labelRect = Rect.fromLTWH(minX + 10, minY - 28, 90, 22);

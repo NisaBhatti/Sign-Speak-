@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'alphabet_detection_page.dart';
 
 class AlphabetSelectionPage extends StatefulWidget {
-  const AlphabetSelectionPage({Key? key}) : super(key: key);
+  const AlphabetSelectionPage({super.key});
 
   @override
   State<AlphabetSelectionPage> createState() => _AlphabetSelectionPageState();
@@ -81,7 +81,7 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  color: Colors.blueAccent.withOpacity(0.1),
+                  color: Colors.blueAccent.withValues(alpha: 0.1),
                   child: Row(
                     children: [
                       const Icon(Icons.info_outline, color: Colors.blueAccent),
@@ -143,7 +143,7 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

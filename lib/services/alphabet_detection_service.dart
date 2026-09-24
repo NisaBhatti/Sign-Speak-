@@ -3,18 +3,12 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class AlphabetDetectionService {
-  // ✅ Current laptop IP is FIRST (fastest detection)
-  // If IP changes again, just add the new one at the top.
+  // ✅ Live Railway server URL
   static const List<String> POSSIBLE_HOSTS = [
-    'http://192.168.1.142:5000',   // ← current IP
-    'http://192.168.100.7:5000',   // previous
-    'http://192.168.1.62:5000',    // older
-    'http://192.168.0.100:5000',
-    'http://10.0.0.100:5000',
+    'https://pythonserversignspeak-production.up.railway.app',
   ];
 
   static String? _activeBaseUrl;
-  static const int PORT = 5000;
 
   // ============================================
   // AUTO-DETECT REACHABLE SERVER
@@ -22,14 +16,14 @@ class AlphabetDetectionService {
   static Future<String?> findServer() async {
     if (_activeBaseUrl != null) return _activeBaseUrl;
 
-    print('🔎 Searching for server...');
+    print('🔎 Connecting to server...');
 
     for (final host in POSSIBLE_HOSTS) {
       try {
         print('  Trying $host ...');
         final r = await http
             .get(Uri.parse('$host/ping'))
-            .timeout(const Duration(seconds: 2));
+            .timeout(const Duration(seconds: 10));
         if (r.statusCode == 200) {
           _activeBaseUrl = host;
           print('✅ Found server at: $host');
@@ -40,11 +34,11 @@ class AlphabetDetectionService {
       }
     }
 
-    print('❌ No server found on any host');
+    print('❌ No server found');
     return null;
   }
 
-  /// Force reset (e.g., after IP change)
+  /// Force reset
   static void resetServer() {
     _activeBaseUrl = null;
   }
@@ -68,7 +62,7 @@ class AlphabetDetectionService {
 
       final response = await http
           .get(Uri.parse(PING_URL))
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 10));
       return {'connected': response.statusCode == 200};
     } catch (e) {
       print('❌ Ping error: $e');
@@ -103,7 +97,7 @@ class AlphabetDetectionService {
             }),
           )
           .timeout(
-            const Duration(seconds: 3),
+            const Duration(seconds: 15),
             onTimeout: () => throw Exception('Timeout'),
           );
 

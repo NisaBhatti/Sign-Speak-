@@ -222,7 +222,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -269,7 +269,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -291,7 +291,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: marineBlue.withOpacity(0.1),
+                            color: marineBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
@@ -348,7 +348,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: marineBlue.withOpacity(0.3),
+                    color: marineBlue.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -376,7 +376,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: marineBlue.withOpacity(0.6),
+                color: marineBlue.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 32),
@@ -395,7 +395,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: marineBlue.withOpacity(0.3),
+                      color: marineBlue.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     ),
@@ -409,7 +409,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         width: 56,
                         height: 56,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -443,7 +443,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
@@ -526,7 +526,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.25),
+              color: marineBlue.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -576,7 +576,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -612,11 +612,11 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
+                            color: Colors.white.withValues(alpha: 0.95),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 4,
                               ),
                             ],
@@ -655,7 +655,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                     Text(
                       sign['category'] ?? 'Gallery',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 11,
                       ),
                       maxLines: 1,
@@ -673,20 +673,20 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
   Widget _buildNoImage() {
     return Container(
-      color: Colors.white.withOpacity(0.1),
+      color: Colors.white.withValues(alpha: 0.1),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.image_not_supported,
             size: 40,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
             'No Image',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 11,
             ),
           ),
@@ -773,7 +773,7 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
-                  color: lightBlue.withOpacity(0.1),
+                  color: lightBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

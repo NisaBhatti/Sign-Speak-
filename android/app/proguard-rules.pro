@@ -1,16 +1,12 @@
-# Keep Flutter
--keep class io.flutter.app.** { *; }
--keep class io.flutter.plugin.**  { *; }
--keep class io.flutter.util.**  { *; }
--keep class io.flutter.view.**  { *; }
--keep class io.flutter.**  { *; }
--keep class io.flutter.plugins.**  { *; }
+# Flutter
+-keep class io.flutter.** { *; }
+-keep class io.flutter.embedding.** { *; }
 
-# Keep Camera
+# CameraX
 -keep class androidx.camera.** { *; }
 
-# Keep ML Kit (if using)
--keep class com.google.mlkit.** { *; }
+# Firebase
+-keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 
 # Keep native methods
@@ -21,5 +17,8 @@
 # Keep annotations
 -keepattributes *Annotation*
 -keepattributes Signature
--keepattributes SourceFile
--keepattributes LineNumberTable
+-keepattributes Exceptions
+
+# Don't warn
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
