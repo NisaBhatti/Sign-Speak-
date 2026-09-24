@@ -86,7 +86,7 @@ def load_model(alphabet_name):
 
 
 # ============================================
-# INITIALIZE MEDIAPIPE HANDS
+# INITIALIZE HANDS
 # ============================================
 hands = mp_hands_module.Hands(
     static_image_mode=False,
@@ -110,9 +110,6 @@ ALPHABET_DISPLAY = {
     'zal': 'ذ', 'khay': 'خ', 'rre': 'ڑ',
 }
 
-# ============================================
-# ROUTES
-# ============================================
 @app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({
@@ -171,7 +168,7 @@ def detect():
                 'hasHand': False, 'isAlphabet': False, 'confidence': 0.0,
                 'landmarks': [], 'alphabet': alphabet,
                 'display': ALPHABET_DISPLAY.get(alphabet, alphabet),
-                'message': 'No hand detected'
+                'message': 'No hand'
             })
 
         landmarks = []
