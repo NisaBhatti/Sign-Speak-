@@ -117,15 +117,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      // 1. ALPHABET DETECTION
+                      // 1. ALPHABET DETECTION  — ✅ now blue themed
                       _buildFeatureCard(
                         title: 'Alphabet Detection',
                         subtitle: 'All Arabic/Urdu alphabets',
                         description:
                             'Detect Alif, Bay, Jeem and more in real-time.',
                         icon: Icons.back_hand,
-                        gradient: const LinearGradient(
-                          colors: [Colors.deepPurple, Colors.purpleAccent],
+                        gradient: LinearGradient(
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),

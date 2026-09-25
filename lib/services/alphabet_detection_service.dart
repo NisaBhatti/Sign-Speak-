@@ -9,8 +9,8 @@ class AlphabetDetectionService {
   // 2. Railway cloud — used when laptop is off / phone is on mobile data
   // ============================================
   static const List<String> POSSIBLE_HOSTS = [
-    'http://192.168.100.7:5000',              // Local laptop (Wi-Fi)
-    'https://signspeaks.nutrispherepk.site',  // Railway cloud
+    'http://10.200.7.224:5000',              // Local laptop (Wi-Fi)
+    // 'https://signspeaks.nutrispherepk.site',  // Railway cloud
   ];
 
   static String? _activeBaseUrl;

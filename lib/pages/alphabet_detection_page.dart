@@ -23,6 +23,12 @@ class AlphabetDetectionPage extends StatefulWidget {
 }
 
 class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
+  // ✅ Theme colors (same as HomeScreen)
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+
   CameraController? _controller;
   DetectionResult _result = DetectionResult.error('Waiting...');
   bool _isProcessing = false;
@@ -187,7 +193,6 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
           numChannels: 3,
         );
 
-        // Higher quality for better local detection
         final resized = img.copyResize(imgImage, width: 480);
         final jpegBytes = img.encodeJpg(resized, quality: 60);
         return Uint8List.fromList(jpegBytes);
@@ -227,7 +232,6 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
       if (mounted) setState(() {});
     }
 
-    // 🐞 debug mode
     if (_debugMode == 1) {
       final dummy = _generateDebugLandmarks();
       setState(() {
@@ -304,177 +308,346 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              widget.arabic,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 10),
-            Text(widget.displayName),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color1, color2],
+          ),
         ),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bug_report),
-            tooltip: _debugMode == 0 ? 'Enable dummy landmarks' : 'Disable dummy',
-            onPressed: () {
-              setState(() {
-                _debugMode = _debugMode == 0 ? 1 : 0;
-                if (_debugMode == 0) {
-                  _landmarks = [];
-                  _result = DetectionResult.error('Waiting...');
-                }
-              });
-            },
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: _isConnected ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _isConnected ? Icons.cloud_done : Icons.cloud_off,
-                  color: Colors.white,
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  _isConnected ? 'Server' : 'Offline',
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          if (_controller != null && _controller!.value.isInitialized)
-            CameraPreview(_controller!),
-
-          _buildLandmarkOverlay(),
-
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.75),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _result.hasHand
-                            ? (_result.isAlphabet
-                                ? Icons.check_circle
-                                : Icons.cancel)
-                            : Icons.handshake,
-                        color: _result.hasHand
-                            ? (_result.isAlphabet ? Colors.green : Colors.red)
-                            : Colors.grey,
-                        size: 28,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ============================
+              // TOP BAR (matches HomeScreen style)
+              // ============================
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text(
-                          _result.label,
-                          style: TextStyle(
-                            color: _result.hasHand
-                                ? (_result.isAlphabet
-                                    ? Colors.green
-                                    : Colors.red)
-                                : Colors.grey,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back,
+                            color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Arabic letter badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: marineBlue.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
                           ),
-                          overflow: TextOverflow.ellipsis,
+                        ],
+                      ),
+                      child: Text(
+                        widget.arabic,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'hasHand=${_result.hasHand}  |  '
-                    'landmarks=${_landmarks.length}  |  '
-                    'conf=${(_result.confidence * 100).toStringAsFixed(0)}%'
-                    '${_debugMode == 1 ? "  |  DEBUG" : ""}',
-                    style: const TextStyle(
-                      color: Colors.amber,
-                      fontSize: 11,
-                      fontFamily: 'monospace',
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        widget.displayName,
+                        style: const TextStyle(
+                          color: marineBlue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Debug toggle
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.bug_report,
+                          color: _debugMode == 1 ? Colors.orange : marineBlue,
+                          size: 22,
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                        tooltip: _debugMode == 0
+                            ? 'Enable dummy landmarks'
+                            : 'Disable dummy',
+                        onPressed: () {
+                          setState(() {
+                            _debugMode = _debugMode == 0 ? 1 : 0;
+                            if (_debugMode == 0) {
+                              _landmarks = [];
+                              _result = DetectionResult.error('Waiting...');
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ============================
+              // SERVER STATUS BADGE
+              // ============================
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _isConnected
+                        ? Colors.green.withValues(alpha: 0.15)
+                        : Colors.red.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      width: 1,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        '⚡ ${_fps.toStringAsFixed(0)} FPS',
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 11),
+                      Icon(
+                        _isConnected ? Icons.cloud_done : Icons.cloud_off,
+                        color: _isConnected ? Colors.green : Colors.red,
+                        size: 16,
                       ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text(
-                          'msg: ${_result.message}',
-                          style: const TextStyle(
-                              color: Colors.white54, fontSize: 11),
-                          overflow: TextOverflow.ellipsis,
+                      const SizedBox(width: 6),
+                      Text(
+                        _isConnected
+                            ? 'Server Connected'
+                            : 'Server Offline',
+                        style: TextStyle(
+                          color: _isConnected ? Colors.green : Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 30,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.75),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                !_isConnected
-                    ? '❌ Server offline — check Wi-Fi and server IP'
-                    : _result.hasHand
-                        ? (_result.isAlphabet
-                            ? '✅ Correct! You are showing ${widget.displayName}'
-                            : '❌ This is not ${widget.displayName}')
-                        : '👋 Show your hand to camera',
-                style: TextStyle(
-                  color: !_isConnected
-                      ? Colors.red
-                      : _result.hasHand
-                          ? (_result.isAlphabet ? Colors.green : Colors.red)
-                          : Colors.grey,
-                  fontSize: 12,
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
+
+              const SizedBox(height: 12),
+
+              // ============================
+              // CAMERA PREVIEW + OVERLAY
+              // ============================
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: marineBlue.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: marineBlue.withValues(alpha: 0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          if (_controller != null &&
+                              _controller!.value.isInitialized)
+                            SizedBox.expand(
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: SizedBox(
+                                  width: _controller!.value.previewSize!
+                                      .height,
+                                  height: _controller!.value.previewSize!
+                                      .width,
+                                  child: CameraPreview(_controller!),
+                                ),
+                              ),
+                            )
+                          else
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    _isConnected
+                                        ? 'Starting camera...'
+                                        : 'Server offline',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          _buildLandmarkOverlay(),
+
+                          // Top status overlay
+                          Positioned(
+                            top: 12,
+                            left: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? Icons.check_circle
+                                            : Icons.cancel)
+                                        : Icons.handshake,
+                                    color: _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? Colors.green
+                                            : Colors.red)
+                                        : Colors.grey,
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      _result.label,
+                                      style: TextStyle(
+                                        color: _result.hasHand
+                                            ? (_result.isAlphabet
+                                                ? Colors.green
+                                                : Colors.red)
+                                            : Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_fps.toStringAsFixed(0)} FPS',
+                                    style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // Bottom hint overlay
+                          Positioned(
+                            bottom: 12,
+                            left: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Text(
+                                !_isConnected
+                                    ? '❌ Server offline — check Wi-Fi and server IP'
+                                    : _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? '✅ Correct! You are showing ${widget.displayName}'
+                                            : '❌ This is not ${widget.displayName}')
+                                        : '👋 Show your hand to camera',
+                                style: TextStyle(
+                                  color: !_isConnected
+                                      ? Colors.red
+                                      : _result.hasHand
+                                          ? (_result.isAlphabet
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.white70,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // ============================
+              // DEBUG INFO (compact)
+              // ============================
+              if (_debugMode == 1)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange, width: 1),
+                    ),
+                    child: Text(
+                      'DEBUG  |  hasHand=${_result.hasHand}  |  '
+                      'landmarks=${_landmarks.length}  |  '
+                      'conf=${(_result.confidence * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

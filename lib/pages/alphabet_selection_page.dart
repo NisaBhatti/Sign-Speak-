@@ -9,6 +9,12 @@ class AlphabetSelectionPage extends StatefulWidget {
 }
 
 class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
+  // ✅ Theme colors (same as HomeScreen)
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+
   // ✅ Urdu alphabetical order
   final List<Map<String, String>> _alphabets = [
     {'name': 'alif',      'display': 'Alif',      'arabic': 'ا'},
@@ -50,46 +56,110 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('📚 Select Alphabet'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.blueAccent.withOpacity(0.1),
-            child: Row(
-              children: [
-                const Icon(Icons.info_outline, color: Colors.blueAccent),
-                const SizedBox(width: 8),
-                Text(
-                  '${_alphabets.length} alphabets available',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
+      // ✅ Same gradient background as HomeScreen
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color1, color2],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ============================
+              // TOP BAR (matches HomeScreen style)
+              // ============================
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back,
+                            color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'Select Alphabet',
+                      style: TextStyle(
+                        color: lightBlue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              // ============================
+              // INFO BANNER
+              // ============================
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: lightBlue.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline,
+                          color: lightBlue, size: 20),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${_alphabets.length} alphabets available',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: marineBlue,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
               ),
-              itemCount: _alphabets.length,
-              itemBuilder: (context, index) =>
-                  _buildAlphabetCard(context, _alphabets[index]),
-            ),
+
+              const SizedBox(height: 16),
+
+              // ============================
+              // ALPHABET GRID
+              // ============================
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(20),
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: _alphabets.length,
+                  itemBuilder: (context, index) =>
+                      _buildAlphabetCard(context, _alphabets[index]),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -111,17 +181,21 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
       },
       child: Container(
         decoration: BoxDecoration(
+          // ✅ Blue theme matching HomeScreen cards
           gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade400, Colors.purple.shade200],
+            colors: [
+              marineBlue.withValues(alpha: 0.9),
+              lightBlue,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: marineBlue.withValues(alpha: 0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
