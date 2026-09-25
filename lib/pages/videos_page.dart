@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../services/favourite_service.dart';   // 👈 YEH ADD HUA
 import '../services/history_service.dart';
 
 class VideosPage extends StatefulWidget {
@@ -10,19 +11,16 @@ class VideosPage extends StatefulWidget {
 }
 
 class _VideosPageState extends State<VideosPage> {
-  // Colors matching your app
   static const Color color1 = Color(0xFFCFE8EA);
   static const Color color2 = Color(0xFFACD9D9);
   static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
   static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
-  // Search query
   String _searchQuery = '';
 
-  // ✅ History Service
   final HistoryService _historyService = HistoryService();
+  final FavouriteService _favouriteService = FavouriteService();   // 👈 YEH ADD HUA
 
-  // ✅ VIDEOS LIST
   final List<Map<String, dynamic>> _videos = [
     {
       'title': 'Sign Language Basics',
@@ -30,6 +28,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=0FcwzMq4iWg',
       'category': 'Basics',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Alphabet Signs A to Z',
@@ -37,6 +36,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=Ld6lsSqU00g',
       'category': 'Alphabets',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Common Greetings',
@@ -44,6 +44,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=YyUS7Aw9aiA',
       'category': 'Greetings',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Numbers 1 to 10',
@@ -51,6 +52,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=jXybuIDFx_k',
       'category': 'Numbers',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Family Signs',
@@ -58,6 +60,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=NkrBTZl0vG8',
       'category': 'Family',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Daily Conversation',
@@ -65,14 +68,15 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=_c--P6VRTUo',
       'category': 'Conversation',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
-    // 👇 URDU SIGN LANGUAGE VIDEOS - YAHAN ADD HUI HAIN
     {
       'title': 'Urdu Sign Language Basics',
       'subtitle': 'اردو اشاروں کی زبان - بنیادی باتیں',
       'url': 'https://www.youtube.com/watch?v=ZH0mHEiTVjI',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Pakistani Sign Language Alphabet',
@@ -80,6 +84,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=xbaX0BIHQD4&list=PLn55kp0ywMLyOHdWGYxjwwyxufUFQ2Uds',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Common Urdu Phrases in Sign Language',
@@ -87,6 +92,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=6ulmshS13Xo',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Urdu Greetings in Sign Language',
@@ -94,6 +100,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=ncjJRwWdeC8',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Family Signs in Urdu',
@@ -101,6 +108,7 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=B_Hq0WuqDkY',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
     {
       'title': 'Numbers in Urdu Sign Language',
@@ -108,10 +116,10 @@ class _VideosPageState extends State<VideosPage> {
       'url': 'https://www.youtube.com/watch?v=jXybuIDFx_k',
       'category': 'Urdu',
       'thumbnail': '',
+      'isVideo': true,   // 👈 YEH ADD HUA
     },
   ];
 
-  // Filtered videos
   List<Map<String, dynamic>> get _filteredVideos {
     if (_searchQuery.isEmpty) return _videos;
     return _videos.where((video) {
@@ -130,30 +138,25 @@ class _VideosPageState extends State<VideosPage> {
   void initState() {
     super.initState();
     _historyService.loadHistory();
+    _favouriteService.loadFavourites();   // 👈 YEH ADD HUA
   }
 
-  // 🎬 Video open karne ka method - UPDATED
   Future<void> _openVideo(String url, String title) async {
-    // ✅ History save karein
     await _historyService.addHistory(
       title: title,
       action: 'Video',
       details: 'Watched video tutorial',
     );
 
-    // ✅ Video open karein (Multiple methods try karein)
     final Uri uri = Uri.parse(url);
 
     try {
-      // Method 1: Try external app (YouTube)
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        // Method 2: Try in-app browser
         await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
       }
     } catch (e) {
-      // Method 3: Try platform default
       try {
         await launchUrl(uri);
       } catch (e2) {
@@ -185,7 +188,6 @@ class _VideosPageState extends State<VideosPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // ========== APP BAR ==========
               Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -217,7 +219,6 @@ class _VideosPageState extends State<VideosPage> {
                 ),
               ),
 
-              // ========== WELCOME TEXT ==========
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
                 child: Text(
@@ -230,7 +231,6 @@ class _VideosPageState extends State<VideosPage> {
                 ),
               ),
 
-              // ========== SEARCH BAR ==========
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: Container(
@@ -266,7 +266,6 @@ class _VideosPageState extends State<VideosPage> {
                 ),
               ),
 
-              // ========== VIDEOS LIST ==========
               Expanded(
                 child: _filteredVideos.isEmpty
                     ? Center(
@@ -313,8 +312,9 @@ class _VideosPageState extends State<VideosPage> {
     );
   }
 
-  // ========== VIDEO CARD ==========
   Widget _buildVideoCard(Map<String, dynamic> video) {
+    final isFav = _favouriteService.isFavourite(video['title']);   // 👈 YEH ADD HUA
+
     return GestureDetector(
       onTap: () => _openVideo(video['url'], video['title']),
       child: Container(
@@ -339,7 +339,6 @@ class _VideosPageState extends State<VideosPage> {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Play Icon Circle
               Container(
                 width: 56,
                 height: 56,
@@ -355,7 +354,6 @@ class _VideosPageState extends State<VideosPage> {
               ),
               const SizedBox(width: 16),
 
-              // Video Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +399,43 @@ class _VideosPageState extends State<VideosPage> {
                 ),
               ),
 
-              // Arrow Icon
+              // 👇 YEH ADD HUA - Heart icon
+              GestureDetector(
+                onTap: () async {
+                  await _favouriteService.toggleFavourite(video);
+                  await _historyService.addHistory(
+                    title: video['title'] ?? 'Video',
+                    action: 'Favourite',
+                    details: isFav ? 'Removed from favourites' : 'Added to favourites',
+                  );
+                  setState(() {});
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isFav ? 'Removed from favourites' : 'Added to favourites'),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: isFav ? Colors.red : Colors.green,
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? Colors.red : Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
               Container(
                 width: 32,
                 height: 32,

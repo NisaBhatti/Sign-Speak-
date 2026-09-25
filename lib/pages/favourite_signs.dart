@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';   // 👈 YEH ADD HUA
 import 'dart:io';
 import '../services/favourite_service.dart';
-import '../services/history_service.dart';   // 👈 YEH ADD HUA
+import '../services/history_service.dart';
 
 class FavouriteSignsPage extends StatefulWidget {
   const FavouriteSignsPage({super.key});
@@ -19,16 +20,15 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
   final FavouriteService _favouriteService = FavouriteService();
   final ImagePicker _imagePicker = ImagePicker();
-  final HistoryService _historyService = HistoryService();   // 👈 YEH ADD HUA
+  final HistoryService _historyService = HistoryService();
 
   @override
   void initState() {
     super.initState();
     _favouriteService.loadFavourites();
-    _historyService.loadHistory();   // 👈 YEH ADD HUA
+    _historyService.loadHistory();
   }
 
-  // 📸 Gallery se image pick karne ka method
   Future<void> _pickImageFromGallery() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -50,7 +50,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
       await _favouriteService.addFavourite(newSign);
 
-      // 👈 YEH ADD HUA
       await _historyService.addHistory(
         title: 'Image from Gallery',
         action: 'Gallery',
@@ -76,7 +75,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     }
   }
 
-  // 📷 Camera se image capture karne ka method
   Future<void> _pickImageFromCamera() async {
     try {
       final XFile? image = await _imagePicker.pickImage(
@@ -98,7 +96,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
 
       await _favouriteService.addFavourite(newSign);
 
-      // 👈 YEH ADD HUA
       await _historyService.addHistory(
         title: 'Image from Camera',
         action: 'Camera',
@@ -124,7 +121,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     }
   }
 
-  // 🆕 Add Sign Dialog
   void _showAddSignDialog() {
     showModalBottomSheet(
       context: context,
@@ -260,7 +256,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // ========== APP BAR ==========
               Container(
                 height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -315,7 +310,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
               ),
 
-              // ========== CONTENT ==========
               Expanded(
                 child: _favouriteService.favourites.isEmpty
                     ? _buildEmptyState()
@@ -328,7 +322,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
-  // ========== EMPTY STATE ==========
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -488,7 +481,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
-  // ========== FAVOURITES GRID ==========
   Widget _buildFavouritesGrid() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -508,13 +500,18 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
     );
   }
 
-  // ========== FAVOURITE CARD ==========
   Widget _buildFavouriteCard(Map<String, dynamic> sign) {
     final isGalleryImage = sign['isGalleryImage'] == true;
+    final isVideo = sign['isVideo'] == true;   // 👈 YEH ADD HUA
 
     return GestureDetector(
       onTap: () {
-        _showSignDetail(sign);
+        // 👇 YEH UPDATE HUA - Agar video hai toh YouTube open karo
+        if (isVideo) {
+          _openVideo(sign['url'] ?? '', sign['name'] ?? 'Video');
+        } else {
+          _showSignDetail(sign);
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -547,27 +544,39 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                 ),
                 child: Stack(
                   children: [
+                    // 👇 YEH UPDATE HUA - Video ke liye play icon
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(20),
                       ),
-                      child: isGalleryImage
-                          ? Image.file(
-                              File(sign['image']),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) {
-                                return _buildNoImage();
-                              },
+                      child: isVideo
+                          ? Container(
+                              color: Colors.black26,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.play_circle_fill,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                              ),
                             )
-                          : Image.asset(
-                              sign['image'],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              errorBuilder: (context, error, stackTrace) {
-                                return _buildNoImage();
-                              },
-                            ),
+                          : isGalleryImage
+                              ? Image.file(
+                                  File(sign['image']),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _buildNoImage();
+                                  },
+                                )
+                              : Image.asset(
+                                  sign['image'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _buildNoImage();
+                                  },
+                                ),
                     ),
                     if (isGalleryImage)
                       Positioned(
@@ -586,6 +595,24 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                           ),
                         ),
                       ),
+                    // 👇 YEH ADD HUA - Video badge
+                    if (isVideo)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.video_library,
+                            color: lightBlue,
+                            size: 14,
+                          ),
+                        ),
+                      ),
                     Positioned(
                       top: 8,
                       right: 8,
@@ -593,7 +620,6 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
                         onTap: () async {
                           await _favouriteService.removeFavourite(sign['name']);
 
-                          // 👈 YEH ADD HUA
                           await _historyService.addHistory(
                             title: sign['name'] ?? 'Sign',
                             action: 'Favourite',
@@ -693,6 +719,40 @@ class _FavouriteSignsPageState extends State<FavouriteSignsPage> {
         ],
       ),
     );
+  }
+
+  // 👇 YEH NAYA METHOD ADD HUA - Video open karne ke liye
+  Future<void> _openVideo(String url, String title) async {
+    await _historyService.addHistory(
+      title: title,
+      action: 'Video',
+      details: 'Watched video from favourites',
+    );
+
+    if (url.isEmpty) return;
+
+    final Uri uri = Uri.parse(url);
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+      }
+    } catch (e) {
+      try {
+        await launchUrl(uri);
+      } catch (e2) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('❌ Could not open video'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   void _showSignDetail(Map<String, dynamic> sign) {
