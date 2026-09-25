@@ -14,6 +14,12 @@ dependencies:
   # ===== CAMERA =====
   camera: ^0.10.6
 
+  # ===== TEXT TO SPEECH =====
+  flutter_tts: ^4.0.2
+
+  # ===== TENSORFLOW LITE =====
+  # tflite_flutter: ^0.11.0
+
   # ===== IMAGE PROCESSING =====
   image: ^4.2.0
 
@@ -57,3 +63,6 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/models/alif_robust.tflite
+    - assets/models/hand_landmarker.tflite
+    - assets/models/hand_detection.tflite

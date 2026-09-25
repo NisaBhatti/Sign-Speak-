@@ -22,6 +22,48 @@
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
 
+    <!-- ══════════════════════════════════════════ -->
+    <!-- QUERIES — TTS + Camera + YouTube + Browser -->
+    <!-- ══════════════════════════════════════════ -->
+    <queries>
+        <!-- Text To Speech engine (REQUIRED for flutter_tts on Android 11+) -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+
+        <!-- Camera capture -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+
+        <!-- Image picker -->
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data android:mimeType="image/*" />
+        </intent>
+
+        <!-- YouTube app -->
+        <package android:name="com.google.android.youtube" />
+
+        <!-- Chrome browser -->
+        <package android:name="com.android.chrome" />
+
+        <!-- Generic browser for https links -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+
+        <!-- YouTube deep link -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="vnd.youtube" />
+        </intent>
+    </queries>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- APPLICATION                                -->
+    <!-- ══════════════════════════════════════════ -->
     <application
         android:name="androidx.multidex.MultiDexApplication"
         android:label="Sign Speak"
@@ -67,15 +109,5 @@
         </provider>
 
     </application>
-
-    <queries>
-        <intent>
-            <action android:name="android.media.action.IMAGE_CAPTURE" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.PICK" />
-            <data android:mimeType="image/*" />
-        </intent>
-    </queries>
 
 </manifest>
