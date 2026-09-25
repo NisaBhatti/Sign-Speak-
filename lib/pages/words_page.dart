@@ -114,7 +114,7 @@ class _WordsPageState extends State<WordsPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -131,7 +131,7 @@ class _WordsPageState extends State<WordsPage> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-                child: Text('Learn Common Sign Language Signs', style: TextStyle(color: marineBlue.withOpacity(0.7), fontSize: 20, fontWeight: FontWeight.bold)),
+                child: Text('Learn Common Sign Language Signs', style: TextStyle(color: marineBlue.withValues(alpha: 0.7), fontSize: 20, fontWeight: FontWeight.bold)),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -139,7 +139,7 @@ class _WordsPageState extends State<WordsPage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
                   ),
                   child: TextField(
                     onChanged: (value) => setState(() => _searchQuery = value),
@@ -169,7 +169,7 @@ class _WordsPageState extends State<WordsPage> {
                         label: Text(category, style: TextStyle(color: isSelected ? Colors.white : marineBlue, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
                         selected: isSelected,
                         onSelected: (selected) => setState(() => _selectedCategory = category),
-                        backgroundColor: Colors.white.withOpacity(0.7),
+                        backgroundColor: Colors.white.withValues(alpha: 0.7),
                         selectedColor: lightBlue,
                         side: BorderSide(color: isSelected ? lightBlue : Colors.transparent, width: 1),
                       ),
@@ -224,7 +224,7 @@ class _WordsPageState extends State<WordsPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,9 +247,9 @@ class _WordsPageState extends State<WordsPage> {
                     right: 8,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
                       ),
                       child: IconButton(
                         icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: isFav ? Colors.red : Colors.grey, size: 20),
@@ -388,7 +388,7 @@ class _WordsPageState extends State<WordsPage> {
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(color: lightBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: lightBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                     child: Text(sign['category'], style: TextStyle(color: lightBlue, fontSize: 14, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 16),

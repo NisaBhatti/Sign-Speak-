@@ -143,7 +143,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -164,7 +164,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     if (_historyService.history.isNotEmpty)
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
@@ -189,7 +189,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -272,7 +272,7 @@ class _HistoryPageState extends State<HistoryPage> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: marineBlue.withOpacity(0.3),
+                  color: marineBlue.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -298,7 +298,7 @@ class _HistoryPageState extends State<HistoryPage> {
             'Your activities will appear here',
             style: TextStyle(
               fontSize: 14,
-              color: marineBlue.withOpacity(0.6),
+              color: marineBlue.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -321,7 +321,7 @@ class _HistoryPageState extends State<HistoryPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -334,7 +334,7 @@ class _HistoryPageState extends State<HistoryPage> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: actionColor.withOpacity(0.12),
+              color: actionColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: actionColor, size: 22),
@@ -397,7 +397,7 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.08),
+                color: Colors.red.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(

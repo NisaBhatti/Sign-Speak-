@@ -9,112 +9,158 @@ class AlphabetSelectionPage extends StatefulWidget {
 }
 
 class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
-  bool _isLoading = true;
+  // ✅ Theme colors (same as HomeScreen)
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
 
-  // ============================================
-  // ALL ALPHABETS (matches python_server models)
-  // ============================================
+  // ✅ Urdu alphabetical order
   final List<Map<String, String>> _alphabets = [
-    {'name': 'alif',     'display': 'Alif',     'arabic': 'ا'},
-    {'name': 'bay',      'display': 'Bay',      'arabic': 'ب'},
-    {'name': 'tay',      'display': 'Tay',      'arabic': 'ت'},
-    {'name': 'thay',     'display': 'Thay',     'arabic': 'ث'},
-    {'name': 'seen',     'display': 'Seen',     'arabic': 'س'},
-    {'name': 'sheen',    'display': 'Sheen',    'arabic': 'ش'},
-    {'name': 'suaad',    'display': 'Suaad',    'arabic': 'ص'},
-    {'name': 'zvad',     'display': 'Zvad',     'arabic': 'ض'},
-    {'name': 'toayn',    'display': 'Toayn',    'arabic': 'ط'},
-    {'name': 'zoyn',     'display': 'Zoyn',     'arabic': 'ظ'},
-    {'name': 'ain',      'display': 'Ain',      'arabic': 'ع'},
-    {'name': 'ghain',    'display': 'Ghain',    'arabic': 'غ'},
-    {'name': 'fe',       'display': 'Fe',       'arabic': 'ف'},
-    {'name': 'quaaf',    'display': 'Quaaf',    'arabic': 'ق'},
-    {'name': 'kaf',      'display': 'Kaf',      'arabic': 'ك'},
-    {'name': 'gaf',      'display': 'Gaf',      'arabic': 'گ'},
-    {'name': 'lam',      'display': 'Lam',      'arabic': 'ل'},
-    {'name': 'mim',      'display': 'Mim',      'arabic': 'م'},
-    {'name': 'noon',     'display': 'Noon',     'arabic': 'ن'},
-    {'name': 'vao',      'display': 'Vao',      'arabic': 'و'},
-    {'name': 'hamza',    'display': 'Hamza',    'arabic': 'ء'},
-    {'name': 'choti_ye', 'display': 'Choti Ye', 'arabic': 'ی'},
-    {'name': 'bari_ye',  'display': 'Bari Ye',  'arabic': 'ے'},
-    {'name': 'ray',      'display': 'Ray',      'arabic': 'ر'},
-    {'name': 'rray',     'display': 'Rray',     'arabic': 'ڑ'},
-    {'name': 'zay',      'display': 'Zay',      'arabic': 'ز'},
-    {'name': 'dal',      'display': 'Dal',      'arabic': 'د'},
-    {'name': 'daal',     'display': 'Daal',     'arabic': 'ڈ'},
-    {'name': 'zal',      'display': 'Zal',      'arabic': 'ذ'},
-    {'name': 'khay',     'display': 'Khay',     'arabic': 'خ'},
-    {'name': 'rre',      'display': 'Rre',      'arabic': 'ڑ'},
+    {'name': 'alif',      'display': 'Alif',      'arabic': 'ا'},
+    {'name': 'bay',       'display': 'Bay',       'arabic': 'ب'},
+    {'name': 'pay',       'display': 'Pay',       'arabic': 'پ'},
+    {'name': 'tay',       'display': 'Tay',       'arabic': 'ت'},
+    {'name': 'tey',       'display': 'Tey',       'arabic': 'ٹ'},
+    {'name': 'thay',      'display': 'Thay',      'arabic': 'ث'},
+    {'name': 'jeem',      'display': 'Jeem',      'arabic': 'ج'},
+    {'name': 'chay',      'display': 'Chay',      'arabic': 'چ'},
+    {'name': 'khay',      'display': 'Khay',      'arabic': 'خ'},
+    {'name': 'dal',       'display': 'Dal',       'arabic': 'د'},
+    {'name': 'daal',      'display': 'Daal',      'arabic': 'ڈ'},
+    {'name': 'zal',       'display': 'Zal',       'arabic': 'ذ'},
+    {'name': 'ray',       'display': 'Ray',       'arabic': 'ر'},
+    {'name': 'rray',      'display': 'Rray',      'arabic': 'ڑ'},
+    {'name': 'zay',       'display': 'Zay',       'arabic': 'ز'},
+    {'name': 'seen',      'display': 'Seen',      'arabic': 'س'},
+    {'name': 'sheen',     'display': 'Sheen',     'arabic': 'ش'},
+    {'name': 'suaad',     'display': 'Suaad',     'arabic': 'ص'},
+    {'name': 'zvad',      'display': 'Zvad',      'arabic': 'ض'},
+    {'name': 'toayn',     'display': 'Toayn',     'arabic': 'ط'},
+    {'name': 'zoyn',      'display': 'Zoyn',      'arabic': 'ظ'},
+    {'name': 'ain',       'display': 'Ain',       'arabic': 'ع'},
+    {'name': 'ghain',     'display': 'Ghain',     'arabic': 'غ'},
+    {'name': 'fe',        'display': 'Fe',        'arabic': 'ف'},
+    {'name': 'quaaf',     'display': 'Quaaf',     'arabic': 'ق'},
+    {'name': 'kaf',       'display': 'Kaf',       'arabic': 'ك'},
+    {'name': 'gaf',       'display': 'Gaf',       'arabic': 'گ'},
+    {'name': 'lam',       'display': 'Lam',       'arabic': 'ل'},
+    {'name': 'mim',       'display': 'Mim',       'arabic': 'م'},
+    {'name': 'noon',      'display': 'Noon',      'arabic': 'ن'},
+    {'name': 'vao',       'display': 'Vao',       'arabic': 'و'},
+    {'name': 'hamza',     'display': 'Hamza',     'arabic': 'ء'},
+    {'name': 'choti_ye',  'display': 'Choti Ye',  'arabic': 'ی'},
+    {'name': 'bari_ye',   'display': 'Bari Ye',   'arabic': 'ے'},
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('📚 Select Alphabet'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-      ),
-      body: _isLoading
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading alphabets...'),
-                ],
+      // ✅ Same gradient background as HomeScreen
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color1, color2],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ============================
+              // TOP BAR (matches HomeScreen style)
+              // ============================
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back,
+                            color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'Select Alphabet',
+                      style: TextStyle(
+                        color: lightBlue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    const SizedBox(width: 48),
+                  ],
+                ),
               ),
-            )
-          : Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.blueAccent.withOpacity(0.1),
+
+              // ============================
+              // INFO BANNER
+              // ============================
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: lightBlue.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.blueAccent),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.info_outline,
+                          color: lightBlue, size: 20),
+                      const SizedBox(width: 10),
                       Text(
                         '${_alphabets.length} alphabets available',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
+                          color: marineBlue,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.85,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    itemCount: _alphabets.length,
-                    itemBuilder: (context, index) {
-                      return _buildAlphabetCard(context, _alphabets[index]);
-                    },
+              ),
+
+              const SizedBox(height: 16),
+
+              // ============================
+              // ALPHABET GRID
+              // ============================
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(20),
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                   ),
+                  itemCount: _alphabets.length,
+                  itemBuilder: (context, index) =>
+                      _buildAlphabetCard(context, _alphabets[index]),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -135,11 +181,19 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
       },
       child: Container(
         decoration: BoxDecoration(
+<<<<<<< HEAD
           // 👇 YAHAN SIRF COLOUR CHANGE HUA HAI (Purple → Dark Blue)
           gradient: LinearGradient(
             colors: [
               const Color.fromARGB(255, 8, 4, 84).withOpacity(0.9),
               const Color.fromARGB(255, 0, 109, 176),
+=======
+          // ✅ Blue theme matching HomeScreen cards
+          gradient: LinearGradient(
+            colors: [
+              marineBlue.withValues(alpha: 0.9),
+              lightBlue,
+>>>>>>> fc4623e65d122f057e5283087afc708c3c20c565
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -147,9 +201,9 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: marineBlue.withValues(alpha: 0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -169,10 +223,7 @@ class _AlphabetSelectionPageState extends State<AlphabetSelectionPage> {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 alphabet['display']!,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 12),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

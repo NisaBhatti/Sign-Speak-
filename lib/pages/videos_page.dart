@@ -196,7 +196,7 @@ class _VideosPageState extends State<VideosPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: marineBlue.withOpacity(0.1),
+                        color: marineBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
@@ -224,7 +224,7 @@ class _VideosPageState extends State<VideosPage> {
                 child: Text(
                   'Watch Sign Language Videos',
                   style: TextStyle(
-                    color: marineBlue.withOpacity(0.7),
+                    color: marineBlue.withValues(alpha: 0.7),
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -239,7 +239,7 @@ class _VideosPageState extends State<VideosPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -329,7 +329,7 @@ class _VideosPageState extends State<VideosPage> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: marineBlue.withOpacity(0.25),
+              color: marineBlue.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -343,7 +343,7 @@ class _VideosPageState extends State<VideosPage> {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -373,7 +373,7 @@ class _VideosPageState extends State<VideosPage> {
                     Text(
                       video['subtitle'],
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 12,
                       ),
                       maxLines: 1,
@@ -383,7 +383,7 @@ class _VideosPageState extends State<VideosPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -440,7 +440,7 @@ class _VideosPageState extends State<VideosPage> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(

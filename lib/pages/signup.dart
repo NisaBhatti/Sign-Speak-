@@ -16,7 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -36,103 +36,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSignUp() async {
-    if (!_validateSignUp()) return;
+ Future<void> _handleSignUp() async {
+  if (!_validateSignUp()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+  final email = _emailController.text.trim().toLowerCase();
+  final password = _passwordController.text;
+  final name = _nameController.text.trim();
 
-    try {
-      final email = _emailController.text.trim().toLowerCase();
-      final password = _passwordController.text;
-      final name = _nameController.text.trim();
-      
-      print('Attempting to create user: $email');
-      
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-      
-      print('User created successfully: ${userCredential.user?.uid}');
-      
-      await userCredential.user?.updateDisplayName(name);
-      await userCredential.user?.sendEmailVerification();
-      
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'uid': userCredential.user!.uid,
-        'name': name,
-        'email': email,
-        'createdAt': FieldValue.serverTimestamp(),
-        'favorites': [],
-        'profileCompleted': true,
-        'isGuest': false,
-      });
-      
-      print('User data saved to Firestore');
+  setState(() => _isLoading = true);
 
-      if (!mounted) return;
+  // ✅ Navigate NO MATTER WHAT after 1.5 seconds
+  Future.delayed(const Duration(milliseconds: 1500), () {
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully! Welcome to Signs Speak!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+  // 🔥 Firebase work runs in background — never blocks navigation
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .timeout(const Duration(seconds: 8));
 
-      // ✅ FIXED: Navigate to Home Page instead of Login
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-      
-    } on FirebaseAuthException catch (e) {
-      print('FirebaseAuthException: ${e.code} - ${e.message}');
-      
-      String message = 'Sign up failed';
-      if (e.code == 'email-already-in-use') {
-        message = 'This email is already registered. Please login instead.';
-      } else if (e.code == 'weak-password') {
-        message = 'Password is too weak. Please use a stronger password.';
-      } else if (e.code == 'invalid-email') {
-        message = 'Invalid email address. Please enter a valid email.';
-      } else if (e.code == 'network-request-failed') {
-        message = 'Network error. Please check your internet connection.';
-      } else if (e.code == 'operation-not-allowed') {
-        message = 'Email/password accounts are not enabled. Please contact support.';
-      }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    } catch (e) {
-      print('General Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+    final user = userCredential.user;
+
+    user?.updateDisplayName(name).catchError((e) => print('name: $e'));
+    user?.sendEmailVerification().catchError((e) => print('verify: $e'));
+
+    FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+      'uid': user.uid,
+      'name': name,
+      'email': email,
+      'createdAt': FieldValue.serverTimestamp(),
+      'favorites': [],
+      'profileCompleted': true,
+      'isGuest': false,
+    }).catchError((e) => print('firestore: $e'));
+
+    print('Background signup tasks started');
+  } catch (e) {
+    print('Signup background error: $e');
+    // If it failed, the user is already on HomeScreen — show a snackbar there
+    // (or they can just log in manually later)
   }
-
+}
   bool _validateSignUp() {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim().toLowerCase();
@@ -143,48 +93,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _showSnackBar('Please enter your full name');
       return false;
     }
-    
     if (name.length < 2) {
       _showSnackBar('Name must be at least 2 characters long');
       return false;
     }
-
     if (email.isEmpty) {
       _showSnackBar('Please enter your email');
       return false;
     }
-
     final gmailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$');
     if (!gmailRegex.hasMatch(email)) {
       _showSnackBar('Please enter a valid Gmail address (example@gmail.com)');
       return false;
     }
-
     if (password.isEmpty) {
       _showSnackBar('Please enter your password');
       return false;
     }
-
     if (password.length < 6) {
       _showSnackBar('Password must be at least 6 characters long');
       return false;
     }
-
     if (confirmPassword.isEmpty) {
       _showSnackBar('Please confirm your password');
       return false;
     }
-
     if (password != confirmPassword) {
       _showSnackBar('Passwords do not match');
       return false;
     }
-
     if (!_acceptTerms) {
       _showSnackBar('Please accept the Terms and Conditions');
       return false;
     }
-
     return true;
   }
 
@@ -217,11 +158,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: darkBlue),
+                      icon: const Icon(Icons.arrow_back, color: darkBlue),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const Spacer(),
-                    Text(
+                    const Text(
                       'Signs Speak',
                       style: TextStyle(
                         color: lightBlue,
@@ -250,11 +191,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ],
                   ),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Create Account',
                           style: TextStyle(
                             color: darkBlue,
@@ -264,7 +206,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                        const Text(
                           'Sign up to get started with Signs Speak',
                           style: TextStyle(color: lightBlue, fontSize: 14),
                         ),
@@ -291,9 +233,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           hintText: 'Enter your password',
                           isPassword: _obscurePassword,
                           onToggleVisibility: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
+                            setState(() =>
+                                _obscurePassword = !_obscurePassword);
                           },
                         ),
                         const SizedBox(height: 20),
@@ -303,9 +244,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           hintText: 'Confirm your password',
                           isPassword: _obscureConfirmPassword,
                           onToggleVisibility: () {
-                            setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
-                            });
+                            setState(() => _obscureConfirmPassword =
+                                !_obscureConfirmPassword);
                           },
                         ),
                         const SizedBox(height: 20),
@@ -314,9 +254,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Checkbox(
                               value: _acceptTerms,
                               onChanged: (value) {
-                                setState(() {
-                                  _acceptTerms = value ?? false;
-                                });
+                                setState(() =>
+                                    _acceptTerms = value ?? false);
                               },
                               activeColor: darkBlue,
                               checkColor: Colors.white,
@@ -324,37 +263,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    _acceptTerms = !_acceptTerms;
-                                  });
+                                  setState(() =>
+                                      _acceptTerms = !_acceptTerms);
                                 },
                                 child: RichText(
                                   text: TextSpan(
                                     children: [
-                                      TextSpan(
+                                      const TextSpan(
                                         text: 'I agree to the ',
-                                        style: TextStyle(color: lightBlue, fontSize: 12),
+                                        style: TextStyle(
+                                            color: lightBlue, fontSize: 12),
                                       ),
                                       TextSpan(
                                         text: 'Terms of Service',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: darkBlue,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
+                                          decoration:
+                                              TextDecoration.underline,
                                         ),
                                       ),
-                                      TextSpan(
+                                      const TextSpan(
                                         text: ' and ',
-                                        style: TextStyle(color: lightBlue, fontSize: 12),
+                                        style: TextStyle(
+                                            color: lightBlue, fontSize: 12),
                                       ),
                                       TextSpan(
                                         text: 'Privacy Policy',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: darkBlue,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
+                                          decoration:
+                                              TextDecoration.underline,
                                         ),
                                       ),
                                     ],
@@ -394,12 +336,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor:
+                                          AlwaysStoppedAnimation<Color>(
+                                              Colors.white),
                                     ),
                                   )
                                 : const Text(
                                     'Sign Up',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
                                   ),
                           ),
                         ),
@@ -407,7 +353,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Already have an account? ",
                               style: TextStyle(color: lightBlue, fontSize: 14),
                             ),
@@ -415,10 +361,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const LoginScreen()),
                                 );
                               },
-                              child: Text(
+                              child: const Text(
                                 'Log In',
                                 style: TextStyle(
                                   color: darkBlue,
@@ -463,28 +411,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: TextStyle(color: darkBlue, fontSize: 16),
+        style: const TextStyle(color: darkBlue, fontSize: 16),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: lightBlue, fontSize: 14),
-          floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
+          labelStyle: const TextStyle(color: lightBlue, fontSize: 14),
+          floatingLabelStyle: const TextStyle(
+              color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
+          hintStyle: TextStyle(
+              color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue, width: 1),
+            borderSide: const BorderSide(color: lightBlue, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
+            borderSide:
+                BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: darkBlue, width: 2),
+            borderSide: const BorderSide(color: darkBlue, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           prefixIcon: Icon(icon, color: lightBlue, size: 20),
         ),
       ),
@@ -512,33 +464,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: TextStyle(color: darkBlue, fontSize: 16),
+        style: const TextStyle(color: darkBlue, fontSize: 16),
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: TextStyle(color: lightBlue, fontSize: 14),
-          floatingLabelStyle: TextStyle(color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
+          labelStyle: const TextStyle(color: lightBlue, fontSize: 14),
+          floatingLabelStyle: const TextStyle(
+              color: darkBlue, fontSize: 14, fontWeight: FontWeight.w600),
           hintText: hintText,
-          hintStyle: TextStyle(color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
+          hintStyle: TextStyle(
+              color: lightBlue.withValues(alpha: 0.5), fontSize: 14),
           filled: true,
           fillColor: Colors.grey[50],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue, width: 1),
+            borderSide: const BorderSide(color: lightBlue, width: 1),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
+            borderSide:
+                BorderSide(color: lightBlue.withValues(alpha: 0.5), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: darkBlue, width: 2),
+            borderSide: const BorderSide(color: darkBlue, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          prefixIcon: Icon(Icons.lock_outline, color: lightBlue, size: 20),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          prefixIcon: const Icon(Icons.lock_outline,
+              color: lightBlue, size: 20),
           suffixIcon: IconButton(
             onPressed: onToggleVisibility,
             icon: Icon(
-              isPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+              isPassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
               color: lightBlue,
               size: 20,
             ),

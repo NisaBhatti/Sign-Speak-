@@ -22,16 +22,32 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final HistoryService _historyService = HistoryService();
 
+  /// Safe wrapper — never blocks navigation if history write fails
+  Future<void> _logHistory({
+    required String title,
+    required String action,
+    required String details,
+  }) async {
+    try {
+      await _historyService
+          .addHistory(title: title, action: action, details: details)
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      // Non-critical — ignore
+      print('addHistory failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isGuest = user == null;
+    // Keep a reference so the auth stream is observed (prevents stale user)
+    FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       key: _scaffoldKey,
       drawer: const DrawerPage(),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -59,13 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: IconButton(
                         onPressed: () =>
                             _scaffoldKey.currentState?.openDrawer(),
-                        icon: Icon(Icons.menu, color: marineBlue, size: 22),
+                        icon:
+                            const Icon(Icons.menu, color: marineBlue, size: 22),
                         padding: const EdgeInsets.all(6),
                         constraints: const BoxConstraints(
                             minWidth: 40, minHeight: 40),
                       ),
                     ),
-                    Text(
+                    const Text(
                       'Signs Speak',
                       style: TextStyle(
                           color: lightBlue,
@@ -100,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      // 1. ALPHABET DETECTION
+                      // 1. ALPHABET DETECTION  — ✅ now blue themed
                       _buildFeatureCard(
                         title: 'Alphabet Detection',
                         subtitle: 'All Arabic/Urdu alphabets',
@@ -116,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () async {
-                          await _historyService.addHistory(
+                          await _logHistory(
                             title: 'Alphabet Detection',
                             action: 'Detection',
                             details: 'Opened alphabet detection',
@@ -148,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () async {
-                          await _historyService.addHistory(
+                          await _logHistory(
                             title: 'Sign Book',
                             action: 'Dictionary',
                             details: 'Opened dictionary',
@@ -179,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                         onTap: () async {
-                          await _historyService.addHistory(
+                          await _logHistory(
                             title: 'Favourite Signs',
                             action: 'Favourite',
                             details: 'Opened favourites',

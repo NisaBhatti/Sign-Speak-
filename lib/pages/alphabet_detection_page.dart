@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter_tts/flutter_tts.dart';
 import '../services/alphabet_detection_service.dart';
 
 class AlphabetDetectionPage extends StatefulWidget {
@@ -11,17 +12,23 @@ class AlphabetDetectionPage extends StatefulWidget {
   final String arabic;
 
   const AlphabetDetectionPage({
-    Key? key,
+    super.key,
     required this.alphabet,
     required this.displayName,
     required this.arabic,
-  }) : super(key: key);
+  });
 
   @override
   State<AlphabetDetectionPage> createState() => _AlphabetDetectionPageState();
 }
 
 class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
+  // ✅ Theme colors (same as HomeScreen)
+  static const Color color1 = Color(0xFFCFE8EA);
+  static const Color color2 = Color(0xFFACD9D9);
+  static const Color marineBlue = Color.fromARGB(255, 8, 4, 84);
+  static const Color lightBlue = Color.fromARGB(255, 0, 109, 176);
+
   CameraController? _controller;
   DetectionResult _result = DetectionResult.error('Waiting...');
   bool _isProcessing = false;
@@ -29,12 +36,71 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
   int _frameCount = 0;
   double _fps = 0.0;
   DateTime _lastFpsUpdate = DateTime.now();
+  DateTime? _lastFrameTime;
   List<double> _landmarks = [];
+
+  final FlutterTts _tts = FlutterTts();
+  bool _ttsReady = false;
+  String _lastSpokenMessage = '';
+  DateTime _lastSpokenTime = DateTime.now();
+
+  // 🐞 debug: 1 = draw dummy landmarks
+  int _debugMode = 0;
 
   @override
   void initState() {
     super.initState();
+    _initTts();
     _initialize();
+  }
+
+  Future<void> _initTts() async {
+    try {
+      await _tts.setLanguage('en-US');
+      await _tts.setSpeechRate(0.5);
+      await _tts.setVolume(1.0);
+      await _tts.setPitch(1.2);
+
+      final voices = await _tts.getVoices;
+      if (voices != null) {
+        for (final v in voices) {
+          final name = (v['name'] ?? '').toString().toLowerCase();
+          if (name.contains('female') ||
+              name.contains('samantha') ||
+              name.contains('victoria') ||
+              name.contains('karen') ||
+              name.contains('zira') ||
+              name.contains('google us english')) {
+            await _tts.setVoice({
+              'name': v['name'].toString(),
+              'locale': v['locale'].toString(),
+            });
+            print('🔊 TTS voice: ${v['name']}');
+            break;
+          }
+        }
+      }
+      _ttsReady = true;
+      print('✅ TTS initialized');
+    } catch (e) {
+      print('⚠️ TTS init failed: $e');
+      _ttsReady = false;
+    }
+  }
+
+  Future<void> _speak(String text, {bool force = false}) async {
+    if (!_ttsReady) return;
+    if (!force && text == _lastSpokenMessage) {
+      if (DateTime.now().difference(_lastSpokenTime).inSeconds < 3) return;
+    }
+    _lastSpokenMessage = text;
+    _lastSpokenTime = DateTime.now();
+    try {
+      await _tts.stop();
+      await _tts.speak(text);
+    } catch (e) {
+      print('⚠️ TTS speak failed: $e');
+    }
   }
 
   Future<void> _initialize() async {
@@ -46,13 +112,16 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
     setState(() {});
 
     if (_isConnected) {
+      await AlphabetDetectionService.preloadModel(widget.alphabet);
       await _initializeCamera();
     } else {
       setState(() {
         _result = DetectionResult.error(
-          'Server not connected!\nMake sure Python server is running.',
+          'Server not connected!\nCheck Wi-Fi and server IP.',
         );
       });
+      _speak('Server is offline. Please check Wi-Fi and server IP.',
+          force: true);
     }
   }
 
@@ -68,6 +137,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
         frontCamera,
         ResolutionPreset.medium,
         enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.yuv420,
       );
 
       await _controller!.initialize();
@@ -95,7 +165,6 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
         final vPlane = image.planes[2];
 
         int rgbIndex = 0;
-
         for (int y = 0; y < height; y++) {
           for (int x = 0; x < width; x++) {
             final yValue = yPlane.bytes[y * yPlane.bytesPerRow + x] & 0xFF;
@@ -124,10 +193,10 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
           numChannels: 3,
         );
 
-        final jpegBytes = img.encodeJpg(imgImage);
+        final resized = img.copyResize(imgImage, width: 480);
+        final jpegBytes = img.encodeJpg(resized, quality: 60);
         return Uint8List.fromList(jpegBytes);
       }
-
       return null;
     } catch (e) {
       print('❌ Conversion error: $e');
@@ -135,17 +204,48 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
     }
   }
 
+  List<double> _generateDebugLandmarks() {
+    final lm = <double>[];
+    for (int i = 0; i < 21; i++) {
+      lm.add((0.3 + 0.4 * (i / 20.0)).clamp(0.0, 1.0));
+      lm.add((0.3 + 0.4 * (i / 20.0)).clamp(0.0, 1.0));
+    }
+    return lm;
+  }
+
   void _processCameraImage(CameraImage image) {
     if (_isProcessing || !_isConnected) return;
+
+    final now = DateTime.now();
+    if (_lastFrameTime != null &&
+        now.difference(_lastFrameTime!).inMilliseconds < 250) {
+      return;
+    }
+    _lastFrameTime = now;
     _isProcessing = true;
 
     _frameCount++;
-    final now = DateTime.now();
     if (now.difference(_lastFpsUpdate) > const Duration(seconds: 1)) {
       _fps = _frameCount.toDouble();
       _frameCount = 0;
       _lastFpsUpdate = now;
       if (mounted) setState(() {});
+    }
+
+    if (_debugMode == 1) {
+      final dummy = _generateDebugLandmarks();
+      setState(() {
+        _result = DetectionResult(
+          hasHand: true,
+          isAlphabet: true,
+          confidence: 0.9,
+          landmarks: dummy,
+          message: 'Debug mode',
+        );
+        _landmarks = dummy;
+      });
+      _isProcessing = false;
+      return;
     }
 
     _convertCameraImageToBytes(image).then((jpegBytes) async {
@@ -160,6 +260,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
               _result = result;
               _landmarks = result.landmarks;
             });
+            _handleVoiceFeedback(result);
           }
         } catch (e) {
           print('❌ Detection error: $e');
@@ -171,10 +272,19 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
     });
   }
 
-  Widget _buildLandmarkOverlay() {
-    if (_landmarks.isEmpty || !_result.hasHand) {
-      return Container();
+  void _handleVoiceFeedback(DetectionResult result) {
+    if (!result.hasHand) {
+      _speak('Please show your hand to the camera.');
+    } else if (result.isAlphabet) {
+      _speak('Correct! It is ${widget.displayName}.');
+    } else {
+      _speak('This is not ${widget.displayName}. Please do the correct sign.');
     }
+  }
+
+  Widget _buildLandmarkOverlay() {
+    if (_landmarks.length < 42) return Container();
+    if (!_result.hasHand && _debugMode == 0) return Container();
 
     return CustomPaint(
       painter: HandLandmarkPainter(
@@ -189,6 +299,7 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
 
   @override
   void dispose() {
+    _tts.stop();
     _controller?.stopImageStream();
     _controller?.dispose();
     super.dispose();
@@ -197,158 +308,346 @@ class _AlphabetDetectionPageState extends State<AlphabetDetectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              widget.arabic,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 10),
-            Text(widget.displayName),
-          ],
-        ),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-        actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: _isConnected ? Colors.green : Colors.red,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _isConnected ? Icons.cloud_done : Icons.cloud_off,
-                  color: Colors.white,
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  _isConnected ? 'Server' : 'Offline',
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
-                ),
-              ],
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [color1, color2],
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          if (_controller != null && _controller!.value.isInitialized)
-            CameraPreview(_controller!),
-
-          _buildLandmarkOverlay(),
-
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(16),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ============================
+              // TOP BAR (matches HomeScreen style)
+              // ============================
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back,
+                            color: marineBlue, size: 22),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Arabic letter badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            marineBlue.withValues(alpha: 0.9),
+                            lightBlue,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: marineBlue.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        widget.arabic,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        widget.displayName,
+                        style: const TextStyle(
+                          color: marineBlue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Debug toggle
+                    Container(
+                      decoration: BoxDecoration(
+                        color: marineBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.bug_report,
+                          color: _debugMode == 1 ? Colors.orange : marineBlue,
+                          size: 22,
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                            minWidth: 40, minHeight: 40),
+                        tooltip: _debugMode == 0
+                            ? 'Enable dummy landmarks'
+                            : 'Disable dummy',
+                        onPressed: () {
+                          setState(() {
+                            _debugMode = _debugMode == 0 ? 1 : 0;
+                            if (_debugMode == 0) {
+                              _landmarks = [];
+                              _result = DetectionResult.error('Waiting...');
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+
+              // ============================
+              // SERVER STATUS BADGE
+              // ============================
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _isConnected
+                        ? Colors.green.withValues(alpha: 0.15)
+                        : Colors.red.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _result.hasHand
-                            ? (_result.isAlphabet
-                                ? Icons.check_circle
-                                : Icons.cancel)
-                            : Icons.handshake,
-                        color: _result.hasHand
-                            ? (_result.isAlphabet ? Colors.green : Colors.red)
-                            : Colors.grey,
-                        size: 28,
+                        _isConnected ? Icons.cloud_done : Icons.cloud_off,
+                        color: _isConnected ? Colors.green : Colors.red,
+                        size: 16,
                       ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text(
-                          _result.label,
-                          style: TextStyle(
-                            color: _result.hasHand
-                                ? (_result.isAlphabet
-                                    ? Colors.green
-                                    : Colors.red)
-                                : Colors.grey,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                      const SizedBox(width: 6),
                       Text(
-                        '⚡ ${_fps.toStringAsFixed(0)} FPS',
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 12),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '📍 ${_landmarks.length ~/ 2} pts',
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 12),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '🎯 ${(_result.confidence * 100).toStringAsFixed(0)}%',
+                        _isConnected
+                            ? 'Server Connected'
+                            : 'Server Offline',
                         style: TextStyle(
-                          color:
-                              _result.hasHand ? Colors.green : Colors.grey,
+                          color: _isConnected ? Colors.green : Colors.red,
                           fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 30,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                !_isConnected
-                    ? '❌ Server offline — check Python server'
-                    : _result.hasHand
-                        ? (_result.isAlphabet
-                            ? '✅ Correct! You are showing ${widget.displayName}'
-                            : '❌ This is not ${widget.displayName}')
-                        : '👋 Show your hand to camera',
-                style: TextStyle(
-                  color: !_isConnected
-                      ? Colors.red
-                      : _result.hasHand
-                          ? (_result.isAlphabet ? Colors.green : Colors.red)
-                          : Colors.grey,
-                  fontSize: 12,
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
+
+              const SizedBox(height: 12),
+
+              // ============================
+              // CAMERA PREVIEW + OVERLAY
+              // ============================
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: marineBlue.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: marineBlue.withValues(alpha: 0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        children: [
+                          if (_controller != null &&
+                              _controller!.value.isInitialized)
+                            SizedBox.expand(
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: SizedBox(
+                                  width: _controller!.value.previewSize!
+                                      .height,
+                                  height: _controller!.value.previewSize!
+                                      .width,
+                                  child: CameraPreview(_controller!),
+                                ),
+                              ),
+                            )
+                          else
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    _isConnected
+                                        ? 'Starting camera...'
+                                        : 'Server offline',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          _buildLandmarkOverlay(),
+
+                          // Top status overlay
+                          Positioned(
+                            top: 12,
+                            left: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? Icons.check_circle
+                                            : Icons.cancel)
+                                        : Icons.handshake,
+                                    color: _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? Colors.green
+                                            : Colors.red)
+                                        : Colors.grey,
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      _result.label,
+                                      style: TextStyle(
+                                        color: _result.hasHand
+                                            ? (_result.isAlphabet
+                                                ? Colors.green
+                                                : Colors.red)
+                                            : Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_fps.toStringAsFixed(0)} FPS',
+                                    style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // Bottom hint overlay
+                          Positioned(
+                            bottom: 12,
+                            left: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.7),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Text(
+                                !_isConnected
+                                    ? '❌ Server offline — check Wi-Fi and server IP'
+                                    : _result.hasHand
+                                        ? (_result.isAlphabet
+                                            ? '✅ Correct! You are showing ${widget.displayName}'
+                                            : '❌ This is not ${widget.displayName}')
+                                        : '👋 Show your hand to camera',
+                                style: TextStyle(
+                                  color: !_isConnected
+                                      ? Colors.red
+                                      : _result.hasHand
+                                          ? (_result.isAlphabet
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.white70,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // ============================
+              // DEBUG INFO (compact)
+              // ============================
+              if (_debugMode == 1)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange, width: 1),
+                    ),
+                    child: Text(
+                      'DEBUG  |  hasHand=${_result.hasHand}  |  '
+                      'landmarks=${_landmarks.length}  |  '
+                      'conf=${(_result.confidence * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -392,7 +691,7 @@ class HandLandmarkPainter extends CustomPainter {
     ];
 
     final linePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.7)
+      ..color = Colors.yellow.withValues(alpha: 0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -417,7 +716,6 @@ class HandLandmarkPainter extends CustomPainter {
 
     double minX = double.infinity, minY = double.infinity;
     double maxX = -double.infinity, maxY = -double.infinity;
-
     for (var p in points) {
       if (p.dx < minX) minX = p.dx;
       if (p.dy < minY) minY = p.dy;
@@ -433,48 +731,16 @@ class HandLandmarkPainter extends CustomPainter {
 
     final rect = Rect.fromLTRB(minX, minY, maxX, maxY);
 
-    final glowPaint = Paint()
-      ..color = color.withOpacity(0.15)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 20
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
-    canvas.drawRect(rect, glowPaint);
-
     final borderPaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(rect, borderPaint);
 
-    const cornerSize = 15.0;
-    final cornerPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
-    canvas.drawLine(
-        Offset(minX, minY + cornerSize), Offset(minX, minY), cornerPaint);
-    canvas.drawLine(
-        Offset(minX, minY), Offset(minX + cornerSize, minY), cornerPaint);
-    canvas.drawLine(
-        Offset(maxX, minY + cornerSize), Offset(maxX, minY), cornerPaint);
-    canvas.drawLine(
-        Offset(maxX, minY), Offset(maxX - cornerSize, minY), cornerPaint);
-    canvas.drawLine(
-        Offset(minX, maxY - cornerSize), Offset(minX, maxY), cornerPaint);
-    canvas.drawLine(
-        Offset(minX, maxY), Offset(minX + cornerSize, maxY), cornerPaint);
-    canvas.drawLine(
-        Offset(maxX, maxY - cornerSize), Offset(maxX, maxY), cornerPaint);
-    canvas.drawLine(
-        Offset(maxX, maxY), Offset(maxX - cornerSize, maxY), cornerPaint);
-
     final label = isAlphabet ? 'MATCH!' : 'Not Match';
     final labelColor = isAlphabet ? Colors.green : Colors.red;
 
-    final labelPaint = Paint()
-      ..color = Colors.black.withOpacity(0.7)
-      ..style = PaintingStyle.fill;
+    final labelPaint = Paint()..color = Colors.black.withValues(alpha: 0.7);
 
     final labelRect = Rect.fromLTWH(minX + 10, minY - 28, 90, 22);
     canvas.drawRRect(
@@ -482,14 +748,15 @@ class HandLandmarkPainter extends CustomPainter {
       labelPaint,
     );
 
-    final textStyle = TextStyle(
-      color: labelColor,
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-    );
-    final textSpan = TextSpan(text: label, style: textStyle);
     final textPainter = TextPainter(
-      text: textSpan,
+      text: TextSpan(
+        text: label,
+        style: TextStyle(
+          color: labelColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();

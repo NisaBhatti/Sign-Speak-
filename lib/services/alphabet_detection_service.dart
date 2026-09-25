@@ -3,18 +3,17 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class AlphabetDetectionService {
-  // ✅ Current laptop IP is FIRST (fastest detection)
-  // If IP changes again, just add the new one at the top.
+  // ============================================
+  // BOTH SERVERS — tried in this order
+  // 1. Local laptop (Wi-Fi) — used when developing
+  // 2. Railway cloud — used when laptop is off / phone is on mobile data
+  // ============================================
   static const List<String> POSSIBLE_HOSTS = [
-    'http://192.168.1.142:5000',   // ← current IP
-    'http://192.168.100.7:5000',   // previous
-    'http://192.168.1.62:5000',    // older
-    'http://192.168.0.100:5000',
-    'http://10.0.0.100:5000',
+    'http://10.200.7.224:5000',              // Local laptop (Wi-Fi)
+    // 'https://signspeaks.nutrispherepk.site',  // Railway cloud
   ];
 
   static String? _activeBaseUrl;
-  static const int PORT = 5000;
 
   // ============================================
   // AUTO-DETECT REACHABLE SERVER
@@ -29,10 +28,10 @@ class AlphabetDetectionService {
         print('  Trying $host ...');
         final r = await http
             .get(Uri.parse('$host/ping'))
-            .timeout(const Duration(seconds: 2));
+            .timeout(const Duration(seconds: 5));
         if (r.statusCode == 200) {
           _activeBaseUrl = host;
-          print('✅ Found server at: $host');
+          print('✅ Using server: $host');
           return host;
         }
       } catch (_) {
@@ -40,19 +39,13 @@ class AlphabetDetectionService {
       }
     }
 
-    print('❌ No server found on any host');
+    print('❌ No server reachable');
     return null;
   }
 
-  /// Force reset (e.g., after IP change)
-  static void resetServer() {
-    _activeBaseUrl = null;
-  }
+  static void resetServer() => _activeBaseUrl = null;
 
   static String get _base => _activeBaseUrl ?? POSSIBLE_HOSTS[0];
-  static String get DETECT_URL => '$_base/detect';
-  static String get PING_URL => '$_base/ping';
-  static String get MODELS_URL => '$_base/models';
 
   // ============================================
   // PING SERVER
@@ -63,16 +56,46 @@ class AlphabetDetectionService {
         await findServer();
       }
       if (_activeBaseUrl == null) {
-        return {'connected': false, 'error': 'Server not found'};
+        return {'connected': false, 'error': 'No server found'};
       }
 
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final url = '$_base/ping?t=$cacheBuster';
+      print('🔌 PING: $url');
+
       final response = await http
-          .get(Uri.parse(PING_URL))
-          .timeout(const Duration(seconds: 3));
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 30));
+
+      print('🔌 PING: ${response.statusCode}');
       return {'connected': response.statusCode == 200};
     } catch (e) {
-      print('❌ Ping error: $e');
+      print('❌ PING error: $e');
       return {'connected': false, 'error': e.toString()};
+    }
+  }
+
+  // ============================================
+  // PRELOAD MODEL
+  // ============================================
+  static Future<void> preloadModel(String alphabet) async {
+    try {
+      if (_activeBaseUrl == null) {
+        await findServer();
+      }
+      if (_activeBaseUrl == null) return;
+
+      final cacheBuster = DateTime.now().millisecondsSinceEpoch;
+      final url = '$_base/warmup/$alphabet?t=$cacheBuster';
+      print('🔥 Preloading $alphabet');
+
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 30));
+
+      print('🔥 Preload: ${response.statusCode} — ${response.body}');
+    } catch (e) {
+      print('⚠️ Preload failed: $e');
     }
   }
 
@@ -88,14 +111,15 @@ class AlphabetDetectionService {
         await findServer();
       }
       if (_activeBaseUrl == null) {
-        return DetectionResult.error('Server not found');
+        return DetectionResult.error('No server reachable');
       }
 
       final base64Image = base64Encode(imageBytes);
+      print('🎯 POST detect alphabet=$alphabet bytes=${imageBytes.length}');
 
       final response = await http
           .post(
-            Uri.parse(DETECT_URL),
+            Uri.parse('$_base/detect'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'image': base64Image,
@@ -103,42 +127,26 @@ class AlphabetDetectionService {
             }),
           )
           .timeout(
-            const Duration(seconds: 3),
+            const Duration(seconds: 30),
             onTimeout: () => throw Exception('Timeout'),
           );
 
+      print('🎯 Response: ${response.statusCode}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final lmCount = (data['landmarks'] as List?)?.length ?? 0;
+        print('🎯 hasHand=${data['hasHand']} '
+            'isAlphabet=${data['isAlphabet']} '
+            'landmarks=$lmCount '
+            'msg=${data['message']}');
         return DetectionResult.fromJson(data);
-      } else {
-        return DetectionResult.error('Server error: ${response.statusCode}');
       }
+      return DetectionResult.error('Server ${response.statusCode}');
     } catch (e) {
-      return DetectionResult.error('Connection error: $e');
+      print('❌ DETECT error: $e');
+      return DetectionResult.error('$e');
     }
-  }
-}
-
-// ============================================
-// ALPHABET MODEL
-// ============================================
-class AlphabetModel {
-  final String name;
-  final String display;
-  final String arabic;
-
-  AlphabetModel({
-    required this.name,
-    required this.display,
-    required this.arabic,
-  });
-
-  factory AlphabetModel.fromJson(Map<String, dynamic> json) {
-    return AlphabetModel(
-      name: json['name'] ?? '',
-      display: json['display'] ?? '',
-      arabic: json['arabic'] ?? '',
-    );
   }
 }
 
